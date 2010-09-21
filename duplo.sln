@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Duplo", "Duplo.vcxproj", "{157BC9C0-3E8D-4929-A477-FAA2058DECDE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{157BC9C0-3E8D-4929-A477-FAA2058DECDE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{157BC9C0-3E8D-4929-A477-FAA2058DECDE}.Debug|Win32.Build.0 = Debug|Win32
+		{157BC9C0-3E8D-4929-A477-FAA2058DECDE}.Release|Win32.ActiveCfg = Release|Win32
+		{157BC9C0-3E8D-4929-A477-FAA2058DECDE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
