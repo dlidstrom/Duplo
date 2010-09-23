@@ -1,4 +1,4 @@
-Duplo (C/C++/Java Duplicate Source Code Block Finder)
+# Duplo (C/C++/Java Duplicate Source Code Block Finder)
 
 # GENERAL INFORMATION
 
@@ -6,7 +6,7 @@ Duplicated source code blocks can harm maintainability of software systems.
 Duplo is a tool to find duplicated code blocks in large C, C++, Java, C# and 
 VB.Net systems.
 
-Sample output snippet
+Sample output snippet:
     ...
     src\engine\geometry\simple\TorusGeometry.cpp(56)
     src\engine\geometry\simple\SphereGeometry.cpp(54)
@@ -35,12 +35,15 @@ Please send Feedback and Bug Reports to: dlidstrom@gmail.com
 Generate a list of all files of a directory with:
 
 - Windows
+
     dir /s /b /a-d *.cpp *.h > files.lst
 
 - UNIX
+
     find -name "*.cpp" > cppList.lst
     find -name "*.h" > includeList.lst
     cat cppList.lst includeList.lst > all.lst
+	
 ---
 
 # PERFORMANCE MEASUREMENTS
@@ -50,6 +53,7 @@ Generate a list of all files of a directory with:
     Quake2                    266   102740  58sec   3.4GHZ P4
     Computer Game            5639   754320  34min   3.4GHZ P4
     Linux Kernel 2.6.11.10  17034  4184356  16h     3.4GHZ P4
+
 ---
 
 # BACKGROUND
@@ -75,6 +79,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Duplo; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
 ---
 
 2005, Christian M. Ammann (cammann@giants.ch)
