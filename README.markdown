@@ -34,16 +34,16 @@ Please send Feedback and Bug Reports to: dlidstrom@gmail.com
 
 Generate a list of all files of a directory with:
 
-- Windows
+### Windows
 
     dir /s /b /a-d *.cpp *.h > files.lst
 
-- UNIX
+### UNIX
 
     find -name "*.cpp" > cppList.lst
     find -name "*.h" > includeList.lst
     cat cppList.lst includeList.lst > all.lst
-	
+
 ---
 
 # PERFORMANCE MEASUREMENTS
@@ -82,5 +82,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 ---
 
-2005, Christian M. Ammann (cammann@giants.ch)
-2010, Daniel Lidstrom     (dlidstrom@gmail.com)
+- 2005, Christian M. Ammann (cammann@giants.ch)
+- 2010, Daniel Lidstrom     (dlidstrom@gmail.com)
