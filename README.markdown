@@ -7,6 +7,7 @@ Duplo is a tool to find duplicated code blocks in large C, C++, Java, C# and
 VB.Net systems.
 
 Sample output snippet:
+
     ...
     src\engine\geometry\simple\TorusGeometry.cpp(56)
     src\engine\geometry\simple\SphereGeometry.cpp(54)
