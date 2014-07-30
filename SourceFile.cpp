@@ -178,6 +178,14 @@ SourceLine* SourceFile::getLine(const int index){
 	return m_sourceLines[index];
 }
 
-const std::string& SourceFile::getFilename(){
+const std::string& SourceFile::getFilename() const {
 	return m_fileName;
+}
+
+bool SourceFile::operator==(const SourceFile &other) const {
+    return (this == &other) || (getFilename() == other.getFilename());
+}
+
+bool SourceFile::operator!=(const SourceFile &other) const {
+    return !(*this == other);
 }
