@@ -118,45 +118,56 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
                 seqLen++;
             } else {
                 if(seqLen >= m_minBlockSize){
-                    reportSeq(y+x-seqLen, x-seqLen, seqLen, pSource1, pSource2, outFile);
-                    blocks++;
+                    int line1 = y+x-seqLen;
+                    int line2 = x-seqLen;
+                    if (!((line1 == line2) && (pSource1 == pSource2))) {
+                        reportSeq(line1, line2, seqLen, pSource1, pSource2, outFile);
+                        blocks++;
+                    }
                 }
                 seqLen=0;
             }
         }
 
         if(seqLen >= m_minBlockSize){
-            reportSeq(m-seqLen, n-seqLen, seqLen, pSource1, pSource2, outFile);
-            blocks++;
+            int line1 = m-seqLen;
+            int line2 = n-seqLen;
+            if (!((line1 == line2) && (pSource1 == pSource2))) {
+                reportSeq(line1, line2, seqLen, pSource1, pSource2, outFile);
+                blocks++;
+            }
         }
     }
 
-    // Scan horizontal part
-    for(int x=1; x<n; x++){
-        unsigned int seqLen=0;
-        int maxY = MIN(m, n-x);
-        for(int y=0; y<maxY; y++){
-            if(m_pMatrix[x+y+n*y] == MATCH){
-                seqLen++;
-            } else {
-                if(seqLen >= m_minBlockSize){
-                    reportSeq(y-seqLen, x+y-seqLen, seqLen, pSource1, pSource2, outFile);
-                    blocks++;
+    if (pSource1 != pSource2)
+    {
+        // Scan horizontal part
+        for(int x=1; x<n; x++){
+            unsigned int seqLen=0;
+            int maxY = MIN(m, n-x);
+            for(int y=0; y<maxY; y++){
+                if(m_pMatrix[x+y+n*y] == MATCH){
+                    seqLen++;
+                } else {
+                    if(seqLen >= m_minBlockSize){
+                        reportSeq(y-seqLen, x+y-seqLen, seqLen, pSource1, pSource2, outFile);
+                        blocks++;
+                    }
+                    seqLen=0;
                 }
-                seqLen=0;
             }
-        }
 
-        if(seqLen >= m_minBlockSize){
-            reportSeq(m-seqLen, n-seqLen, seqLen, pSource1, pSource2, outFile);
-            blocks++;
+            if(seqLen >= m_minBlockSize){
+                reportSeq(m-seqLen, n-seqLen, seqLen, pSource1, pSource2, outFile);
+                blocks++;
+            }
         }
     }
 
 	return blocks;
 }
 
-const std::string Duplo::getFilenamePart(const std::string& fullpath){
+const std::string Duplo::getFilenamePart(const std::string& fullpath) const {
     std::string path = StringUtil::substitute('\\', '/', fullpath);
 
     std::string filename = path;
@@ -169,7 +180,7 @@ const std::string Duplo::getFilenamePart(const std::string& fullpath){
     return filename;
 }
 
-bool Duplo::isSameFilename(const std::string& filename1, const std::string& filename2){
+bool Duplo::isSameFilename(const std::string& filename1, const std::string& filename2) const {
     return (getFilenamePart(filename1) == getFilenamePart(filename2) && m_ignoreSameFilename);
 }
 
@@ -239,7 +250,7 @@ void Duplo::run(std::string outputFileName){
 		int blocks = 0;
 		
 		for(int j=0;j<(int)sourceFiles.size();j++){
-			if(i > j && !isSameFilename(sourceFiles[i]->getFilename(), sourceFiles[j]->getFilename())){
+			if(i >= j) { 
 				blocks+=process(sourceFiles[i], sourceFiles[j], outfile);
 			}
 		}
@@ -292,7 +303,7 @@ void Duplo::run(std::string outputFileName){
  * @param argc  number of arguments
  * @param argv  arguments
  */
-int main(int argc, char* argv[]){
+int main(int argc, const char* argv[]){
 	ArgumentParser ap(argc, argv);
 
 	const int MIN_BLOCK_SIZE = 4;

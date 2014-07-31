@@ -25,15 +25,15 @@
 class ArgumentParser{
 private:
 	int argc;
-	char **argv;
+	const char **argv;
 
 public:
-	ArgumentParser(int m_argc, char* m_argv[]);
+	ArgumentParser(int m_argc, const char* m_argv[]);
 
-	bool is(char *s);
-	char *getStr(char *s, char *defaultValue="");
-	int getInt(char *s, int defaultValue);
-	float getFloat(char *s, float defaultValue);
+	bool is(const char *s);
+	const char *getStr(const char *s, const char *defaultValue="");
+	int getInt(const char *s, int defaultValue);
+	float getFloat(const char *s, float defaultValue);
 };
 
 #endif
