@@ -2,7 +2,7 @@
 CC = g++
 
 # Flags
-CXXFLAGS = -O3
+CXXFLAGS = -O3 -Wall
 LDFLAGS =  ${CXXFLAGS}
 
 # Define what extensions we use
