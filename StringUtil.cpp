@@ -25,7 +25,7 @@
  * @return returns trimmed string
  */
 std::string StringUtil::trim(const std::string& input){
-	// If string is empty, there is nothing to look for.
+    // If string is empty, there is nothing to look for.
     if(input.length()==0){
         return "";
     }
@@ -36,22 +36,22 @@ std::string StringUtil::trim(const std::string& input){
     // Remove spaces at beginning
     int i=0;
     while(i<(int)input.length() && input[i] <= ' '){
-	    i++;
+        i++;
     }
 
     // String full of spaces, return nothing.
     if(i >= (int)input.length()){
-	    return "";
+        return "";
     }
 
     if(i>0){
-	    final = input.substr(i, input.length()-i);
+        final = input.substr(i, input.length()-i);
     }
 
     // Remove spaces at end
     i = (int)final.length()-1;
     while(i>=0 && final[i] <= ' '){
-	    i--;
+        i--;
     }
 
     final = final.substr(0, i+1);
@@ -76,7 +76,7 @@ int StringUtil::split(const std::string& input, const std::string& delimiter, st
 
     if(newPos < 0){
         if(doTrim){
-			results.push_back(trim(input));
+            results.push_back(trim(input));
         } else {
             results.push_back(input);
         }

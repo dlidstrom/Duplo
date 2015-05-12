@@ -45,8 +45,8 @@ protected:
 
     std::vector<SourceLine*> m_sourceLines;
 
-	bool isSourceLine(const std::string& line);
-	void getCleanLine(const std::string& line, std::string& cleanedLine);
+    bool isSourceLine(const std::string& line);
+    void getCleanLine(const std::string& line, std::string& cleanedLine);
 
 public:
     SourceFile(const std::string& fileName, const unsigned int minChars, const bool ignorePrepStuff);

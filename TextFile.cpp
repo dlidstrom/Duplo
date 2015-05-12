@@ -47,23 +47,23 @@ bool TextFile::readAll(std::string& all){
         delete buffer;
         all = os.str();
     } else {
-		std::cout << "Error: Can't open file: " <<  m_fileName <<  ". File doesn't exist or access denied.\n";
-		return false;
+        std::cout << "Error: Can't open file: " <<  m_fileName <<  ". File doesn't exist or access denied.\n";
+        return false;
     }
     return true;
 }
 
 bool TextFile::readLines(std::vector<std::string>& lines, bool doTrim){
 
-	std::string list;
-	if(readAll(list)){
-		StringUtil::substitute('\r', ' ', list);
-		StringUtil::substitute('\t', ' ', list);
-		StringUtil::split(list, "\n", lines, doTrim);
-	} else {
-		return false;	
-	}
-	return true;
+    std::string list;
+    if(readAll(list)){
+        StringUtil::substitute('\r', ' ', list);
+        StringUtil::substitute('\t', ' ', list);
+        StringUtil::split(list, "\n", lines, doTrim);
+    } else {
+        return false;
+    }
+    return true;
 }
 
 /** 
@@ -76,10 +76,9 @@ bool TextFile::writeAll(const std::string& all){
         outFile << all;
         outFile.close();
     } else {
-		std::cout << "Error: Can't open file: " <<  m_fileName <<  ". File doesn't exist or access denied.\n";
-		return false;
+        std::cout << "Error: Can't open file: " <<  m_fileName <<  ". File doesn't exist or access denied.\n";
+        return false;
     }
     
     return true;
 }
-
