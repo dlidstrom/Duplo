@@ -106,9 +106,9 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
     memset(m_pMatrix, NONE, m*n);
 
     // Compute matrix
-    for(int y=0; y<m; y++){
+    for(unsigned int y=0; y<m; y++){
         SourceLine* pSLine = pSource1->getLine(y);
-        for(int x=0; x<n; x++){
+        for(unsigned int x=0; x<n; x++){
             if(pSLine->equals(pSource2->getLine(x))){
                 m_pMatrix[x+n*y] = MATCH;
             }
@@ -128,7 +128,7 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
     int blocks=0;
 
     // Scan vertical part
-    for(int y=0; y<m; y++){
+    for(unsigned int y=0; y<m; y++){
         unsigned int seqLen=0;
         int maxX = MIN(n, m-y);
         for(int x=0; x<maxX; x++){
@@ -160,7 +160,7 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
     if (pSource1 != pSource2)
     {
         // Scan horizontal part
-        for(int x=1; x<n; x++){
+        for(unsigned int x=1; x<n; x++){
             unsigned int seqLen=0;
             int maxY = MIN(m, n-x);
             for(int y=0; y<maxY; y++){
