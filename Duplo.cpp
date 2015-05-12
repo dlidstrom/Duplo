@@ -19,6 +19,8 @@
 #include <fstream>
 #include <time.h>
 
+#include <algorithm>
+
 #include "SourceFile.h"
 #include "SourceLine.h"
 
@@ -27,15 +29,21 @@
 #include "TextFile.h"
 #include "ArgumentParser.h"
 
-Duplo::Duplo(const std::string& listFileName, unsigned int minBlockSize, unsigned int minChars, bool ignorePrepStuff, bool ignoreSameFilename, bool Xml) :
+Duplo::Duplo(
+    const std::string& listFileName, 
+    unsigned int minBlockSize, 
+    unsigned int blockPercentThreshold,
+    unsigned int minChars, 
+    bool ignorePrepStuff, bool ignoreSameFilename, bool Xml) :
     m_listFileName(listFileName),
     m_minBlockSize(minBlockSize),
+    m_blockPercentThreshold(blockPercentThreshold),
     m_minChars(minChars),
     m_ignorePrepStuff(ignorePrepStuff),
     m_ignoreSameFilename(ignoreSameFilename),
-    m_Xml(Xml),
     m_maxLinesPerFile(0),
     m_DuplicateLines(0),
+    m_Xml(Xml),
     m_pMatrix(NULL)
 {
 }
@@ -78,18 +86,18 @@ void Duplo::reportSeq(int line1, int line2, int count, SourceFile* pSource1, Sou
     else
     {
         outFile << pSource1->getFilename() << "(" << pSource1->getLine(line1)->getLineNumber() << ")" << std::endl;
-	    outFile << pSource2->getFilename() << "(" << pSource2->getLine(line2)->getLineNumber() << ")" << std::endl;
-	    for(int j=0;j<count;j++){
-		    outFile << pSource1->getLine(j+line1)->getLine() << std::endl;
-		    m_DuplicateLines++;
-	    }
-	    outFile << std::endl;
+        outFile << pSource2->getFilename() << "(" << pSource2->getLine(line2)->getLineNumber() << ")" << std::endl;
+        for(int j=0;j<count;j++){
+            outFile << pSource1->getLine(j+line1)->getLine() << std::endl;
+            m_DuplicateLines++;
+        }
+        outFile << std::endl;
     }
 }
 
 int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& outFile){
-	const int m = pSource1->getNumOfLines();
-	const int n = pSource2->getNumOfLines();
+    const unsigned int m = pSource1->getNumOfLines();
+    const unsigned int n = pSource2->getNumOfLines();
 
     const unsigned char NONE = 0;
     const unsigned char MATCH = 1;
@@ -98,8 +106,8 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
     memset(m_pMatrix, NONE, m*n);
 
     // Compute matrix
-	for(int y=0; y<m; y++){
-	    SourceLine* pSLine = pSource1->getLine(y);
+    for(int y=0; y<m; y++){
+        SourceLine* pSLine = pSource1->getLine(y);
         for(int x=0; x<n; x++){
             if(pSLine->equals(pSource2->getLine(x))){
                 m_pMatrix[x+n*y] = MATCH;
@@ -107,7 +115,17 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
         }
     }
 
-	int blocks=0;
+    // support reporting filtering by both:
+    // - "lines of code duplicated", &
+    // - "percentage of file duplicated"
+    const unsigned int lMinBlockSize = std::max(
+        1u, std::min(
+            m_minBlockSize, 
+            (std::max(n,m)*100)/m_blockPercentThreshold
+        )
+    );
+    
+    int blocks=0;
 
     // Scan vertical part
     for(int y=0; y<m; y++){
@@ -117,7 +135,7 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
             if(m_pMatrix[x+n*(y+x)] == MATCH){
                 seqLen++;
             } else {
-                if(seqLen >= m_minBlockSize){
+                if(seqLen >= lMinBlockSize){
                     int line1 = y+x-seqLen;
                     int line2 = x-seqLen;
                     if (!((line1 == line2) && (pSource1 == pSource2))) {
@@ -129,7 +147,7 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
             }
         }
 
-        if(seqLen >= m_minBlockSize){
+        if(seqLen >= lMinBlockSize){
             int line1 = m-seqLen;
             int line2 = n-seqLen;
             if (!((line1 == line2) && (pSource1 == pSource2))) {
@@ -149,7 +167,7 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
                 if(m_pMatrix[x+y+n*y] == MATCH){
                     seqLen++;
                 } else {
-                    if(seqLen >= m_minBlockSize){
+                    if(seqLen >= lMinBlockSize){
                         reportSeq(y-seqLen, x+y-seqLen, seqLen, pSource1, pSource2, outFile);
                         blocks++;
                     }
@@ -157,14 +175,14 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
                 }
             }
 
-            if(seqLen >= m_minBlockSize){
+            if(seqLen >= lMinBlockSize){
                 reportSeq(m-seqLen, n-seqLen, seqLen, pSource1, pSource2, outFile);
                 blocks++;
             }
         }
     }
 
-	return blocks;
+    return blocks;
 }
 
 const std::string Duplo::getFilenamePart(const std::string& fullpath) const {
@@ -208,22 +226,22 @@ void Duplo::run(std::string outputFileName){
 
     start = clock();
 
-	std::cout << "Loading and hashing files ... ";
-	std::cout.flush();
+    std::cout << "Loading and hashing files ... ";
+    std::cout.flush();
 
-	std::vector<SourceFile*> sourceFiles;
-	
-	TextFile listOfFiles(m_listFileName.c_str());
-	std::vector<std::string> lines;
-	listOfFiles.readLines(lines, true);
-	
+    std::vector<SourceFile*> sourceFiles;
+    
+    TextFile listOfFiles(m_listFileName.c_str());
+    std::vector<std::string> lines;
+    listOfFiles.readLines(lines, true);
+    
     int files = 0;
     int locsTotal = 0;
 
-	// Create vector with all source files
-	for(int i=0;i<(int)lines.size();i++){
-		if(lines[i].size() > 5){
-			SourceFile* pSourceFile = new SourceFile(lines[i], m_minChars, m_ignorePrepStuff);
+    // Create vector with all source files
+    for(int i=0;i<(int)lines.size();i++){
+        if(lines[i].size() > 5){
+            SourceFile* pSourceFile = new SourceFile(lines[i], m_minChars, m_ignorePrepStuff);
             int numLines = pSourceFile->getNumOfLines();
             if(numLines > 0){
                 files++;
@@ -233,10 +251,10 @@ void Duplo::run(std::string outputFileName){
                     m_maxLinesPerFile = numLines;
                 }
             }
-		}
-	}
+        }
+    }
 
-	std::cout << "done.\n\n";
+    std::cout << "done.\n\n";
 
     // Generate matrix large enough for all files
     m_pMatrix = new unsigned char[m_maxLinesPerFile*m_maxLinesPerFile];
@@ -244,26 +262,26 @@ void Duplo::run(std::string outputFileName){
 
     int blocksTotal = 0;
 
-	// Compare each file with each other
-	for(int i=0;i<(int)sourceFiles.size();i++){
-		std::cout << sourceFiles[i]->getFilename();
-		int blocks = 0;
-		
-		blocks+=process(sourceFiles[i], sourceFiles[i], outfile);
-		for(int j=i+1;j<(int)sourceFiles.size();j++){
-			if ((m_ignoreSameFilename && isSameFilename(sourceFiles[i]->getFilename(), sourceFiles[j]->getFilename()))==false){
-				blocks+=process(sourceFiles[i], sourceFiles[j], outfile);
-			}
-		}
-
-		if(blocks > 0){
-			std::cout << " found " << blocks << " block(s)" << std::endl;
-		} else {
-			std::cout << " nothing found" << std::endl;
-		}
+    // Compare each file with each other
+    for(int i=0;i<(int)sourceFiles.size();i++){
+        std::cout << sourceFiles[i]->getFilename();
+        int blocks = 0;
         
+        blocks+=process(sourceFiles[i], sourceFiles[i], outfile);
+        for(int j=i+1;j<(int)sourceFiles.size();j++){
+            if ((m_ignoreSameFilename && isSameFilename(sourceFiles[i]->getFilename(), sourceFiles[j]->getFilename()))==false){
+                blocks+=process(sourceFiles[i], sourceFiles[j], outfile);
+            }
+        }
+
+        if(blocks > 0){
+            std::cout << " found " << blocks << " block(s)" << std::endl;
+        } else {
+            std::cout << " nothing found" << std::endl;
+        }
+
         blocksTotal+=blocks;
-	}
+    }
 
 
     finish = clock();
@@ -298,6 +316,11 @@ void Duplo::run(std::string outputFileName){
     }
 }
 
+int Clamp (int upper, int lower, int value)
+{
+    return std::max( lower, std::min( upper, value ) );
+}
+
 /**
  * Main routine
  *
@@ -305,41 +328,50 @@ void Duplo::run(std::string outputFileName){
  * @param argv  arguments
  */
 int main(int argc, const char* argv[]){
-	ArgumentParser ap(argc, argv);
+    ArgumentParser ap(argc, argv);
 
-	const int MIN_BLOCK_SIZE = 4;
-	const int MIN_CHARS = 3;
+    const int MIN_BLOCK_SIZE = 4;
+    const int MIN_CHARS = 3;
 
-	if(!ap.is("--help") && argc > 2){
-        Duplo duplo(argv[argc-2], ap.getInt("-ml", MIN_BLOCK_SIZE), ap.getInt("-mc", MIN_CHARS), ap.is("-ip"), ap.is("-d"), ap.is("-xml"));
-		duplo.run(argv[argc-1]);
-	} else {
-		std::cout << "\nNAME\n";
-		std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";
+    if(!ap.is("--help") && argc > 2){
+        Duplo duplo(
+            argv[argc-2], 
+            ap.getInt("-ml", MIN_BLOCK_SIZE), 
+            Clamp( 100, 0, ap.getInt("-pt", 100) ),
+            ap.getInt("-mc", MIN_CHARS), 
+            ap.is("-ip"), ap.is("-d"), ap.is("-xml")
+        );
+        duplo.run(argv[argc-1]);
+    } else {
+        std::cout << "\nNAME\n";
+        std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";
 
-		std::cout << "\nSYNOPSIS\n";
-		std::cout << "       duplo [OPTIONS] [INTPUT_FILELIST] [OUTPUT_FILE]\n";
+        std::cout << "\nSYNOPSIS\n";
+        std::cout << "       duplo [OPTIONS] [INTPUT_FILELIST] [OUTPUT_FILE]\n";
 
-		std::cout << "\nDESCRIPTION\n";
-		std::cout << "       Duplo is a tool to find duplicated code blocks in large\n";
-		std::cout << "       C/C++/Java/C#/VB.Net software systems.\n\n";
+        std::cout << "\nDESCRIPTION\n";
+        std::cout << "       Duplo is a tool to find duplicated code blocks in large\n";
+        std::cout << "       C/C++/Java/C#/VB.Net software systems.\n\n";
 
         std::cout << "       -ml              minimal block size in lines (default is " << MIN_BLOCK_SIZE << ")\n";
-		std::cout << "       -mc              minimal characters in line (default is " << MIN_CHARS << ")\n";
-		std::cout << "                        lines with less characters are ignored\n";
-		std::cout << "       -ip              ignore preprocessor directives\n";
-		std::cout << "       -d               ignore file pairs with same name\n";
-		std::cout << "       -xml             output file in XML\n";
-		std::cout << "       INTPUT_FILELIST  input filelist\n";
-		std::cout << "       OUTPUT_FILE      output file\n";
+        std::cout << "       -pt              percentage of lines of duplication threshold to override -ml\n";
+        std::cout << "                        (default is 100%)\n";
+        std::cout << "                        useful for identifying whole file class duplication\n";
+        std::cout << "       -mc              minimal characters in line (default is " << MIN_CHARS << ")\n";
+        std::cout << "                        lines with less characters are ignored\n";
+        std::cout << "       -ip              ignore preprocessor directives\n";
+        std::cout << "       -d               ignore file pairs with same name\n";
+        std::cout << "       -xml             output file in XML\n";
+        std::cout << "       INTPUT_FILELIST  input filelist\n";
+        std::cout << "       OUTPUT_FILE      output file\n";
 
-		std::cout << "\nVERSION\n";
-		std::cout << "       " << VERSION << "\n";
+        std::cout << "\nVERSION\n";
+        std::cout << "       " << VERSION << "\n";
 
         std::cout << "\nAUTHORS\n";
-		std::cout << "       Christian M. Ammann (cammann@giants.ch)\n";	
-		std::cout << "       Trevor D'Arcy-Evans (tdarcyevans@hotmail.com)\n\n";	
-	}
+        std::cout << "       Christian M. Ammann (cammann@giants.ch)\n";    
+        std::cout << "       Trevor D'Arcy-Evans (tdarcyevans@hotmail.com)\n\n";    
+    }
 
     return 0;
 }
