@@ -275,9 +275,9 @@ void Duplo::run(std::string outputFileName){
         }
 
         if(blocks > 0){
-            std::cout << " found " << blocks << " block(s)" << std::endl;
+            std::cout << " found: " << blocks << " block(s)" << std::endl;
         } else {
-            std::cout << " nothing found" << std::endl;
+            std::cout << " nothing found." << std::endl;
         }
 
         blocksTotal+=blocks;
