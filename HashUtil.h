@@ -108,7 +108,7 @@ private:
     static void MD5_memset(unsigned char*, int, unsigned int);
 
 public:
-	static unsigned char* getMD5Sum(unsigned char* pData, int size);
+    static unsigned char* getMD5Sum(unsigned char* pData, int size);
 };
 
 #endif

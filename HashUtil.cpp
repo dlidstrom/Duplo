@@ -213,15 +213,15 @@ void HashUtil::MD5_memset(unsigned char* output, int value, unsigned int len){
 
 
 unsigned char* HashUtil::getMD5Sum(unsigned char* pData, int size){
-	MD5_CTX context;
-	
+    MD5_CTX context;
+    
     unsigned char* pDigest = new unsigned char[16];
 
-	MD5Init(&context);
-	MD5Update(&context, pData, size);
-	MD5Final(pDigest, &context);
+    MD5Init(&context);
+    MD5Update(&context, pData, size);
+    MD5Final(pDigest, &context);
 
-	return pDigest;	
+    return pDigest;    
 }
 
 
