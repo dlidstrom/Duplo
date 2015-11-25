@@ -20,6 +20,7 @@
 #include <time.h>
 
 #include <algorithm>
+#include <cstring>
 
 #include "SourceFile.h"
 #include "SourceLine.h"
