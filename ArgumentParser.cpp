@@ -56,6 +56,7 @@ int ArgumentParser::getInt(const char *s, int defaultValue){
     return defaultValue;
 }
 
+#ifdef _WIN32
 void ArgumentParser::winGlob( Duplo & duplo, const std::string & path ) const
 {
 	intptr_t handle;
@@ -70,7 +71,9 @@ void ArgumentParser::winGlob( Duplo & duplo, const std::string & path ) const
 	while ( _findnext(handle, &fileinfo) == 0 )
 		duplo.pushFileName(fileinfo.name);
 	_findclose( handle );
+
 }
+#endif
 
 void ArgumentParser::getFileNames( Duplo & duplo ) const {
     for ( int i = 1; i < argc - 1; i++ ) {

@@ -30,7 +30,9 @@ private:
     int argc;
     const char **argv;
 
-	void ArgumentParser::winGlob( Duplo & duplo, const std::string & path ) const;
+#ifdef _WIN32
+    void winGlob( Duplo & duplo, const std::string & path ) const;
+#endif
 
 public:
     ArgumentParser(int m_argc, const char* m_argv[]);
