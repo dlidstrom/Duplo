@@ -349,9 +349,12 @@ int main(int argc, const char* argv[]){
             ap.getInt("-mc", MIN_CHARS),
             ap.is("-ip"), ap.is("-d"), ap.is("-xml")
         );
-        if ( ap.is("-cll") )
-            ap.getFileNames( duplo );
-        duplo.run(argv[argc-1]);
+		if (ap.is("-cll")) {
+			ap.getFileNames(duplo);
+			duplo.run("duplo.out");
+		}
+		else
+			duplo.run(argv[argc - 1]);
     } else {
         std::cout << "\nNAME\n";
         std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";
@@ -383,6 +386,5 @@ int main(int argc, const char* argv[]){
         std::cout << "       Christian M. Ammann (cammann@giants.ch)\n";
         std::cout << "       Trevor D'Arcy-Evans (tdarcyevans@hotmail.com)\n\n";
     }
-
     return 0;
 }

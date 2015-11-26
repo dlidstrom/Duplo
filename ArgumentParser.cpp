@@ -19,6 +19,10 @@
 #include <cstdlib>
 #include <cstring>
 
+#ifdef _WIN32
+    #include <io.h>
+#endif
+
 ArgumentParser::ArgumentParser(int m_argc, const char* m_argv[]){
     argc = m_argc;
     argv = m_argv;
@@ -52,12 +56,36 @@ int ArgumentParser::getInt(const char *s, int defaultValue){
     return defaultValue;
 }
 
+void ArgumentParser::winGlob( Duplo & duplo, const std::string & path ) const
+{
+	intptr_t handle;
+	struct _finddata_t fileinfo;
+
+	handle = _findfirst(path.c_str(), &fileinfo);
+	if (handle == -1) {
+		std::cerr << "Error opening " << path << std::endl;
+		return ;
+	}
+	duplo.pushFileName( fileinfo.name );
+	while ( _findnext(handle, &fileinfo) == 0 )
+		duplo.pushFileName(fileinfo.name);
+	_findclose( handle );
+}
+
 void ArgumentParser::getFileNames( Duplo & duplo ) const {
     for ( int i = 1; i < argc - 1; i++ ) {
-        std::ifstream f( argv[i] );
-        if ( f.good() )
-            duplo.pushFileName( argv[i] );
-        f.close();
+		if (argv[i][0] != '-') {
+#ifdef _WIN32
+			if (std::string(argv[i]).find("*") != std::string::npos) {
+				winGlob(duplo, argv[i]);
+				continue;
+			}
+#endif
+			std::ifstream f(argv[i]);
+			if (f.good())
+				duplo.pushFileName(argv[i]);
+			f.close();
+		}
     }
 }
 
