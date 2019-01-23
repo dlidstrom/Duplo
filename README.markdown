@@ -41,8 +41,8 @@ Generate a list of all files of a directory with:
 
 ### UNIX
 
-    find -name "*.cpp" > cppList.lst
-    find -name "*.h" > includeList.lst
+    find . -name "*.cpp" > cppList.lst
+    find . -name "*.h" > includeList.lst
     cat cppList.lst includeList.lst > all.lst
 
 # PERFORMANCE MEASUREMENTS
