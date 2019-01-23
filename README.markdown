@@ -1,9 +1,20 @@
 # Duplo (C/C++/Java Duplicate Source Code Block Finder)
 
-# GENERAL INFORMATION
+- [Duplo (C/C++/Java Duplicate Source Code Block Finder)](#duplo-ccjava-duplicate-source-code-block-finder)
+  - [GENERAL INFORMATION](#general-information)
+  - [OPTIONS](#options)
+  - [FEEDBACK AND BUG REPORTING](#feedback-and-bug-reporting)
+  - [FILE LIST GENERATION](#file-list-generation)
+    - [Windows](#windows)
+    - [UNIX](#unix)
+  - [PERFORMANCE MEASUREMENTS](#performance-measurements)
+  - [BACKGROUND](#background)
+  - [LICENSE](#license)
+
+## GENERAL INFORMATION
 
 Duplicated source code blocks can harm maintainability of software systems.
-Duplo is a tool to find duplicated code blocks in large C, C++, Java, C# and 
+Duplo is a tool to find duplicated code blocks in large C, C++, Java, C# and
 VB.Net systems.
 
 Sample output snippet:
@@ -11,10 +22,10 @@ Sample output snippet:
     ...
     src\engine\geometry\simple\TorusGeometry.cpp(56)
     src\engine\geometry\simple\SphereGeometry.cpp(54)
-	    pBuffer[currentIndex*size+3]=(i+1)/(float)subdsU;
-	    pBuffer[currentIndex*size+4]=j/(float)subdsV;
-	    currentIndex++;
-	    pPrimitiveBuffer->unlock();
+        pBuffer[currentIndex*size+3]=(i+1)/(float)subdsU;
+        pBuffer[currentIndex*size+4]=j/(float)subdsV;
+        currentIndex++;
+        pPrimitiveBuffer->unlock();
 
     src\engine\geometry\subds\SubDsGeometry.cpp(37)
     src\engine\geometry\SkinnedMeshGeometry.cpp(45)
@@ -45,7 +56,7 @@ Generate a list of all files of a directory with:
     find . -name "*.h" > includeList.lst
     cat cppList.lst includeList.lst > all.lst
 
-# PERFORMANCE MEASUREMENTS
+## PERFORMANCE MEASUREMENTS
 
     SYSTEM                  FILES     LOCs   TIME   HARDWARE
     3D Game Engine            275    12211   4sec   3.4GHZ P4
@@ -53,13 +64,13 @@ Generate a list of all files of a directory with:
     Computer Game            5639   754320  34min   3.4GHZ P4
     Linux Kernel 2.6.11.10  17034  4184356  16h     3.4GHZ P4
 
-# BACKGROUND
+## BACKGROUND
 
 Duplo uses the same techniques as Duploc to detect duplicated code blocks. See
 [Duca99bCodeDuplication](http://www.iam.unibe.ch/~scg/Archive/Papers/Duca99bCodeDuplication.pdf) for
 further information.
 
-# LICENSE
+## LICENSE
 
 Duplo is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
