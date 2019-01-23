@@ -3,12 +3,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -31,10 +31,10 @@
 #include "ArgumentParser.h"
 
 Duplo::Duplo(
-    const std::string& listFileName, 
-    unsigned int minBlockSize, 
+    const std::string& listFileName,
+    unsigned int minBlockSize,
     unsigned int blockPercentThreshold,
-    unsigned int minChars, 
+    unsigned int minChars,
     bool ignorePrepStuff, bool ignoreSameFilename, bool Xml) :
     m_listFileName(listFileName),
     m_minBlockSize(minBlockSize),
@@ -120,12 +120,12 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
     // - "lines of code duplicated", &
     // - "percentage of file duplicated"
     const unsigned int lMinBlockSize = std::max(
-        1u, std::min(
-            m_minBlockSize, 
+        m_minBlockSize, std::min(
+            m_minBlockSize,
             (std::max(n,m)*100)/m_blockPercentThreshold
         )
     );
-    
+
     int blocks=0;
 
     // Scan vertical part
@@ -211,9 +211,9 @@ void Duplo::run(std::string outputFileName){
         outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
         outfile << "<?xml-stylesheet href=\"duplo.xsl\" type=\"text/xsl\"?>" << std::endl;
         outfile << "<duplo version=\"" << VERSION << "\">" << std::endl;
-        outfile << "    <check Min_block_size=\"" << m_minBlockSize << 
-            "\" Min_char_line=\"" << m_minChars << 
-            "\" Ignore_prepro=\"" << (m_ignorePrepStuff ? "true" : "false") << 
+        outfile << "    <check Min_block_size=\"" << m_minBlockSize <<
+            "\" Min_char_line=\"" << m_minChars <<
+            "\" Ignore_prepro=\"" << (m_ignorePrepStuff ? "true" : "false") <<
             "\" Ignore_same_filename=\"" << (m_ignoreSameFilename ? "true" : "false") << "\">" << std::endl;
     }
 
@@ -231,11 +231,11 @@ void Duplo::run(std::string outputFileName){
     std::cout.flush();
 
     std::vector<SourceFile*> sourceFiles;
-    
+
     TextFile listOfFiles(m_listFileName.c_str());
     std::vector<std::string> lines;
     listOfFiles.readLines(lines, true);
-    
+
     int files = 0;
     unsigned long locsTotal = 0;
 
@@ -267,7 +267,7 @@ void Duplo::run(std::string outputFileName){
     for(int i=0;i<(int)sourceFiles.size();i++){
         std::cout << sourceFiles[i]->getFilename();
         int blocks = 0;
-        
+
         blocks+=process(sourceFiles[i], sourceFiles[i], outfile);
         for(int j=i+1;j<(int)sourceFiles.size();j++){
             if ((m_ignoreSameFilename && isSameFilename(sourceFiles[i]->getFilename(), sourceFiles[j]->getFilename()))==false){
@@ -336,10 +336,10 @@ int main(int argc, const char* argv[]){
 
     if(!ap.is("--help") && argc > 2){
         Duplo duplo(
-            argv[argc-2], 
-            ap.getInt("-ml", MIN_BLOCK_SIZE), 
+            argv[argc-2],
+            ap.getInt("-ml", MIN_BLOCK_SIZE),
             Clamp( 100, 0, ap.getInt("-pt", 100) ),
-            ap.getInt("-mc", MIN_CHARS), 
+            ap.getInt("-mc", MIN_CHARS),
             ap.is("-ip"), ap.is("-d"), ap.is("-xml")
         );
         duplo.run(argv[argc-1]);
@@ -370,8 +370,8 @@ int main(int argc, const char* argv[]){
         std::cout << "       " << VERSION << "\n";
 
         std::cout << "\nAUTHORS\n";
-        std::cout << "       Christian M. Ammann (cammann@giants.ch)\n";    
-        std::cout << "       Trevor D'Arcy-Evans (tdarcyevans@hotmail.com)\n\n";    
+        std::cout << "       Christian M. Ammann (cammann@giants.ch)\n";
+        std::cout << "       Trevor D'Arcy-Evans (tdarcyevans@hotmail.com)\n\n";
     }
 
     return 0;
