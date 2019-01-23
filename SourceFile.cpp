@@ -63,7 +63,7 @@ SourceFile::SourceFile(const std::string& fileName, const unsigned int minChars,
                 }
             }
         }
-        if (FileType::FILETYPE_VB == m_FileType) {
+        if (FileType::FILETYPE_VB == m_FileType || FileType::FILETYPE_UNKNOWN  == m_FileType) {
             tmp = line;
         }
 
