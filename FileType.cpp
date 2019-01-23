@@ -9,6 +9,7 @@ static const std::string FileTypeExtn_HPP = "hpp";
 static const std::string FileTypeExtn_Java = "java";
 static const std::string FileTypeExtn_CS = "cs";
 static const std::string FileTypeExtn_VB = "vb";
+static const std::string FileTypeExtn_S = "s"; // gcc assembly
 
 #include <algorithm>
 
@@ -59,6 +60,12 @@ FileType::FILETYPE FileType::GetFileType(const std::string& FileName)
     {
         return FILETYPE_VB;
     }
-
-    return FILETYPE_UNKNOWN;
+    else if (!FileExtn.compare(FileTypeExtn_S))
+    {
+        return FILETYPE_S;
+    }
+    else
+    {
+        return FILETYPE_UNKNOWN;
+    }
 }

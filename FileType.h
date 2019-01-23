@@ -17,7 +17,8 @@ public:
         FILETYPE_HPP,
         FILETYPE_JAVA,
         FILETYPE_CS,
-        FILETYPE_VB
+        FILETYPE_VB,
+        FILETYPE_S // gcc assembly
     };
 
 public:

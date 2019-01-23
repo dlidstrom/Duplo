@@ -3,12 +3,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -25,14 +25,14 @@
 SourceFile::SourceFile(const std::string& fileName, const unsigned int minChars, const bool ignorePrepStuff) :
     m_fileName(fileName),
     m_FileType(FileType::GetFileType(fileName)),
-    m_minChars(minChars),    
+    m_minChars(minChars),
     m_ignorePrepStuff(ignorePrepStuff)
 {
     TextFile listOfFiles(m_fileName.c_str());
 
     std::vector<std::string> lines;
     listOfFiles.readLines(lines, false);
-    
+
     int openBlockComments = 0;
     for(int i=0;i<(int)lines.size();i++){
         std::string& line = lines[i];
@@ -40,36 +40,50 @@ SourceFile::SourceFile(const std::string& fileName, const unsigned int minChars,
 
         tmp.reserve(line.size());
 
-        // Remove block comments
-        if (FileType::FILETYPE_C    == m_FileType ||
-            FileType::FILETYPE_CPP  == m_FileType ||
-            FileType::FILETYPE_CXX  == m_FileType ||
-            FileType::FILETYPE_H    == m_FileType ||
-            FileType::FILETYPE_HPP  == m_FileType ||
-            FileType::FILETYPE_JAVA == m_FileType ||
-            FileType::FILETYPE_CS   == m_FileType ){
-            int lineSize = (int)line.size();
-            for(int j=0;j<(int)line.size();j++){
-                if(line[j] == '/' && line[MIN(lineSize-1, j+1)] == '*'){
-                    openBlockComments++;
+        switch (m_FileType)
+        {
+            // Remove block comments
+            case FileType::FILETYPE_C:
+            case FileType::FILETYPE_CPP:
+            case FileType::FILETYPE_CXX:
+            case FileType::FILETYPE_H:
+            case FileType::FILETYPE_HPP:
+            case FileType::FILETYPE_JAVA:
+            case FileType::FILETYPE_CS:
+            {
+                int lineSize = (int)line.size();
+                for(int j=0;j<(int)line.size();j++){
+                    if(line[j] == '/' && line[MIN(lineSize-1, j+1)] == '*'){
+                        openBlockComments++;
+                    }
+
+                    if(openBlockComments <= 0){
+                        tmp.push_back(line[j]);
+                    }
+
+                    if(line[MAX(0, j-1)] == '*' && line[j] == '/'){
+                        openBlockComments--;
+                    }
                 }
 
-                if(openBlockComments <= 0){
-                    tmp.push_back(line[j]);
-                }
-
-                if(line[MAX(0, j-1)] == '*' && line[j] == '/'){
-                    openBlockComments--;
-                }
+                break;
             }
-        }
-        if (FileType::FILETYPE_VB == m_FileType || FileType::FILETYPE_UNKNOWN  == m_FileType) {
-            tmp = line;
+            case FileType::FILETYPE_VB:
+            case FileType::FILETYPE_UNKNOWN:
+            {
+                tmp = line;
+                break;
+            }
+            case FileType::FILETYPE_S:
+            {
+                tmp.assign(line,0,line.find(";"));
+                break;
+            }
         }
 
         std::string cleaned;
         getCleanLine(tmp, cleaned);
-        
+
         if(isSourceLine(cleaned)){
             m_sourceLines.push_back(new SourceLine(cleaned, i));
         }
@@ -100,7 +114,13 @@ void SourceFile::getCleanLine(const std::string& line, std::string& cleanedLine)
                     return;
                 }
                 break;
-            
+
+            case FileType::FILETYPE_S:
+                if(i < lineSize-1 && line[i] == ';'){
+                    return;
+                }
+                break;
+
             // no pre-processing of code of unknown languages
             case FileType::FILETYPE_UNKNOWN:
                 break;
@@ -164,17 +184,24 @@ bool SourceFile::isSourceLine(const std::string& line){
              return std::string::npos == tmp.find(PreProc_VB.c_str(), 0, PreProc_VB.length());
           }
           break;
-          
+
+        case FileType::FILETYPE_S:
+            {
+                const std::string PreProc_S = "ret"; //we can't deduplicate ret AFAIK
+                return std::string::npos == tmp.find(PreProc_S.c_str(), 0, PreProc_S.length());
+            }
+            break;
+
         // no pre-processing of code of unknown languages
         case FileType::FILETYPE_UNKNOWN:
             break;
-          
+
        }
     }
 
     bool bRet = ((int)tmp.size() >= m_minChars);
     assert(bRet);
-    
+
     // must be at least one alpha-numeric character
     return bRet && std::find_if(tmp.begin(), tmp.end(), isalpha)!=tmp.end();
 }
