@@ -237,7 +237,7 @@ void Duplo::run(std::string outputFileName){
     listOfFiles.readLines(lines, true);
     
     int files = 0;
-    int locsTotal = 0;
+    unsigned long locsTotal = 0;
 
     // Create vector with all source files
     for(int i=0;i<(int)lines.size();i++){
