@@ -27,7 +27,7 @@
 
 class SourceFile;
 
-const std::string VERSION = "0.2.0";
+const std::string VERSION = "0.3.0";
 
 class Duplo {
 protected:
