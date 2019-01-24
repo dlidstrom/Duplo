@@ -2,6 +2,8 @@
 
 - [Duplo (C/C++/Java Duplicate Source Code Block Finder)](#duplo-ccjava-duplicate-source-code-block-finder)
   - [GENERAL INFORMATION](#general-information)
+  - [MAINTAINER](#maintainer)
+  - [FILE FORMAT SUPPORT](#file-format-support)
   - [OPTIONS](#options)
   - [FEEDBACK AND BUG REPORTING](#feedback-and-bug-reporting)
   - [FILE LIST GENERATION](#file-list-generation)
@@ -9,6 +11,7 @@
     - [UNIX](#unix)
   - [PERFORMANCE MEASUREMENTS](#performance-measurements)
   - [BACKGROUND](#background)
+  - [CHANGES](#changes)
   - [LICENSE](#license)
 
 ## GENERAL INFORMATION
@@ -16,6 +19,32 @@
 Duplicated source code blocks can harm maintainability of software systems.
 Duplo is a tool to find duplicated code blocks in large C, C++, Java, C# and
 VB.Net systems.
+
+## MAINTAINER
+
+Duplo was originally developed by Christian
+M. Ammann and is now maintained by Daniel
+Lidström.
+
+## FILE FORMAT SUPPORT
+
+Duplo has built in support for the following
+file formats:
+
+- C/C++ ()
+- Java
+- C#
+- VB
+- GCC assembly
+
+This means that Duplo will remove
+preprocessor directives, block comments, using
+statements, etc, to only consider duplicates
+in actual code.
+In addition, Duplo can be used as a general
+(without special support) duplicates detector
+in arbitrary text files and will even detect
+duplicates found in the same file.
 
 Sample output snippet:
 
@@ -36,11 +65,12 @@ Sample output snippet:
 
 ## OPTIONS
 
-Run "duplo --help" on the command line to see the detailed options.
+Run `duplo --help` on the command line to see the detailed options.
 
 ## FEEDBACK AND BUG REPORTING
 
-Please send Feedback and Bug Reports to: dlidstrom@gmail.com
+Please open an issue to discuss feedback,
+feature requests and bug reports.
 
 ## FILE LIST GENERATION
 
@@ -70,6 +100,15 @@ Duplo uses the same techniques as Duploc to detect duplicated code blocks. See
 [Duca99bCodeDuplication](http://www.iam.unibe.ch/~scg/Archive/Papers/Duca99bCodeDuplication.pdf) for
 further information.
 
+## CHANGES
+
+- 0.3
+  - Updated links in html output to GitHub
+  - Support for gcc assembly (.s)
+  - Fixed minimum number of lines in analysis
+  - Fixed limitation of total number of lines of code
+  - Checking of arbitrary files
+
 ## LICENSE
 
 Duplo is free software; you can redistribute it and/or modify
@@ -77,7 +116,7 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
-Foobar is distributed in the hope that it will be useful,
+Duplo is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
