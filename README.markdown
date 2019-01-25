@@ -31,7 +31,7 @@ Lidström.
 Duplo has built in support for the following
 file formats:
 
-- C/C++ ()
+- C/C++ (.c, .cpp, .cxx, .h, .hpp)
 - Java
 - C#
 - VB
