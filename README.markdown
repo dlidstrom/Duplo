@@ -97,7 +97,7 @@ Generate a list of all files of a directory with:
 ## BACKGROUND
 
 Duplo uses the same techniques as Duploc to detect duplicated code blocks. See
-[Duca99bCodeDuplication](http://www.iam.unibe.ch/~scg/Archive/Papers/Duca99bCodeDuplication.pdf) for
+[Duca99bCodeDuplication](http://scg.unibe.ch/archive/papers/Duca99bCodeDuplication.pdf) for
 further information.
 
 ## CHANGES
