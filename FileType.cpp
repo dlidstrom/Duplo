@@ -16,7 +16,7 @@ static const std::string FileTypeExtn_S = "s"; // gcc assembly
 FileType::FILETYPE FileType::GetFileType(const std::string& FileName)
 {
     std::string TrimFileName = StringUtil::trim(FileName);
-    std::string::size_type DotPos = TrimFileName.find_last_of (".");
+    std::string::size_type DotPos = TrimFileName.find_last_of(".");
 
     if (std::string::npos == DotPos)
     {
@@ -31,40 +31,31 @@ FileType::FILETYPE FileType::GetFileType(const std::string& FileName)
     if (!FileExtn.compare(FileTypeExtn_C))
     {
         return FILETYPE_C;
-    }
-    else if (!FileExtn.compare(FileTypeExtn_CPP))
+    } else if (!FileExtn.compare(FileTypeExtn_CPP))
     {
         return FILETYPE_CPP;
-    }
-    else if (!FileExtn.compare(FileTypeExtn_CXX))
+    } else if (!FileExtn.compare(FileTypeExtn_CXX))
     {
         return FILETYPE_CXX;
-    }
-    else if (!FileExtn.compare(FileTypeExtn_H))
+    } else if (!FileExtn.compare(FileTypeExtn_H))
     {
         return FILETYPE_H;
-    }
-    else if (!FileExtn.compare(FileTypeExtn_HPP))
+    } else if (!FileExtn.compare(FileTypeExtn_HPP))
     {
         return FILETYPE_HPP;
-    }
-    else if (!FileExtn.compare(FileTypeExtn_Java))
+    } else if (!FileExtn.compare(FileTypeExtn_Java))
     {
         return FILETYPE_JAVA;
-    }
-    else if (!FileExtn.compare(FileTypeExtn_CS))
+    } else if (!FileExtn.compare(FileTypeExtn_CS))
     {
         return FILETYPE_CS;
-    }
-    else if (!FileExtn.compare(FileTypeExtn_VB))
+    } else if (!FileExtn.compare(FileTypeExtn_VB))
     {
         return FILETYPE_VB;
-    }
-    else if (!FileExtn.compare(FileTypeExtn_S))
+    } else if (!FileExtn.compare(FileTypeExtn_S))
     {
         return FILETYPE_S;
-    }
-    else
+    } else
     {
         return FILETYPE_UNKNOWN;
     }
