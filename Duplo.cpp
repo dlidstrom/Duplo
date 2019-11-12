@@ -160,7 +160,7 @@ int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& out
 }
 
 const std::string Duplo::getFilenamePart(const std::string& fullpath) const {
-    std::string path = StringUtil::substitute('\\', '/', fullpath);
+    std::string path = StringUtil::Substitute('\\', '/', fullpath);
 
     std::string filename = path;
 

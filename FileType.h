@@ -7,7 +7,7 @@
 class FileType
 {
 public:
-    enum FILETYPE
+    enum class FILETYPE
     {
         FILETYPE_UNKNOWN,
         FILETYPE_C,

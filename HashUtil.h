@@ -1,6 +1,4 @@
-/** \class HashUtil
- * HashUtil (MD5 hashing)
- *
+/**
  * Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
  * rights reserved.
  *
