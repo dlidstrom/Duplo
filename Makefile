@@ -13,7 +13,7 @@ PROG_NAME = duplo
 
 # List of object files
 OBJS = StringUtil.o HashUtil.o ArgumentParser.o TextFile.o \
-       SourceFile.o SourceLine.o Duplo.o FileType.o
+       SourceFile.o SourceLine.o Duplo.o FileType.o Main.o
 
 # Build process
 
