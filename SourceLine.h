@@ -17,7 +17,7 @@ public:
 
     int getLineNumber() const;
     const std::string& getLine() const;
-    friend bool operator==(const SourceLine&, const SourceLine&);
+    bool operator==(const SourceLine& other) const;
 };
 
 #endif

@@ -109,7 +109,7 @@ int Duplo::process(const SourceFile& pSource1, const SourceFile& pSource2, std::
                 if (seqLen >= lMinBlockSize) {
                     int line1 = y + x - seqLen;
                     int line2 = x - seqLen;
-                    if (!((line1 == line2) && (pSource1 == pSource2))) {
+                    if (line1 != line2 || pSource1 != pSource2) {
                         reportSeq(line1, line2, seqLen, pSource1, pSource2, outFile);
                         blocks++;
                     }

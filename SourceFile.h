@@ -29,7 +29,6 @@ public:
     const std::string& getFilename() const;
 
     bool operator==(const SourceFile& other) const;
-    bool operator!=(const SourceFile& other) const;
 };
 
 #endif

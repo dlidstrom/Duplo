@@ -195,7 +195,3 @@ const std::string& SourceFile::getFilename() const {
 bool SourceFile::operator==(const SourceFile& other) const {
     return this == &other || getFilename() == other.getFilename();
 }
-
-bool SourceFile::operator!=(const SourceFile& other) const {
-    return !(*this == other);
-}

@@ -22,8 +22,8 @@ int SourceLine::getLineNumber() const {
     return m_lineNumber;
 }
 
-bool operator==(const SourceLine& left, const SourceLine& right) {
-    return left.hash == right.hash;
+bool SourceLine::operator==(const SourceLine& other) const {
+    return hash == other.hash;
 }
 
 const std::string& SourceLine::getLine() const {
