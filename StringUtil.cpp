@@ -1,6 +1,8 @@
 #include "StringUtil.h"
 
+#include <algorithm>
 #include <ctype.h>
+#include <locale>
 
 namespace StringUtil {
     std::string Trim(const std::string& input) {
@@ -92,7 +94,7 @@ namespace StringUtil {
     }
 
     std::string Substitute(char s, char d, const std::string& str) {
-        std::string tmp = str;
+        std::string tmp(str);
 
         for (int i = 0; i < (int)tmp.size(); i++) {
             if (tmp[i] == s) {
@@ -120,5 +122,29 @@ namespace StringUtil {
                 return;
             }
         }
+    }
+
+    auto& facet = std::use_facet<std::ctype<char>>(std::locale());
+    std::string ToLower(const std::string& s) {
+        std::string copy;
+        copy.reserve(s.length());
+        std::transform(
+            s.begin(),
+            s.end(),
+            std::back_inserter(copy),
+            [](char c) -> char { return facet.tolower(c); });
+        return copy;
+    }
+
+    std::string GetFileExtension(const std::string& filename) {
+        auto trimFileName = StringUtil::Trim(filename);
+        auto DotPos = trimFileName.find_last_of('.');
+
+        std::string ext;
+        if (std::string::npos != DotPos) {
+            ext = trimFileName.substr(DotPos + 1);
+        }
+
+        return ext;
     }
 }

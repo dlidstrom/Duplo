@@ -1,14 +1,14 @@
 #ifndef _FILETYPE_H_
 #define _FILETYPE_H_
 
-#include <vector>
+#include "IFileType.h"
 #include <string>
+#include <vector>
 
-class FileType
-{
+// TODO Rename into FileTypeFactory
+class FileType {
 public:
-    enum class FILETYPE
-    {
+    enum class FILETYPE {
         FILETYPE_UNKNOWN,
         FILETYPE_C,
         FILETYPE_CPP,
@@ -25,5 +25,11 @@ public:
     static FileType::FILETYPE GetFileType(const std::string& FileName);
 };
 
-#endif
+namespace FileTypeFactory {
+    IFileTypePtr CreateFileType(
+        const std::string& filename,
+        bool ignorePrepStuff,
+        unsigned minChars);
+}
 
+#endif

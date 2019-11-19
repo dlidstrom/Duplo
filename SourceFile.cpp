@@ -3,21 +3,32 @@
 #include "TextFile.h"
 
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 
-SourceFile::SourceFile(const std::string& fileName, const unsigned int minChars, const bool ignorePrepStuff)
+SourceFile::SourceFile(SourceFile&& right) noexcept
+    : m_fileName(std::move(right.m_fileName))
+    , m_FileType(right.m_FileType)
+    , m_fileType(std::move(right.m_fileType))
+    , m_minChars(right.m_minChars)
+    , m_ignorePrepStuff(right.m_ignorePrepStuff)
+    , m_sourceLines(std::move(right.m_sourceLines)) {
+}
+
+SourceFile::SourceFile(const std::string& fileName, unsigned int minChars, bool ignorePrepStuff)
     : m_fileName(fileName),
       m_FileType(FileType::GetFileType(fileName)),
+      m_fileType(FileTypeFactory::CreateFileType(fileName, ignorePrepStuff, minChars)),
       m_minChars(minChars),
       m_ignorePrepStuff(ignorePrepStuff) {
-    TextFile listOfFiles(m_fileName.c_str());
+    TextFile listOfFiles(m_fileName);
 
-    std::vector<std::string> lines;
-    listOfFiles.readLines(lines, false);
+    auto lines = listOfFiles.readLines(false);
 
+    m_sourceLines = m_fileType->GetCleanedSourceLines(lines);
     int openBlockComments = 0;
+    m_sourceLines.reserve(lines.size());
     for (int i = 0; i < (int)lines.size(); i++) {
-        std::string& line = lines[i];
+        const std::string& line = lines[i];
         std::string tmp;
 
         tmp.reserve(line.size());
@@ -33,7 +44,7 @@ SourceFile::SourceFile(const std::string& fileName, const unsigned int minChars,
         case FileType::FILETYPE::FILETYPE_CS: {
             int lineSize = (int)line.size();
             for (int j = 0; j < (int)line.size(); j++) {
-                if (line[j] == '/' && line[MIN(lineSize - 1, j + 1)] == '*') {
+                if (line[j] == '/' && line[std::min(lineSize - 1, j + 1)] == '*') {
                     openBlockComments++;
                 }
 
@@ -41,7 +52,7 @@ SourceFile::SourceFile(const std::string& fileName, const unsigned int minChars,
                     tmp.push_back(line[j]);
                 }
 
-                if (line[MAX(0, j - 1)] == '*' && line[j] == '/') {
+                if (line[std::max(0, j - 1)] == '*' && line[j] == '/') {
                     openBlockComments--;
                 }
             }
@@ -62,8 +73,8 @@ SourceFile::SourceFile(const std::string& fileName, const unsigned int minChars,
         std::string cleaned;
         getCleanLine(tmp, cleaned);
 
-        if (isSourceLine(cleaned)) {
-            m_sourceLines.push_back(new SourceLine(cleaned, i));
+        if (m_fileType->IsSourceLine(cleaned)) {
+            m_sourceLines.emplace_back(cleaned, i);
         }
     }
 }
@@ -106,15 +117,13 @@ void SourceFile::getCleanLine(const std::string& line, std::string& cleanedLine)
     }
 }
 
-bool SourceFile::isSourceLine(const std::string& line) {
-    std::string tmp = StringUtil::Trim(line);
+bool SourceFile::isSourceLine(const std::string& line) const {
+    std::string tmp = StringUtil::ToLower(StringUtil::Trim(line));
 
     // filter min size lines
     if (tmp.size() < m_minChars) {
         return false;
     }
-
-    std::transform(tmp.begin(), tmp.end(), tmp.begin(), (int (*)(int))tolower);
 
     if (m_ignorePrepStuff) {
         switch (m_FileType) {
@@ -171,11 +180,11 @@ bool SourceFile::isSourceLine(const std::string& line) {
     return bRet && std::find_if(tmp.begin(), tmp.end(), isalpha) != tmp.end();
 }
 
-int SourceFile::getNumOfLines() {
-    return (int)m_sourceLines.size();
+unsigned SourceFile::getNumOfLines() const {
+    return m_sourceLines.size();
 }
 
-SourceLine* SourceFile::getLine(const int index) {
+const SourceLine& SourceFile::getLine(int index) const {
     return m_sourceLines[index];
 }
 
@@ -184,7 +193,7 @@ const std::string& SourceFile::getFilename() const {
 }
 
 bool SourceFile::operator==(const SourceFile& other) const {
-    return (this == &other) || (getFilename() == other.getFilename());
+    return this == &other || getFilename() == other.getFilename();
 }
 
 bool SourceFile::operator!=(const SourceFile& other) const {

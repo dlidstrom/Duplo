@@ -2,10 +2,7 @@
 #include "HashUtil.h"
 #include "SourceFile.h"
 
-/**
- * Creates a new text file. The file is accessed relative to current directory.
- */
-SourceLine::SourceLine(std::string& line, int lineNumber) {
+SourceLine::SourceLine(const std::string& line, int lineNumber) {
     m_line = line;
     m_lineNumber = lineNumber;
 
@@ -18,20 +15,17 @@ SourceLine::SourceLine(std::string& line, int lineNumber) {
         }
     }
 
-    // MD5 hash
-    long long* pDigest = (long long*)HashUtil::getMD5Sum((unsigned char*)cleanLine.c_str(), (int)cleanLine.size());
-    m_hashHigh = pDigest[0];
-    m_hashLow = pDigest[1];
+    hash = HashUtil::Hash(cleanLine.c_str(), cleanLine.size());
 }
 
-int SourceLine::getLineNumber() {
+int SourceLine::getLineNumber() const {
     return m_lineNumber;
 }
 
-bool SourceLine::equals(SourceLine* pLine) {
-    return (m_hashHigh == pLine->m_hashHigh && m_hashLow == pLine->m_hashLow);
+bool operator==(const SourceLine& left, const SourceLine& right) {
+    return left.hash == right.hash;
 }
 
-std::string& SourceLine::getLine() {
+const std::string& SourceLine::getLine() const {
     return m_line;
 }

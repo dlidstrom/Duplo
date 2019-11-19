@@ -1,10 +1,11 @@
 #include "FileType.h"
+#include "SourceLine.h"
 #include "StringUtil.h"
 
 #include <algorithm>
 #include <map>
 
-namespace {
+namespace x {
     static const auto extensionToFileType =
         std::map<std::string, FileType::FILETYPE>{
             { "c", FileType::FILETYPE::FILETYPE_C },
@@ -21,16 +22,130 @@ namespace {
 }
 
 FileType::FILETYPE FileType::GetFileType(const std::string& FileName) {
-    auto TrimFileName = StringUtil::Trim(FileName);
-    auto DotPos = TrimFileName.find_last_of(".");
-
-    std::string FileExtn = "";
-    if (std::string::npos != DotPos) {
-        FileExtn = TrimFileName.substr(DotPos + 1);
-    }
+    std::string FileExtn = StringUtil::GetFileExtension(FileName);
 
     // get lower case file extension
-    std::transform(FileExtn.begin(), FileExtn.end(), FileExtn.begin(), std::tolower);
-    auto fileType = extensionToFileType.at(FileExtn);
+    auto ext = StringUtil::ToLower(FileExtn);
+    auto fileType = x::extensionToFileType.at(ext);
+    return fileType;
+}
+
+namespace {
+    struct FileTypeBase : public IFileType {
+        bool m_ignorePrepStuff;
+        unsigned m_minChars;
+
+        FileTypeBase(bool ignorePrepStuff, unsigned minChars)
+            : m_ignorePrepStuff(ignorePrepStuff),
+              m_minChars(minChars) {
+        }
+
+        bool IsSourceLine(const std::string& line) const {
+            std::string tmp = StringUtil::ToLower(StringUtil::Trim(line));
+
+            // filter min size lines
+            if (tmp.size() < m_minChars) {
+                return false;
+            }
+
+            if (m_ignorePrepStuff && IsPreprocessorDirective(tmp))
+                return false;
+
+            // must be at least one alpha-numeric character
+            bool isSourceLine =
+                tmp.size() >= m_minChars && std::find_if(tmp.begin(), tmp.end(), isalpha) != tmp.end();
+            return isSourceLine;
+        }
+
+        virtual bool IsPreprocessorDirective(const std::string& line) const = 0;
+    };
+
+    struct FileType_C : public FileTypeBase {
+        FileType_C(bool ignorePrepStuff, unsigned minChars)
+            : FileTypeBase(ignorePrepStuff, minChars) {
+        }
+
+        std::vector<SourceLine> GetCleanedSourceLines(const std::vector<std::string>&) const override {
+            return std::vector<SourceLine>();
+        }
+
+        bool IsPreprocessorDirective(const std::string& line) const override {
+            return line[0] == '#';
+        }
+    };
+
+    struct FileType_CS : public FileTypeBase {
+        FileType_CS(bool ignorePrepStuff, unsigned minChars)
+            : FileTypeBase(ignorePrepStuff, minChars) {
+        }
+
+        std::vector<SourceLine> GetCleanedSourceLines(const std::vector<std::string>&) const override {
+            return std::vector<SourceLine>();
+        }
+
+        bool IsPreprocessorDirective(const std::string& line) const override {
+            if (line[0] == '#')
+                return true;
+
+            // look for attribute
+            if (line[0] == '[') {
+                return true;
+            }
+
+            // look for other markers to avoid
+            const std::string PreProc_CS[] = { "using", "private", "protected", "public" };
+
+            for (int i = 0; i < 4; i++) {
+                if (line.find(PreProc_CS[i].c_str(), 0, PreProc_CS[i].length()) != std::string::npos)
+                    return true;
+            }
+
+            return false;
+        }
+    };
+
+    struct FileType_H : public FileTypeBase {
+        FileType_H(bool ignorePrepStuff, unsigned minChars)
+            : FileTypeBase(ignorePrepStuff, minChars) {
+        }
+
+        std::vector<SourceLine> GetCleanedSourceLines(const std::vector<std::string>&) const override {
+            return std::vector<SourceLine>();
+        }
+
+        bool IsPreprocessorDirective(const std::string& line) const override {
+            return line[0] == '#';
+        }
+    };
+
+    struct FileType_Unknown : public FileTypeBase {
+        FileType_Unknown(unsigned minChars)
+            : FileTypeBase(false, minChars) {
+        }
+
+        std::vector<SourceLine> GetCleanedSourceLines(const std::vector<std::string>&) const override {
+            return std::vector<SourceLine>();
+        }
+
+        bool IsPreprocessorDirective(const std::string&) const override {
+            return false;
+        }
+    };
+}
+
+IFileTypePtr FileTypeFactory::CreateFileType(
+    const std::string& filename,
+    bool ignorePrepStuff,
+    unsigned minChars) {
+    auto ext = StringUtil::ToLower(StringUtil::GetFileExtension(filename));
+    IFileTypePtr fileType;
+    if (ext == "c")
+        fileType.reset(new FileType_C(ignorePrepStuff, minChars));
+    else if (ext == "cs")
+        fileType.reset(new FileType_CS(ignorePrepStuff, minChars));
+    else if (ext == "h")
+        fileType.reset(new FileType_H(ignorePrepStuff, minChars));
+    else
+        fileType.reset(new FileType_Unknown(minChars));
     return fileType;
 }

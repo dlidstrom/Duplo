@@ -5,19 +5,19 @@
 #include <vector>
 
 class SourceLine {
-protected:
     std::string m_line;
     int m_lineNumber;
+    unsigned long hash;
 
 public:
-    SourceLine(std::string& line, int lineNumber);
+    /**
+     * Creates a new text file. The file is accessed relative to current directory.
+     */
+    SourceLine(const std::string& line, int lineNumber);
 
-    long long m_hashHigh;
-    long long m_hashLow;
-
-    int getLineNumber();
-    std::string& getLine();
-    bool equals(SourceLine* pLine);
+    int getLineNumber() const;
+    const std::string& getLine() const;
+    friend bool operator==(const SourceLine&, const SourceLine&);
 };
 
 #endif

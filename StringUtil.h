@@ -27,6 +27,10 @@ namespace StringUtil {
     std::string Substitute(char s, char d, const std::string& str);
 
     void StrSub(std::string& cp, const std::string& sub_this, const std::string& for_this, const int& num_times);
+
+    std::string ToLower(const std::string& s);
+
+    std::string GetFileExtension(const std::string& filename);
 }
 
 #endif

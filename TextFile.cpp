@@ -5,56 +5,43 @@
 #include <iostream>
 #include <sstream>
 
-/**
- * Creates a new text file. The file is accessed relative to current directory.
- */
-TextFile::TextFile(const std::string& fileName) : m_fileName(fileName) {
-}
+namespace {
+    std::string readAll(const std::string fileName) {
+        std::string all;
+        std::ifstream inFile(fileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+        if (!inFile) {
+            std::ostringstream stream;
+            stream << "Error: Can't open file: " << fileName << ". File doesn't exist or access denied.\n";
+            throw std::exception(stream.str().c_str());
+        }
 
-/**
- * Reads the whole text file into a std::string.
- */
-bool TextFile::readAll(std::string& all) {
-    std::ifstream inFile(m_fileName.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
-    if (inFile.is_open()) {
         std::streampos len = inFile.tellg();
         inFile.seekg(0);
-        all.reserve(static_cast<std::size_t>(len));
+        all.resize(static_cast<std::size_t>(len));
         inFile.read(&all[0], len);
-    } else {
-        std::stringstream stream;
+        return all;
+    }
+}
+
+TextFile::TextFile(const std::string& fileName)
+    : m_fileName(fileName) {
+}
+
+std::vector<std::string> TextFile::readLines(bool doTrim) {
+    std::string list = readAll(m_fileName);
+
+    std::vector<std::string> lines;
+    StringUtil::Split(list, "\n", lines, doTrim);
+    return lines;
+}
+
+void TextFile::writeAll(const std::string& all) {
+    std::ofstream outFile(m_fileName.c_str(), std::ios::binary);
+    if (!outFile) {
+        std::ostringstream stream;
         stream << "Error: Can't open file: " << m_fileName << ". File doesn't exist or access denied.\n";
         throw std::exception(stream.str().c_str());
     }
-    return true;
-}
 
-bool TextFile::readLines(std::vector<std::string>& lines, bool doTrim) {
-
-    std::string list;
-    if (readAll(list)) {
-        list = StringUtil::Substitute('\r', ' ', list);
-        list = StringUtil::Substitute('\t', ' ', list);
-        list = StringUtil::Split(list, "\n", lines, doTrim);
-        return true;
-    }
-
-    return false;
-}
-
-/**
- * Writes a std::string into a text file.
- */
-bool TextFile::writeAll(const std::string& all) {
-
-    std::ofstream outFile(m_fileName.c_str(), std::ios::binary);
-    if (outFile.is_open()) {
-        outFile << all;
-        outFile.close();
-    } else {
-        std::cout << "Error: Can't open file: " << m_fileName << ". File doesn't exist or access denied.\n";
-        return false;
-    }
-
-    return true;
+    outFile << all;
 }
