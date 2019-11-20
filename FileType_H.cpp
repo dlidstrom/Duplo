@@ -1,4 +1,5 @@
 #include "FileType_H.h"
+#include "CstyleCommentsFilter.h"
 #include "CstyleUtils.h"
 #include "SourceLine.h"
 
@@ -6,8 +7,8 @@ FileType_H::FileType_H(bool ignorePrepStuff, unsigned minChars)
     : FileTypeBase(ignorePrepStuff, minChars) {
 }
 
-std::vector<SourceLine> FileType_H::GetCleanedSourceLines(const std::vector<std::string>&) const {
-    return std::vector<SourceLine>();
+ILineFilterPtr FileType_H::CreateLineFilter() const {
+    return std::make_shared<CstyleCommentsLineFilter>();
 }
 
 std::string FileType_H::GetCleanLine(const std::string& line) const {

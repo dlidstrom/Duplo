@@ -9,16 +9,8 @@
 
 class SourceFile {
     std::string m_filename;
-    FileType::FILETYPE m_FileType;
     IFileTypePtr m_fileType;
-
-    unsigned int m_minChars;
-    bool m_ignorePrepStuff;
-
     std::vector<SourceLine> m_sourceLines;
-
-    bool isSourceLine(const std::string& line) const;
-    void getCleanLine(const std::string& line, std::string& cleanedLine);
 
 public:
     SourceFile(const std::string& fileName, unsigned int minChars, bool ignorePrepStuff);

@@ -1,10 +1,10 @@
-#ifndef _FILETYPE_H_H_
-#define _FILETYPE_H_H_
+#ifndef _FILETYPE_VB_H_
+#define _FILETYPE_VB_H_
 
 #include "FileTypeBase.h"
 
-struct FileType_H : public FileTypeBase {
-    FileType_H(bool ignorePrepStuff, unsigned minChars);
+struct FileType_VB : public FileTypeBase {
+    FileType_VB(bool ignorePrepStuff, unsigned minChars);
 
     ILineFilterPtr CreateLineFilter() const override;
 

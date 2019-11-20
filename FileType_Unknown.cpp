@@ -1,12 +1,13 @@
 #include "FileType_Unknown.h"
+#include "NoopLineFilter.h"
 #include "SourceLine.h"
 
 FileType_Unknown::FileType_Unknown(unsigned minChars)
     : FileTypeBase(false, minChars) {
 }
 
-std::vector<SourceLine> FileType_Unknown::GetCleanedSourceLines(const std::vector<std::string>&) const {
-    return std::vector<SourceLine>();
+ILineFilterPtr FileType_Unknown::CreateLineFilter() const {
+    return std::make_shared<NoopLineFilter>();
 }
 
 std::string FileType_Unknown::GetCleanLine(const std::string& line) const {

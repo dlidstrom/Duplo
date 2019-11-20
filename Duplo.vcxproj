@@ -92,6 +92,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ArgumentParser.cpp" />
+    <ClCompile Include="CstyleCommentsFilter.cpp" />
     <ClCompile Include="CstyleUtils.cpp" />
     <ClCompile Include="Duplo.cpp" />
     <ClCompile Include="FileType.cpp" />
@@ -99,9 +100,12 @@
     <ClCompile Include="FileType_C.cpp" />
     <ClCompile Include="FileType_CS.cpp" />
     <ClCompile Include="FileType_H.cpp" />
+    <ClCompile Include="FileType_S.cpp" />
     <ClCompile Include="FileType_Unknown.cpp" />
+    <ClCompile Include="FileType_VB.cpp" />
     <ClCompile Include="HashUtil.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="NoopLineFilter.cpp" />
     <ClCompile Include="SourceFile.cpp" />
     <ClCompile Include="SourceLine.cpp" />
     <ClCompile Include="StringUtil.cpp" />
@@ -109,6 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgumentParser.h" />
+    <ClInclude Include="CstyleCommentsFilter.h" />
     <ClInclude Include="CstyleUtils.h" />
     <ClInclude Include="Duplo.h" />
     <ClInclude Include="FileType.h" />
@@ -116,10 +121,14 @@
     <ClInclude Include="FileType_C.h" />
     <ClInclude Include="FileType_CS.h" />
     <ClInclude Include="FileType_H.h" />
+    <ClInclude Include="FileType_S.h" />
     <ClInclude Include="FileType_Unknown.h" />
+    <ClInclude Include="FileType_VB.h" />
     <ClInclude Include="Fwd.h" />
     <ClInclude Include="HashUtil.h" />
     <ClInclude Include="IFileType.h" />
+    <ClInclude Include="ILineFilter.h" />
+    <ClInclude Include="NoopLineFilter.h" />
     <ClInclude Include="SourceFile.h" />
     <ClInclude Include="SourceLine.h" />
     <ClInclude Include="StringUtil.h" />
@@ -131,6 +140,9 @@
     <None Include="Copying" />
     <None Include="Makefile" />
     <None Include="README.markdown" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="duplo.xsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

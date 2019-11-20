@@ -317,6 +317,6 @@ void Duplo::Run(std::string outputFileName) {
         outfile << "  Duplicate lines of code: " << m_duplicateLines << std::endl;
         outfile << "  Total " << blocksTotal << " duplicate block(s) found." << std::endl
                 << std::endl;
-        //outfile << "  Time: " << duration << " seconds" << std::endl;
+        outfile << "  Time: " << duration << " seconds" << std::endl;
     }
 }

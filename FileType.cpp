@@ -2,7 +2,9 @@
 #include "FileType_C.h"
 #include "FileType_CS.h"
 #include "FileType_H.h"
+#include "FileType_S.h"
 #include "FileType_Unknown.h"
+#include "FileType_VB.h"
 #include "SourceLine.h"
 #include "StringUtil.h"
 
@@ -46,6 +48,10 @@ IFileTypePtr FileTypeFactory::CreateFileType(
         fileType.reset(new FileType_CS(ignorePrepStuff, minChars));
     else if (ext == "h")
         fileType.reset(new FileType_H(ignorePrepStuff, minChars));
+    else if (ext == "s")
+        fileType.reset(new FileType_S(ignorePrepStuff, minChars));
+    else if (ext == "vb")
+        fileType.reset(new FileType_VB(ignorePrepStuff, minChars));
     else
         fileType.reset(new FileType_Unknown(minChars));
     return fileType;

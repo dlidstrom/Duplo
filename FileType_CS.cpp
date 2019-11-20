@@ -1,4 +1,5 @@
 #include "FileType_CS.h"
+#include "CstyleCommentsFilter.h"
 #include "CstyleUtils.h"
 #include "SourceLine.h"
 
@@ -6,8 +7,8 @@ FileType_CS::FileType_CS(bool ignorePrepStuff, unsigned minChars)
     : FileTypeBase(ignorePrepStuff, minChars) {
 }
 
-std::vector<SourceLine> FileType_CS::GetCleanedSourceLines(const std::vector<std::string>&) const {
-    return std::vector<SourceLine>();
+ILineFilterPtr FileType_CS::CreateLineFilter() const {
+    return std::make_shared<CstyleCommentsLineFilter>();
 }
 
 std::string FileType_CS::GetCleanLine(const std::string& line) const {
@@ -24,10 +25,10 @@ bool FileType_CS::IsPreprocessorDirective(const std::string& line) const {
     }
 
     // look for other markers to avoid
-    const std::string PreProc_CS[] = { "using", "private", "protected", "public" };
+    const char* markers[] = { "using", "private", "protected", "public" };
 
-    for (int i = 0; i < 4; i++) {
-        if (line.find(PreProc_CS[i].c_str(), 0, PreProc_CS[i].length()) != std::string::npos)
+    for (auto v : markers) {
+        if (line.find(v, 0, std::strlen(v)) != std::string::npos)
             return true;
     }
 

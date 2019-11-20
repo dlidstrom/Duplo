@@ -1,11 +1,25 @@
 #include "FileTypeBase.h"
+#include "SourceLine.h"
 #include "StringUtil.h"
 
 #include <algorithm>
 
 FileTypeBase::FileTypeBase(bool ignorePrepStuff, unsigned minChars)
     : m_ignorePrepStuff(ignorePrepStuff),
-        m_minChars(minChars) {
+      m_minChars(minChars) {
+}
+
+std::vector<SourceLine> FileTypeBase::GetCleanedSourceLines(const std::vector<std::string>& lines) const {
+    auto lineFilter = CreateLineFilter();
+    std::vector<SourceLine> filteredLines;
+    for (std::vector<std::string>::size_type i = 0; i < lines.size(); i++) {
+        auto filteredLine = GetCleanLine(lineFilter->ProcessSourceLine(lines[i]));
+        if (IsSourceLine(filteredLine)) {
+            filteredLines.emplace_back(filteredLine, i);
+        }
+    }
+
+    return filteredLines;
 }
 
 bool FileTypeBase::IsSourceLine(const std::string& line) const {

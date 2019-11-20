@@ -2,19 +2,20 @@
 #include "HashUtil.h"
 #include "SourceFile.h"
 
+#include <algorithm>
+
 SourceLine::SourceLine(const std::string& line, int lineNumber) {
     m_line = line;
     m_lineNumber = lineNumber;
 
     std::string cleanLine;
 
-    //Remove all white space and noise (tabs etc)
-    for (int i = 0; i < (int)line.size(); i++) {
-        if (line[i] > ' ') {
-            cleanLine.push_back(line[i]);
-        }
-    }
-
+    // Remove all white space and noise (tabs etc)
+    std::copy_if(
+        std::begin(line),
+        std::end(line),
+        std::back_inserter(cleanLine),
+        [](char c) { return c > ' '; });
     hash = HashUtil::Hash(cleanLine.c_str(), cleanLine.size());
 }
 
