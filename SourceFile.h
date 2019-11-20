@@ -1,11 +1,10 @@
 #ifndef _SOURCEFILE_H_
 #define _SOURCEFILE_H_
 
+#include "Fwd.h"
+
 #include <string>
 #include <vector>
-
-#include "FileType.h"
-#include "SourceLine.h"
 
 class SourceFile {
     std::string m_filename;

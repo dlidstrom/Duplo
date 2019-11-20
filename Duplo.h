@@ -1,11 +1,11 @@
 #ifndef _DUPLO_H_
 #define _DUPLO_H_
 
+#include "Fwd.h"
+
 #include <string>
 #include <iostream>
 #include <vector>
-
-class SourceFile;
 
 const std::string VERSION = "0.4.0";
 

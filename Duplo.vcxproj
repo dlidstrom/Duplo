@@ -95,7 +95,7 @@
     <ClCompile Include="CstyleCommentsFilter.cpp" />
     <ClCompile Include="CstyleUtils.cpp" />
     <ClCompile Include="Duplo.cpp" />
-    <ClCompile Include="FileType.cpp" />
+    <ClCompile Include="FileTypeFactory.cpp" />
     <ClCompile Include="FileTypeBase.cpp" />
     <ClCompile Include="FileType_C.cpp" />
     <ClCompile Include="FileType_CS.cpp" />
@@ -116,7 +116,7 @@
     <ClInclude Include="CstyleCommentsFilter.h" />
     <ClInclude Include="CstyleUtils.h" />
     <ClInclude Include="Duplo.h" />
-    <ClInclude Include="FileType.h" />
+    <ClInclude Include="FileTypeFactory.h" />
     <ClInclude Include="FileTypeBase.h" />
     <ClInclude Include="FileType_C.h" />
     <ClInclude Include="FileType_CS.h" />

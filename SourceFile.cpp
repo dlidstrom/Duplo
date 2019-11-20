@@ -1,4 +1,7 @@
 #include "SourceFile.h"
+#include "FileTypeFactory.h"
+#include "IFileType.h"
+#include "SourceLine.h"
 #include "StringUtil.h"
 #include "TextFile.h"
 
