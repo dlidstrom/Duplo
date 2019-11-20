@@ -53,7 +53,7 @@ namespace {
 
             // must be at least one alpha-numeric character
             bool isSourceLine =
-                tmp.size() >= m_minChars && std::find_if(tmp.begin(), tmp.end(), isalpha) != tmp.end();
+                tmp.size() >= m_minChars && std::find_if(std::begin(tmp), std::end(tmp), isalpha) != std::end(tmp);
             return isSourceLine;
         }
 

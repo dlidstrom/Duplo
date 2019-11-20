@@ -12,6 +12,12 @@
 #include <sstream>
 #include <time.h>
 
+namespace {
+    bool isSameFilename(const std::string& filename1, const std::string& filename2) {
+        return StringUtil::GetFilenamePart(filename1) == StringUtil::GetFilenamePart(filename2);
+    }
+}
+
 Duplo::Duplo(
     const std::string& listFileName,
     unsigned int minBlockSize,
@@ -70,17 +76,17 @@ void Duplo::reportSeq(int line1, int line2, int count, const SourceFile& pSource
     }
 }
 
-int Duplo::process(const SourceFile& pSource1, const SourceFile& pSource2, std::ostream& outFile) {
-    const unsigned int m = pSource1.getNumOfLines();
-    const unsigned int n = pSource2.getNumOfLines();
+int Duplo::Process(const SourceFile& pSource1, const SourceFile& pSource2, std::ostream& outFile) {
+    unsigned m = pSource1.getNumOfLines();
+    unsigned n = pSource2.getNumOfLines();
 
     // Reset matrix data
-    std::fill(m_pMatrix.begin(), m_pMatrix.begin() + m * n, MatchType::NONE);
+    std::fill(std::begin(m_pMatrix), std::begin(m_pMatrix) + m * n, MatchType::NONE);
 
     // Compute matrix
-    for (unsigned int y = 0; y < m; y++) {
+    for (unsigned y = 0; y < m; y++) {
         const SourceLine& pSLine = pSource1.getLine(y);
-        for (unsigned int x = 0; x < n; x++) {
+        for (unsigned x = 0; x < n; x++) {
             if (pSLine == pSource2.getLine(x)) {
                 m_pMatrix[x + n * y] = MatchType::MATCH;
             }
@@ -90,7 +96,7 @@ int Duplo::process(const SourceFile& pSource1, const SourceFile& pSource2, std::
     // support reporting filtering by both:
     // - "lines of code duplicated", &
     // - "percentage of file duplicated"
-    const unsigned int lMinBlockSize = std::max(
+    unsigned lMinBlockSize = std::max(
         m_minBlockSize,
         std::min(
             m_minBlockSize,
@@ -99,8 +105,8 @@ int Duplo::process(const SourceFile& pSource1, const SourceFile& pSource2, std::
     int blocks = 0;
 
     // Scan vertical part
-    for (unsigned int y = 0; y < m; y++) {
-        unsigned int seqLen = 0;
+    for (unsigned y = 0; y < m; y++) {
+        unsigned seqLen = 0;
         int maxX = std::min(n, m - y);
         for (int x = 0; x < maxX; x++) {
             if (m_pMatrix[x + n * (y + x)] == MatchType::MATCH) {
@@ -130,8 +136,8 @@ int Duplo::process(const SourceFile& pSource1, const SourceFile& pSource2, std::
 
     if (pSource1 != pSource2) {
         // Scan horizontal part
-        for (unsigned int x = 1; x < n; x++) {
-            unsigned int seqLen = 0;
+        for (unsigned x = 1; x < n; x++) {
+            unsigned seqLen = 0;
             int maxY = std::min(m, n - x);
             for (int y = 0; y < maxY; y++) {
                 if (m_pMatrix[x + y + n * y] == MatchType::MATCH) {
@@ -153,23 +159,6 @@ int Duplo::process(const SourceFile& pSource1, const SourceFile& pSource2, std::
     }
 
     return blocks;
-}
-
-const std::string Duplo::getFilenamePart(const std::string& fullpath) const {
-    std::string path = StringUtil::Substitute('\\', '/', fullpath);
-
-    std::string filename = path;
-
-    std::string::size_type idx = path.rfind('/');
-    if (idx != std::string::npos) {
-        filename = path.substr(idx + 1, path.size() - idx - 1);
-    }
-
-    return filename;
-}
-
-bool Duplo::isSameFilename(const std::string& filename1, const std::string& filename2) const {
-    return getFilenamePart(filename1) == getFilenamePart(filename2);
 }
 
 void Duplo::run(std::string outputFileName) {
@@ -199,13 +188,13 @@ void Duplo::run(std::string outputFileName) {
 
     int files = 0;
     unsigned long locsTotal = 0;
-    typedef std::tuple<int, std::string> FileLength;
-    std::vector<std::tuple<int, std::string>> longestFiles;
+    typedef std::tuple<unsigned, std::string> FileLength;
+    std::vector<FileLength> longestFiles;
     auto addSorted = [&longestFiles](int numLines, const std::string& filename) {
         longestFiles.emplace_back(numLines, filename);
         std::sort(
-            longestFiles.begin(),
-            longestFiles.end(),
+            std::begin(longestFiles),
+            std::end(longestFiles),
             [](auto l, auto r) { return std::get<0>(l) > std::get<0>(r); });
         if (longestFiles.size() > 10)
             longestFiles.resize(10);
@@ -228,7 +217,7 @@ void Duplo::run(std::string outputFileName) {
                 if (longestFiles.size() < 10) {
                     addSorted(numLines, lines[i]);
                 } else {
-                    unsigned l = std::get<0>(longestFiles.back());
+                    auto [l, _] = longestFiles.back();
                     if (l < numLines) {
                         addSorted(numLines, lines[i]);
                     }
@@ -248,8 +237,8 @@ void Duplo::run(std::string outputFileName) {
             << std::sqrt(m_pMatrix.max_size())
             << " lines at most." << std::endl
             << "Longest files:" << std::endl;
-        for (auto v : longestFiles) {
-            stream << std::get<1>(v) << ": " << std::get<0>(v) << std::endl;
+        for (auto [l, f] : longestFiles) {
+            stream << l << ": " << f << std::endl;
         }
 
         throw std::exception(stream.str().c_str());
@@ -274,14 +263,14 @@ void Duplo::run(std::string outputFileName) {
     int blocksTotal = 0;
 
     // Compare each file with each other
-    for (int i = 0; i < (int)sourceFiles.size(); i++) {
+    for (unsigned i = 0; i < sourceFiles.size(); i++) {
         std::cout << sourceFiles[i].getFilename();
         int blocks = 0;
 
-        blocks += process(sourceFiles[i], sourceFiles[i], outfile);
-        for (int j = i + 1; j < (int)sourceFiles.size(); j++) {
+        blocks += Process(sourceFiles[i], sourceFiles[i], outfile);
+        for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
             if (!m_ignoreSameFilename || !isSameFilename(sourceFiles[i].getFilename(), sourceFiles[j].getFilename())) {
-                blocks += process(sourceFiles[i], sourceFiles[j], outfile);
+                blocks += Process(sourceFiles[i], sourceFiles[j], outfile);
             }
         }
 

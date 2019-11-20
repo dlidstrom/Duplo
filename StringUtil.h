@@ -31,6 +31,8 @@ namespace StringUtil {
     std::string ToLower(const std::string& s);
 
     std::string GetFileExtension(const std::string& filename);
+
+    std::string GetFilenamePart(const std::string& fullpath);
 }
 
 #endif

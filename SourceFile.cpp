@@ -177,7 +177,7 @@ bool SourceFile::isSourceLine(const std::string& line) const {
     assert(bRet);
 
     // must be at least one alpha-numeric character
-    return bRet && std::find_if(tmp.begin(), tmp.end(), isalpha) != tmp.end();
+    return bRet && std::find_if(std::begin(tmp), std::end(tmp), isalpha) != std::end(tmp);
 }
 
 unsigned SourceFile::getNumOfLines() const {

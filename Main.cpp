@@ -56,7 +56,7 @@ namespace {
                 "       Christian M. Ammann (cammann@giants.ch)",
                 "       Trevor D'Arcy-Evans (tdarcyevans@hotmail.com)",
             };
-            std::copy(authors.begin(), authors.end(), std::ostream_iterator<const char*>(std::cout, "\n"));
+            std::copy(std::begin(authors), std::end(authors), std::ostream_iterator<const char*>(std::cout, "\n"));
             std::cout << "\n";
         }
     }
