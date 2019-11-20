@@ -8,7 +8,7 @@
 #include "SourceLine.h"
 
 class SourceFile {
-    std::string m_fileName;
+    std::string m_filename;
     FileType::FILETYPE m_FileType;
     IFileTypePtr m_fileType;
 
@@ -24,9 +24,9 @@ public:
     SourceFile(const std::string& fileName, unsigned int minChars, bool ignorePrepStuff);
     SourceFile(SourceFile&& right) noexcept;
 
-    unsigned getNumOfLines() const;
-    const SourceLine& getLine(int index) const;
-    const std::string& getFilename() const;
+    unsigned GetNumOfLines() const;
+    const SourceLine& GetLine(int index) const;
+    const std::string& GetFilename() const;
 
     bool operator==(const SourceFile& other) const;
 };

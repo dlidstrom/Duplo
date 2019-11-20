@@ -18,7 +18,7 @@ SourceLine::SourceLine(const std::string& line, int lineNumber) {
     hash = HashUtil::Hash(cleanLine.c_str(), cleanLine.size());
 }
 
-int SourceLine::getLineNumber() const {
+int SourceLine::GetLineNumber() const {
     return m_lineNumber;
 }
 
@@ -26,6 +26,6 @@ bool SourceLine::operator==(const SourceLine& other) const {
     return hash == other.hash;
 }
 
-const std::string& SourceLine::getLine() const {
+const std::string& SourceLine::GetLine() const {
     return m_line;
 }

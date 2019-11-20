@@ -6,7 +6,7 @@
 #include <cassert>
 
 SourceFile::SourceFile(SourceFile&& right) noexcept
-    : m_fileName(std::move(right.m_fileName))
+    : m_filename(std::move(right.m_filename))
     , m_FileType(right.m_FileType)
     , m_fileType(std::move(right.m_fileType))
     , m_minChars(right.m_minChars)
@@ -14,20 +14,20 @@ SourceFile::SourceFile(SourceFile&& right) noexcept
     , m_sourceLines(std::move(right.m_sourceLines)) {
 }
 
-SourceFile::SourceFile(const std::string& fileName, unsigned int minChars, bool ignorePrepStuff)
-    : m_fileName(fileName),
-      m_FileType(FileType::GetFileType(fileName)),
-      m_fileType(FileTypeFactory::CreateFileType(fileName, ignorePrepStuff, minChars)),
+SourceFile::SourceFile(const std::string& filename, unsigned minChars, bool ignorePrepStuff)
+    : m_filename(filename),
+      m_FileType(FileType::GetFileType(filename)),
+      m_fileType(FileTypeFactory::CreateFileType(filename, ignorePrepStuff, minChars)),
       m_minChars(minChars),
       m_ignorePrepStuff(ignorePrepStuff) {
-    TextFile listOfFiles(m_fileName);
+    TextFile listOfFiles(m_filename);
 
-    auto lines = listOfFiles.readLines(false);
+    auto lines = listOfFiles.ReadLines(false);
 
     m_sourceLines = m_fileType->GetCleanedSourceLines(lines);
     int openBlockComments = 0;
     m_sourceLines.reserve(lines.size());
-    for (int i = 0; i < (int)lines.size(); i++) {
+    for (std::size_t i = 0; i < lines.size(); i++) {
         const std::string& line = lines[i];
         std::string tmp;
 
@@ -70,9 +70,7 @@ SourceFile::SourceFile(const std::string& fileName, unsigned int minChars, bool 
         }
         }
 
-        std::string cleaned;
-        getCleanLine(tmp, cleaned);
-
+        std::string cleaned = m_fileType->GetCleanLine(tmp);
         if (m_fileType->IsSourceLine(cleaned)) {
             m_sourceLines.emplace_back(cleaned, i);
         }
@@ -180,18 +178,18 @@ bool SourceFile::isSourceLine(const std::string& line) const {
     return bRet && std::find_if(std::begin(tmp), std::end(tmp), isalpha) != std::end(tmp);
 }
 
-unsigned SourceFile::getNumOfLines() const {
+unsigned SourceFile::GetNumOfLines() const {
     return m_sourceLines.size();
 }
 
-const SourceLine& SourceFile::getLine(int index) const {
+const SourceLine& SourceFile::GetLine(int index) const {
     return m_sourceLines[index];
 }
 
-const std::string& SourceFile::getFilename() const {
-    return m_fileName;
+const std::string& SourceFile::GetFilename() const {
+    return m_filename;
 }
 
 bool SourceFile::operator==(const SourceFile& other) const {
-    return this == &other || getFilename() == other.getFilename();
+    return this == &other || GetFilename() == other.GetFilename();
 }

@@ -23,23 +23,23 @@ namespace {
     }
 }
 
-TextFile::TextFile(const std::string& fileName)
-    : m_fileName(fileName) {
+TextFile::TextFile(const std::string& filename)
+    : m_filename(filename) {
 }
 
-std::vector<std::string> TextFile::readLines(bool doTrim) {
-    std::string list = readAll(m_fileName);
+std::vector<std::string> TextFile::ReadLines(bool doTrim) {
+    std::string list = readAll(m_filename);
 
     std::vector<std::string> lines;
     StringUtil::Split(list, "\n", lines, doTrim);
     return lines;
 }
 
-void TextFile::writeAll(const std::string& all) {
-    std::ofstream outFile(m_fileName.c_str(), std::ios::binary);
+void TextFile::WriteAll(const std::string& all) {
+    std::ofstream outFile(m_filename.c_str(), std::ios::binary);
     if (!outFile) {
         std::ostringstream stream;
-        stream << "Error: Can't open file: " << m_fileName << ". File doesn't exist or access denied.\n";
+        stream << "Error: Can't open file: " << m_filename << ". File doesn't exist or access denied.\n";
         throw std::exception(stream.str().c_str());
     }
 

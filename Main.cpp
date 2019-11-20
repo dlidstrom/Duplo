@@ -23,7 +23,7 @@ namespace {
                 Clamp(100, 0, ap.getInt("-pt", 100)),
                 ap.getInt("-mc", MIN_CHARS),
                 ap.is("-ip"), ap.is("-d"), ap.is("-xml"));
-            duplo.run(argv[argc - 1]);
+            duplo.Run(argv[argc - 1]);
         } else {
             std::cout << "\nNAME\n";
             std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";

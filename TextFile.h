@@ -5,20 +5,20 @@
 #include <vector>
 
 class TextFile {
-    std::string m_fileName;
+    std::string m_filename;
 
 public:
     /**
      * Creates a new text file. The file is accessed relative to current directory.
      */
-    TextFile(const std::string& fileName);
+    TextFile(const std::string& filename);
 
-    std::vector<std::string> readLines(bool doTrim);
+    std::vector<std::string> ReadLines(bool doTrim);
 
     /**
      * Writes a std::string into a text file.
      */
-    void writeAll(const std::string& all);
+    void WriteAll(const std::string& all);
 };
 
 #endif

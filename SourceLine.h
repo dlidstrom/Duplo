@@ -15,8 +15,8 @@ public:
      */
     SourceLine(const std::string& line, int lineNumber);
 
-    int getLineNumber() const;
-    const std::string& getLine() const;
+    int GetLineNumber() const;
+    const std::string& GetLine() const;
     bool operator==(const SourceLine& other) const;
 };
 
