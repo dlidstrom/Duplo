@@ -17,13 +17,26 @@ namespace {
         const int MIN_CHARS = 3;
 
         if (!ap.is("--help") && argc > 2) {
-            Duplo duplo(
+            auto minBlockSize = ap.getInt("-ml", MIN_BLOCK_SIZE);
+            auto blockPercentThresholdValue = Clamp(100, 0, ap.getInt("-pt", 100));
+            if (blockPercentThresholdValue < 0 || 100 < blockPercentThresholdValue) {
+                throw std::exception("-pt out of range");
+            }
+
+            unsigned char blockPercentThreshold = static_cast<unsigned char>(blockPercentThresholdValue);
+            auto minChars = ap.getInt("-mc", MIN_CHARS);
+            bool ignorePrepStuff = ap.is("-ip");
+            bool ignoreSameFilename = ap.is("-d");
+            bool xml = ap.is("-xml");
+            Duplo::Run(
+                minChars,
+                ignorePrepStuff,
+                minBlockSize,
+                blockPercentThreshold,
+                xml,
+                ignoreSameFilename,
                 argv[argc - 2],
-                ap.getInt("-ml", MIN_BLOCK_SIZE),
-                Clamp(100, 0, ap.getInt("-pt", 100)),
-                ap.getInt("-mc", MIN_CHARS),
-                ap.is("-ip"), ap.is("-d"), ap.is("-xml"));
-            duplo.Run(argv[argc - 1]);
+                argv[argc - 1]);
         } else {
             std::cout << "\nNAME\n";
             std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";

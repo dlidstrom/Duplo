@@ -12,7 +12,7 @@ class SourceFile {
     std::vector<SourceLine> m_sourceLines;
 
 public:
-    SourceFile(const std::string& fileName, unsigned int minChars, bool ignorePrepStuff);
+    SourceFile(const std::string& fileName, unsigned minChars, bool ignorePrepStuff);
     SourceFile(SourceFile&& right) noexcept;
 
     unsigned GetNumOfLines() const;
