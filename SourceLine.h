@@ -7,7 +7,7 @@
 class SourceLine {
     std::string m_line;
     int m_lineNumber;
-    unsigned long hash;
+    unsigned long m_hash;
 
 public:
     /**
@@ -17,6 +17,7 @@ public:
 
     int GetLineNumber() const;
     const std::string& GetLine() const;
+    unsigned long GetHash() const;
     bool operator==(const SourceLine& other) const;
 };
 

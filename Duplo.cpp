@@ -13,6 +13,8 @@
 #include <fstream>
 #include <sstream>
 #include <tuple>
+#include <unordered_map>
+#include <unordered_set>
 
 enum class MatchType : unsigned char {
     NONE,
@@ -20,9 +22,12 @@ enum class MatchType : unsigned char {
 };
 typedef std::tuple<unsigned, std::string> FileLength;
 
+typedef std::unordered_map<unsigned long, std::vector<std::string>> HashToFiles;
+
 class ProcessResult {
     unsigned m_blocks;
     unsigned m_duplicateLines;
+
 public:
     ProcessResult()
         : m_blocks(0),
@@ -52,8 +57,8 @@ ProcessResult operator<<(ProcessResult& left, const ProcessResult& right) {
 }
 
 namespace {
-    bool isSameFilename(const std::string& filename1, const std::string& filename2) {
-        return StringUtil::GetFilenamePart(filename1) == StringUtil::GetFilenamePart(filename2);
+    bool IsSameFilename(const SourceFile& left, const SourceFile& right) {
+        return StringUtil::GetFilenamePart(left.GetFilename()) == StringUtil::GetFilenamePart(right.GetFilename());
     }
 
     std::tuple<std::vector<SourceFile>, std::vector<MatchType>, unsigned, unsigned> LoadSourceFiles(
@@ -80,11 +85,11 @@ namespace {
         // Create vector with all source files
         for (unsigned i = 0; i < lines.size(); i++) {
             if (lines[i].size() > 5) {
-                SourceFile pSourceFile(lines[i], minChars, ignorePrepStuff);
-                unsigned numLines = pSourceFile.GetNumOfLines();
+                SourceFile sourceFile(lines[i], minChars, ignorePrepStuff);
+                unsigned numLines = sourceFile.GetNumOfLines();
                 if (numLines > 0) {
                     files++;
-                    sourceFiles.push_back(std::move(pSourceFile));
+                    sourceFiles.push_back(std::move(sourceFile));
                     locsTotal += numLines;
                     if (maxLinesPerFile < numLines) {
                         maxLinesPerFile = numLines;
@@ -311,16 +316,42 @@ void Duplo::Run(
     auto [sourceFiles, matrix, files, locsTotal] =
         LoadSourceFiles(lines, minChars, ignorePrepStuff);
 
-    ProcessResult processResultTotal;
+    // hash maps
+    HashToFiles hashToFiles;
+    for (const auto& s : sourceFiles) {
+        for (size_t i = 0; i < s.GetNumOfLines(); i++) {
+            hashToFiles[s.GetLine(i).GetHash()].push_back(s.GetFilename());
+        }
+    }
 
     // Compare each file with each other
+    ProcessResult processResultTotal;
     for (unsigned i = 0; i < sourceFiles.size(); i++) {
-        std::cout << sourceFiles[i].GetFilename();
+        const auto& left = sourceFiles[i];
+
+        // get matching files
+        std::unordered_set<std::string> matchingFiles;
+        for (std::size_t k = 0; k < left.GetNumOfLines(); k++) {
+            auto hash = left.GetLine(k).GetHash();
+            const auto& filenames = hashToFiles[hash];
+            std::for_each(
+                std::begin(filenames),
+                std::end(filenames),
+                [&matchingFiles](auto s) {
+                    matchingFiles.insert(s);
+            });
+        }
+
+        std::cout << left.GetFilename();
         ProcessResult processResult =
-            Process(sourceFiles[i], sourceFiles[i], matrix, minBlockSize, blockPercentThreshold, xml, outfile);
+            Process(left, left, matrix, minBlockSize, blockPercentThreshold, xml, outfile);
+
+        // files to compare are those that have matching lines
         for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
-            if (!ignoreSameFilename || !isSameFilename(sourceFiles[i].GetFilename(), sourceFiles[j].GetFilename())) {
-                processResult << Process(sourceFiles[i], sourceFiles[j], matrix, minBlockSize, blockPercentThreshold, xml, outfile);
+            const auto& right = sourceFiles[j];
+            if ((!ignoreSameFilename || !IsSameFilename(left, right))
+                && matchingFiles.contains(right.GetFilename())) {
+                processResult << Process(left, right, matrix, minBlockSize, blockPercentThreshold, xml, outfile);
             }
         }
 

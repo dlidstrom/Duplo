@@ -16,7 +16,7 @@ SourceLine::SourceLine(const std::string& line, int lineNumber) {
         std::end(line),
         std::back_inserter(cleanLine),
         [](char c) { return c > ' '; });
-    hash = HashUtil::Hash(cleanLine.c_str(), cleanLine.size());
+    m_hash = HashUtil::Hash(cleanLine.c_str(), cleanLine.size());
 }
 
 int SourceLine::GetLineNumber() const {
@@ -24,9 +24,13 @@ int SourceLine::GetLineNumber() const {
 }
 
 bool SourceLine::operator==(const SourceLine& other) const {
-    return hash == other.hash;
+    return m_hash == other.m_hash;
 }
 
 const std::string& SourceLine::GetLine() const {
     return m_line;
+}
+
+unsigned long SourceLine::GetHash() const {
+    return m_hash;
 }
