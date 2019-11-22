@@ -20,7 +20,7 @@ namespace {
             auto minBlockSize = ap.getInt("-ml", MIN_BLOCK_SIZE);
             auto blockPercentThresholdValue = Clamp(100, 0, ap.getInt("-pt", 100));
             if (blockPercentThresholdValue < 0 || 100 < blockPercentThresholdValue) {
-                throw std::exception("-pt out of range");
+                throw std::runtime_error("-pt out of range");
             }
 
             unsigned char blockPercentThreshold = static_cast<unsigned char>(blockPercentThresholdValue);

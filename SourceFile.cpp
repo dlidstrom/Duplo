@@ -38,3 +38,7 @@ const std::string& SourceFile::GetFilename() const {
 bool SourceFile::operator==(const SourceFile& other) const {
     return this == &other || GetFilename() == other.GetFilename();
 }
+
+bool SourceFile::operator!=(const SourceFile& other) const {
+    return !(*this == other);
+}

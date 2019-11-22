@@ -12,7 +12,7 @@ namespace {
         if (!inFile) {
             std::ostringstream stream;
             stream << "Error: Can't open file: " << fileName << ". File doesn't exist or access denied.\n";
-            throw std::exception(stream.str().c_str());
+            throw std::runtime_error(stream.str().c_str());
         }
 
         std::streampos len = inFile.tellg();
@@ -40,7 +40,7 @@ void TextFile::WriteAll(const std::string& all) {
     if (!outFile) {
         std::ostringstream stream;
         stream << "Error: Can't open file: " << m_filename << ". File doesn't exist or access denied.\n";
-        throw std::exception(stream.str().c_str());
+        throw std::runtime_error(stream.str().c_str());
     }
 
     outFile << all;

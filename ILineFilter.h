@@ -5,6 +5,7 @@
 #include <string>
 
 struct ILineFilter {
+    virtual ~ILineFilter() {}
     virtual std::string ProcessSourceLine(const std::string& line) = 0;
 };
 

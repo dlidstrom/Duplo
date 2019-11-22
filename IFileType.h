@@ -8,6 +8,7 @@
 #include <vector>
 
 struct IFileType {
+    virtual ~IFileType() {}
     virtual std::vector<SourceLine> GetCleanedSourceLines(const std::vector<std::string>& lines) const = 0;
 };
 

@@ -7,6 +7,7 @@
 #include "TextFile.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <ctime>
 #include <fstream>
@@ -113,7 +114,7 @@ namespace {
                 stream << l << ": " << f << std::endl;
             }
 
-            throw std::exception(stream.str().c_str());
+            throw std::runtime_error(stream.str().c_str());
         }
 
         std::cout
@@ -132,7 +133,7 @@ namespace {
                 stream << l << ": " << f << std::endl;
             }
 
-            throw std::exception(stream.str().c_str());
+            throw std::runtime_error(stream.str().c_str());
         }
 
         return std::tuple(std::move(sourceFiles), matrix, files, locsTotal);
@@ -296,7 +297,7 @@ void Duplo::Run(
     if (!outfile) {
         std::ostringstream stream;
         stream << "Error: Can't open file: " << outputFileName << std::endl;
-        throw std::exception(stream.str().c_str());
+        throw std::runtime_error(stream.str().c_str());
     }
 
     double duration;

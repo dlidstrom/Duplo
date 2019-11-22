@@ -20,6 +20,7 @@ public:
     const std::string& GetFilename() const;
 
     bool operator==(const SourceFile& other) const;
+    bool operator!=(const SourceFile& other) const;
 };
 
 #endif

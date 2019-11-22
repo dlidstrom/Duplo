@@ -1,4 +1,4 @@
-#ifndef _FILETYPE_C_H
+#ifndef _FILETYPE_C_H_
 #define _FILETYPE_C_H_
 
 #include "FileTypeBase.h"

@@ -99,7 +99,6 @@
     <ClCompile Include="FileTypeBase.cpp" />
     <ClCompile Include="FileType_C.cpp" />
     <ClCompile Include="FileType_CS.cpp" />
-    <ClCompile Include="FileType_H.cpp" />
     <ClCompile Include="FileType_S.cpp" />
     <ClCompile Include="FileType_Unknown.cpp" />
     <ClCompile Include="FileType_VB.cpp" />
@@ -120,7 +119,6 @@
     <ClInclude Include="FileTypeBase.h" />
     <ClInclude Include="FileType_C.h" />
     <ClInclude Include="FileType_CS.h" />
-    <ClInclude Include="FileType_H.h" />
     <ClInclude Include="FileType_S.h" />
     <ClInclude Include="FileType_Unknown.h" />
     <ClInclude Include="FileType_VB.h" />

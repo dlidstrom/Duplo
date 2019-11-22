@@ -9,3 +9,4 @@ Release
 *.o
 *.opensdf
 duplo
+.ionide

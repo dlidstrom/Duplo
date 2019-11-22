@@ -2,7 +2,7 @@
 CC = g++
 
 # Flags
-CXXFLAGS = -O3 -Wall
+CXXFLAGS = -O3 -Wall -std=c++17
 LDFLAGS =  ${CXXFLAGS}
 
 # Define what extensions we use
@@ -12,8 +12,25 @@ LDFLAGS =  ${CXXFLAGS}
 PROG_NAME = duplo
 
 # List of object files
-OBJS = StringUtil.o HashUtil.o ArgumentParser.o TextFile.o \
-       SourceFile.o SourceLine.o Duplo.o FileType.o Main.o
+OBJS = \
+	ArgumentParser.o \
+	CstyleUtils.o \
+	CstyleCommentsFilter.o \
+	Duplo.o \
+	FileTypeFactory.o \
+	FileTypeBase.o \
+	FileType_C.o \
+	FileType_CS.o \
+	FileType_S.o \
+	FileType_Unknown.o \
+	FileType_VB.o \
+	Main.o \
+	NoopLineFilter.o \
+	HashUtil.o \
+	SourceFile.o \
+	SourceLine.o \
+	StringUtil.o \
+	TextFile.o
 
 # Build process
 
@@ -28,7 +45,7 @@ ${PROG_NAME}: ${OBJS}
 	${CC} ${CXXFLAGS} -c $*.cpp -o$@
 
 # Remove all object files
-clean:	
+clean:
 	rm -f *.o
 
 
