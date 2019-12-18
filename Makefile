@@ -5,8 +5,11 @@ CC = g++
 CXXFLAGS = -O3 -Wall -std=c++17
 LDFLAGS =  ${CXXFLAGS}
 
+# Remove object file if compilation fails
+#.DELETE_ON_ERROR:
+
 # Define what extensions we use
-.SUFFIXES : .cpp
+.SUFFIXES: .cpp
 
 # Name of executable
 PROG_NAME = duplo
@@ -26,6 +29,7 @@ OBJS = \
 	FileType_VB.o \
 	Main.o \
 	NoopLineFilter.o \
+	Options.o \
 	HashUtil.o \
 	SourceFile.o \
 	SourceLine.o \
@@ -42,12 +46,9 @@ ${PROG_NAME}: ${OBJS}
 
 # Each .cpp file compile
 .cpp.o:
+#	@touch $@
 	${CC} ${CXXFLAGS} -c $*.cpp -o$@
 
 # Remove all object files
 clean:
 	rm -f *.o
-
-
-
-

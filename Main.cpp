@@ -1,5 +1,6 @@
 #include "ArgumentParser.h"
 #include "Duplo.h"
+#include "Options.h"
 
 #include <algorithm>
 #include <iostream>
@@ -26,17 +27,20 @@ namespace {
             unsigned char blockPercentThreshold = static_cast<unsigned char>(blockPercentThresholdValue);
             auto minChars = ap.getInt("-mc", MIN_CHARS);
             bool ignorePrepStuff = ap.is("-ip");
+            bool outputXml = ap.is("-xml");
             bool ignoreSameFilename = ap.is("-d");
-            bool xml = ap.is("-xml");
-            Duplo::Run(
+            std::string listFilename(argv[argc - 2]);
+            std::string outputFilename(argv[argc - 1]);
+            Options options(
                 minChars,
                 ignorePrepStuff,
                 minBlockSize,
                 blockPercentThreshold,
-                xml,
+                outputXml,
                 ignoreSameFilename,
-                argv[argc - 2],
-                argv[argc - 1]);
+                listFilename,
+                outputFilename);
+            Duplo::Run(options);
         } else {
             std::cout << "\nNAME\n";
             std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";

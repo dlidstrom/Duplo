@@ -5,8 +5,11 @@
 
 struct IFileType;
 typedef std::shared_ptr<IFileType> IFileTypePtr;
+
 struct ILineFilter;
 typedef std::shared_ptr<ILineFilter> ILineFilterPtr;
+
+class Options;
 class SourceFile;
 class SourceLine;
 
