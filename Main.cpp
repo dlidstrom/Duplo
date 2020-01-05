@@ -61,7 +61,7 @@ namespace {
             std::cout << "       -ip              ignore preprocessor directives\n";
             std::cout << "       -d               ignore file pairs with same name\n";
             std::cout << "       -xml             output file in XML\n";
-            std::cout << "       INTPUT_FILELIST  input filelist\n";
+            std::cout << "       INPUT_FILELIST   input filelist (specify '-' to read from stdin)\n";
             std::cout << "       OUTPUT_FILE      output file\n";
 
             std::cout << "\nVERSION\n";

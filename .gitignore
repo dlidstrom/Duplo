@@ -10,3 +10,4 @@ Release
 *.opensdf
 duplo
 .ionide
+build
