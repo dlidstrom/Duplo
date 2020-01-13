@@ -442,9 +442,9 @@ void Duplo::Run(const Options& options) {
             << std::endl
             << "  Duplicate lines of code: "
             << processResultTotal.DuplicateLines()
-            << " ("
-            << 100 * processResultTotal.DuplicateLines() / locsTotal
-            << "%)"
+            //<< " ("
+            //<< 100 * processResultTotal.DuplicateLines() / locsTotal
+            //<< "%)"
             << std::endl
             << "  Total "
             << processResultTotal.Blocks()
