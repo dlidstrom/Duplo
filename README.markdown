@@ -1,32 +1,37 @@
 # Duplo (C/C++/Java Duplicate Source Code Block Finder)
 
 - [Duplo (C/C++/Java Duplicate Source Code Block Finder)](#duplo-ccjava-duplicate-source-code-block-finder)
-  - [GENERAL INFORMATION](#general-information)
-  - [MAINTAINER](#maintainer)
-  - [FILE FORMAT SUPPORT](#file-format-support)
-  - [OPTIONS](#options)
-  - [FEEDBACK AND BUG REPORTING](#feedback-and-bug-reporting)
-  - [FILE LIST GENERATION](#file-list-generation)
-    - [Windows](#windows)
-    - [UNIX](#unix)
-  - [PERFORMANCE MEASUREMENTS](#performance-measurements)
-  - [BACKGROUND](#background)
-  - [CHANGES](#changes)
-  - [LICENSE](#license)
+  - [General Information](#general-information)
+  - [Maintainer](#maintainer)
+  - [File Format Support](#file-format-support)
+  - [Usage](#usage)
+    - [Passing files using stdin](#passing-files-using-stdin)
+    - [Passing files using file](#passing-files-using-file)
+    - [Xml output](#xml-output)
+  - [Feedback and Bug Reporting](#feedback-and-bug-reporting)
+  - [Performance Measurements](#performance-measurements)
+  - [Algorithm Background](#algorithm-background)
+  - [Developing](#developing)
+    - [Compiling on Unix](#compiling-on-unix)
+    - [Compiling on Windows](#compiling-on-windows)
+    - [Additional Language Support](#additional-language-support)
+    - [Language Suggestions](#language-suggestions)
+  - [Changes](#changes)
+  - [License](#license)
 
-## GENERAL INFORMATION
+## General Information
 
 Duplicated source code blocks can harm maintainability of software systems.
 Duplo is a tool to find duplicated code blocks in large C, C++, Java, C# and
 VB.Net systems.
 
-## MAINTAINER
+## Maintainer
 
 Duplo was originally developed by Christian
 M. Ammann and is now maintained by Daniel
 Lidström.
 
-## FILE FORMAT SUPPORT
+## File Format Support
 
 Duplo has built in support for the following
 file formats:
@@ -48,60 +53,129 @@ duplicates found in the same file.
 
 Sample output snippet:
 
-    ...
-    src\engine\geometry\simple\TorusGeometry.cpp(56)
-    src\engine\geometry\simple\SphereGeometry.cpp(54)
-        pBuffer[currentIndex*size+3]=(i+1)/(float)subdsU;
-        pBuffer[currentIndex*size+4]=j/(float)subdsV;
-        currentIndex++;
-        pPrimitiveBuffer->unlock();
+```txt
+...
+src\engine\geometry\simple\TorusGeometry.cpp(56)
+src\engine\geometry\simple\SphereGeometry.cpp(54)
+    pBuffer[currentIndex*size+3]=(i+1)/(float)subdsU;
+    pBuffer[currentIndex*size+4]=j/(float)subdsV;
+    currentIndex++;
+    pPrimitiveBuffer->unlock();
 
-    src\engine\geometry\subds\SubDsGeometry.cpp(37)
-    src\engine\geometry\SkinnedMeshGeometry.cpp(45)
-        pBuffer[i*size+0]=m_ct[0]->m_pColors[i*3];
-        pBuffer[i*size+1]=m_ct[0]->m_pColors[i*3+1];
-        pBuffer[i*size+2]=m_ct[0]->m_pColors[i*3+2];
-    ...
+src\engine\geometry\subds\SubDsGeometry.cpp(37)
+src\engine\geometry\SkinnedMeshGeometry.cpp(45)
+    pBuffer[i*size+0]=m_ct[0]->m_pColors[i*3];
+    pBuffer[i*size+1]=m_ct[0]->m_pColors[i*3+1];
+    pBuffer[i*size+2]=m_ct[0]->m_pColors[i*3+2];
+...
+```
 
-## OPTIONS
+## Usage
+
+Duplo works with a list of files. You can either specify a file that contains the list of files, or you can pass them using `stdin`.
 
 Run `duplo --help` on the command line to see the detailed options.
 
-## FEEDBACK AND BUG REPORTING
+### Passing files using `stdin`
+
+```bash
+# unix
+> find . \( -iname "*.cpp" -o -iname "*.h" \) | duplo - out.txt
+
+# windows
+> Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | Duplo.exe - out.txt
+```
+
+`duplo` will write the duplicated blocks into `out.txt`.
+
+### Passing files using file
+
+`duplo` can analyze files specified in a separate file:
+
+```bash
+# unix
+> find . -type f \( -iname "*.cpp" -o -iname "*.h" \) > files.lst
+> duplo files.lst out.txt
+
+# windows
+> Get-ChildItem -Include "*.cpp", "*.h" -Recurse |  % { $_.FullName } | Out-File -encoding ascii files.lst
+> Duplo.exe files.lst out.txt
+```
+
+### Xml output
+
+Duplo can also output xml and there is a stylesheet that will format the result for viewing in a browser. This can be used as a report tab in your continuous integration tool (TeamCity, etc).
+
+## Feedback and Bug Reporting
 
 Please open an issue to discuss feedback,
 feature requests and bug reports.
 
-## FILE LIST GENERATION
+## Performance Measurements
 
-Generate a list of all files of a directory with:
+| System | Files | Loc's | Time |
+|-|-|-|-|
+| Quake2 | 266 | 102740 | 18sec |
 
-### Windows
-
-    dir /s /b /a-d *.cpp *.h > files.lst
-
-### UNIX
-
-    find . -name "*.cpp" > cppList.lst
-    find . -name "*.h" > includeList.lst
-    cat cppList.lst includeList.lst > all.lst
-
-## PERFORMANCE MEASUREMENTS
-
-    SYSTEM                  FILES     LOCs   TIME   HARDWARE
-    3D Game Engine            275    12211   4sec   3.4GHZ P4
-    Quake2                    266   102740  58sec   3.4GHZ P4
-    Computer Game            5639   754320  34min   3.4GHZ P4
-    Linux Kernel 2.6.11.10  17034  4184356  16h     3.4GHZ P4
-
-## BACKGROUND
+## Algorithm Background
 
 Duplo uses the same techniques as Duploc to detect duplicated code blocks. See
 [Duca99bCodeDuplication](http://scg.unibe.ch/archive/papers/Duca99bCodeDuplication.pdf) for
 further information.
 
-## CHANGES
+## Developing
 
+### Compiling on Unix
+
+There are two options, a legacy using `make` and one using `CMake` that will probably replace.
+
+```bash
+# legacy
+> make
+# continuous build (needs fswatch)
+> ./watch.sh
+
+# or CMake
+> mkdir build
+> cd build
+> cmake ..
+# now issue make
+> make
+```
+
+### Compiling on Windows
+
+Use Visual Studio 2019 to open the included solution file (or try `CMake`).
+
+### Additional Language Support
+
+Duplo can analyze all text files regardless of format, but it has special support for some programming languages (C++, C#, Java, for example). This allows Duplo to improve the duplication detection as it can ignore preprocessor directives and/or comments.
+
+To implement support for a new language, there are a couple of options (in order of complexity):
+
+1. Implement `FileTypeBase` which has support for handling comments and preprocessor directives. You just need to decide what is a comment. With this option you need to implement a couple of methods, one which is `CreateLineFilter`. This is to remove multiline comments. Look at `CstyleCommentsFilter` for an example.
+2. Implement `IFileType` interface directly. This gives you the most freedom but also is the hardest option of course.
+
+### Language Suggestions
+
+- JavaScript (easy, just look at the existing C-based ones)
+- Ruby
+- Perl
+- PHP
+- F#
+- Scala
+- Haskell
+- Erlang
+
+Send me a pull request!
+
+## Changes
+
+- 0.4
+  - Significant performance improvements
+  - Using modern C++ techniques
+  - Modularized to simplify adding support of new file formats
+  - Can pass files using `stdin`
 - 0.3
   - Updated links in html output to GitHub
   - Support for gcc assembly (.s)
@@ -109,7 +183,7 @@ further information.
   - Fixed limitation of total number of lines of code
   - Checking of arbitrary files
 
-## LICENSE
+## License
 
 Duplo is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -126,6 +200,3 @@ along with Duplo; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 ---
-
-- 2005, Christian M. Ammann (cammann@giants.ch)
-- 2010, Daniel Lidstrom     (dlidstrom@gmail.com)

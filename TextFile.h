@@ -1,24 +1,3 @@
-/** \class TextFile
- * TextFile load and save text files with a simple interface.
- *
- * @author  Christian Ammann (cammann@giants.ch)
- * @date  16/05/05
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
 #ifndef _TEXTFILE_H_
 #define _TEXTFILE_H_
 
@@ -26,15 +5,20 @@
 #include <vector>
 
 class TextFile {
-protected:
-    std::string m_fileName;
+    std::string m_filename;
 
 public:
-    TextFile(const std::string& fileName);
-    bool readAll(std::string& all);
-    bool readLines(std::vector<std::string>& lines, bool doTrim);
-    bool writeAll(const std::string& all);
+    /**
+     * Creates a new text file. The file is accessed relative to current directory.
+     */
+    TextFile(const std::string& filename);
+
+    std::vector<std::string> ReadLines(bool doTrim);
+
+    /**
+     * Writes a std::string into a text file.
+     */
+    void WriteAll(const std::string& all);
 };
 
 #endif
-

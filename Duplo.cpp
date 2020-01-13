@@ -1,379 +1,455 @@
-/**
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
-
 #include "Duplo.h"
-
-#include <fstream>
-#include <time.h>
-
-#include <algorithm>
-#include <cstring>
-
+#include "ArgumentParser.h"
+#include "HashUtil.h"
+#include "Options.h"
 #include "SourceFile.h"
 #include "SourceLine.h"
-
 #include "StringUtil.h"
-#include "HashUtil.h"
 #include "TextFile.h"
-#include "ArgumentParser.h"
 
-Duplo::Duplo(
-    const std::string& listFileName,
-    unsigned int minBlockSize,
-    unsigned int blockPercentThreshold,
-    unsigned int minChars,
-    bool ignorePrepStuff, bool ignoreSameFilename, bool Xml) :
-    m_listFileName(listFileName),
-    m_minBlockSize(minBlockSize),
-    m_blockPercentThreshold(blockPercentThreshold),
-    m_minChars(minChars),
-    m_ignorePrepStuff(ignorePrepStuff),
-    m_ignoreSameFilename(ignoreSameFilename),
-    m_maxLinesPerFile(0),
-    m_DuplicateLines(0),
-    m_Xml(Xml),
-    m_pMatrix(NULL)
-{
-}
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <ctime>
+#include <fstream>
+#include <sstream>
+#include <tuple>
+#include <unordered_map>
+#include <unordered_set>
 
-Duplo::~Duplo(){
-    delete[] m_pMatrix;
-    m_pMatrix = NULL;
-}
+enum class MatchType : unsigned char {
+    NONE,
+    MATCH
+};
+typedef std::tuple<unsigned, std::string> FileLength;
+typedef const std::string* StringPtr;
+typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
 
-void Duplo::reportSeq(int line1, int line2, int count, SourceFile* pSource1, SourceFile* pSource2, std::ostream& outFile){
-    if (m_Xml)
-    {
-        outFile << "    <set LineCount=\"" << count << "\">" << std::endl;
-        outFile << "        <block SourceFile=\"" << pSource1->getFilename() << "\" StartLineNumber=\"" << pSource1->getLine(line1)->getLineNumber() << "\"/>" << std::endl;
-        outFile << "        <block SourceFile=\"" << pSource2->getFilename() << "\" StartLineNumber=\"" << pSource2->getLine(line2)->getLineNumber() << "\"/>" << std::endl;
-        outFile << "        <lines xml:space=\"preserve\">" << std::endl;
-        for(int j = 0; j < count; j++)
-        {
-            // replace various characters/ strings so that it doesn't upset the XML parser
-            std::string tmpstr = pSource1->getLine(j+line1)->getLine();
+class ProcessResult {
+    unsigned m_blocks;
+    unsigned m_duplicateLines;
 
-            // " --> '
-            StringUtil::StrSub(tmpstr, "\'", "\"", -1);
-
-            // & --> &amp;
-            StringUtil::StrSub(tmpstr, "&amp;", "&", -1);
-
-            // < --> &lt;
-            StringUtil::StrSub(tmpstr, "&lt;", "<", -1);
-
-            // > --> &gt;
-            StringUtil::StrSub(tmpstr, "&gt;", ">", -1);
-
-            outFile << "            <line Text=\"" << tmpstr << "\"/>" << std::endl;
-            m_DuplicateLines++;
-        }
-        outFile << "        </lines>" << std::endl;
-        outFile << "    </set>" << std::endl;
+public:
+    ProcessResult()
+        : m_blocks(0),
+          m_duplicateLines(0) {
     }
-    else
-    {
-        outFile << pSource1->getFilename() << "(" << pSource1->getLine(line1)->getLineNumber() << ")" << std::endl;
-        outFile << pSource2->getFilename() << "(" << pSource2->getLine(line2)->getLineNumber() << ")" << std::endl;
-        for(int j=0;j<count;j++){
-            outFile << pSource1->getLine(j+line1)->getLine() << std::endl;
-            m_DuplicateLines++;
-        }
-        outFile << std::endl;
+
+    ProcessResult(unsigned blocks, unsigned duplicateLines)
+        : m_blocks(blocks),
+          m_duplicateLines(duplicateLines) {
     }
+
+    unsigned Blocks() const {
+        return m_blocks;
+    }
+
+    unsigned DuplicateLines() const {
+        return m_duplicateLines;
+    }
+
+    friend ProcessResult operator<<(ProcessResult& left, const ProcessResult& right);
+};
+
+ProcessResult operator<<(ProcessResult& left, const ProcessResult& right) {
+    left.m_blocks += right.m_blocks;
+    left.m_duplicateLines += right.m_duplicateLines;
+    return left;
 }
 
-int Duplo::process(SourceFile* pSource1, SourceFile* pSource2, std::ostream& outFile){
-    const unsigned int m = pSource1->getNumOfLines();
-    const unsigned int n = pSource2->getNumOfLines();
+namespace {
+    bool IsSameFilename(const SourceFile& left, const SourceFile& right) {
+        return StringUtil::GetFilenamePart(left.GetFilename()) == StringUtil::GetFilenamePart(right.GetFilename());
+    }
 
-    const unsigned char NONE = 0;
-    const unsigned char MATCH = 1;
-
-    // Reset matrix data
-    memset(m_pMatrix, NONE, m*n);
-
-    // Compute matrix
-    for(unsigned int y=0; y<m; y++){
-        SourceLine* pSLine = pSource1->getLine(y);
-        for(unsigned int x=0; x<n; x++){
-            if(pSLine->equals(pSource2->getLine(x))){
-                m_pMatrix[x+n*y] = MATCH;
+    std::vector<std::string> LoadFileList(const std::string& listFilename) {
+        if (listFilename == "-") {
+            std::vector<std::string> lines;
+            std::string line;
+            while (std::getline(std::cin, line)) {
+                lines.push_back(line);
             }
+
+            return lines;
+        } else {
+            TextFile textFile(listFilename);
+            auto lines = textFile.ReadLines(true);
+            return lines;
         }
     }
 
-    // support reporting filtering by both:
-    // - "lines of code duplicated", &
-    // - "percentage of file duplicated"
-    const unsigned int lMinBlockSize = std::max(
-        m_minBlockSize, std::min(
-            m_minBlockSize,
-            (std::max(n,m)*100)/m_blockPercentThreshold
-        )
-    );
+    std::tuple<std::vector<SourceFile>, std::vector<MatchType>, unsigned, unsigned> LoadSourceFiles(
+        const std::vector<std::string>& lines,
+        unsigned minChars,
+        bool ignorePrepStuff) {
 
-    int blocks=0;
+        std::vector<SourceFile> sourceFiles;
+        std::vector<MatchType> matrix;
+        unsigned maxLinesPerFile = 0;
+        int files = 0;
+        unsigned long locsTotal = 0;
+        std::vector<FileLength> longestFiles;
+        auto addSorted = [&longestFiles](int numLines, const std::string& filename) {
+            longestFiles.emplace_back(numLines, filename);
+            std::sort(
+                std::begin(longestFiles),
+                std::end(longestFiles),
+                [](auto l, auto r) { return std::get<0>(l) > std::get<0>(r); });
+            if (longestFiles.size() > 10)
+                longestFiles.resize(10);
+        };
 
-    // Scan vertical part
-    for(unsigned int y=0; y<m; y++){
-        unsigned int seqLen=0;
-        int maxX = MIN(n, m-y);
-        for(int x=0; x<maxX; x++){
-            if(m_pMatrix[x+n*(y+x)] == MATCH){
-                seqLen++;
-            } else {
-                if(seqLen >= lMinBlockSize){
-                    int line1 = y+x-seqLen;
-                    int line2 = x-seqLen;
-                    if (!((line1 == line2) && (pSource1 == pSource2))) {
-                        reportSeq(line1, line2, seqLen, pSource1, pSource2, outFile);
-                        blocks++;
+        // Create vector with all source files
+        for (unsigned i = 0; i < lines.size(); i++) {
+            if (lines[i].size() > 5) {
+                SourceFile sourceFile(lines[i], minChars, ignorePrepStuff);
+                unsigned numLines = sourceFile.GetNumOfLines();
+                if (numLines > 0) {
+                    files++;
+                    sourceFiles.push_back(std::move(sourceFile));
+                    locsTotal += numLines;
+                    if (maxLinesPerFile < numLines) {
+                        maxLinesPerFile = numLines;
+                    }
+
+                    // keep 10 worst case files
+                    if (longestFiles.size() < 10) {
+                        addSorted(numLines, lines[i]);
+                    } else {
+                        auto [l, _] = longestFiles.back();
+                        if (l < numLines) {
+                            addSorted(numLines, lines[i]);
+                        }
                     }
                 }
-                seqLen=0;
             }
         }
 
-        if(seqLen >= lMinBlockSize){
-            int line1 = m-seqLen;
-            int line2 = n-seqLen;
-            if (!((line1 == line2) && (pSource1 == pSource2))) {
-                reportSeq(line1, line2, seqLen, pSource1, pSource2, outFile);
-                blocks++;
+        if (maxLinesPerFile * maxLinesPerFile > matrix.max_size()) {
+            std::ostringstream stream;
+            stream
+                << "Some files have too many lines. You can have files with approximately "
+                << std::sqrt(matrix.max_size())
+                << " lines at most." << std::endl
+                << "Longest files:" << std::endl;
+            for (auto [l, f] : longestFiles) {
+                stream << l << ": " << f << std::endl;
             }
+
+            throw std::runtime_error(stream.str().c_str());
         }
+
+        std::cout
+            << lines.size()
+            << " done.\n\n";
+        // Generate matrix large enough for all files
+        try {
+            matrix.resize(maxLinesPerFile * maxLinesPerFile);
+        }
+        catch (const std::bad_alloc& ex) {
+            std::ostringstream stream;
+            stream
+                << ex.what() << std::endl
+                << "Longest files:" << std::endl;
+            for (auto [l, f] : longestFiles) {
+                stream << l << ": " << f << std::endl;
+            }
+
+            throw std::runtime_error(stream.str().c_str());
+        }
+
+        return std::tuple(std::move(sourceFiles), matrix, files, locsTotal);
     }
 
-    if (pSource1 != pSource2)
-    {
-        // Scan horizontal part
-        for(unsigned int x=1; x<n; x++){
-            unsigned int seqLen=0;
-            int maxY = MIN(m, n-x);
-            for(int y=0; y<maxY; y++){
-                if(m_pMatrix[x+y+n*y] == MATCH){
+    unsigned ReportSeq(
+        int line1,
+        int line2,
+        int count,
+        bool xml,
+        const SourceFile& source1,
+        const SourceFile& source2,
+        std::ostream& outFile) {
+        unsigned duplicateLines = 0;
+        if (xml) {
+            outFile << "    <set LineCount=\"" << count << "\">" << std::endl;
+            outFile << "        <block SourceFile=\"" << source1.GetFilename() << "\" StartLineNumber=\"" << source1.GetLine(line1).GetLineNumber() << "\"/>" << std::endl;
+            outFile << "        <block SourceFile=\"" << source2.GetFilename() << "\" StartLineNumber=\"" << source2.GetLine(line2).GetLineNumber() << "\"/>" << std::endl;
+            outFile << "        <lines xml:space=\"preserve\">" << std::endl;
+            for (int j = 0; j < count; j++) {
+                // replace various characters/ strings so that it doesn't upset the XML parser
+                std::string tmpstr = source1.GetLine(j + line1).GetLine();
+
+                // " --> '
+                StringUtil::StrSub(tmpstr, "\'", "\"", -1);
+
+                // & --> &amp;
+                StringUtil::StrSub(tmpstr, "&amp;", "&", -1);
+
+                // < --> &lt;
+                StringUtil::StrSub(tmpstr, "&lt;", "<", -1);
+
+                // > --> &gt;
+                StringUtil::StrSub(tmpstr, "&gt;", ">", -1);
+
+                outFile << "            <line Text=\"" << tmpstr << "\"/>" << std::endl;
+                duplicateLines++;
+            }
+
+            outFile << "        </lines>" << std::endl;
+            outFile << "    </set>" << std::endl;
+        } else {
+            outFile << source1.GetFilename() << "(" << source1.GetLine(line1).GetLineNumber() << ")" << std::endl;
+            outFile << source2.GetFilename() << "(" << source2.GetLine(line2).GetLineNumber() << ")" << std::endl;
+            for (int j = 0; j < count; j++) {
+                outFile << source1.GetLine(j + line1).GetLine() << std::endl;
+                duplicateLines++;
+            }
+
+            outFile << std::endl;
+        }
+
+        return duplicateLines;
+    }
+
+    ProcessResult Process(
+        const SourceFile& source1,
+        const SourceFile& source2,
+        std::vector<MatchType>& matrix,
+        const Options& options,
+        std::ostream& outFile) {
+        unsigned m = source1.GetNumOfLines();
+        unsigned n = source2.GetNumOfLines();
+
+        // Reset matrix data
+        std::fill(std::begin(matrix), std::begin(matrix) + m * n, MatchType::NONE);
+
+        // Compute matrix
+        for (unsigned y = 0; y < m; y++) {
+            auto& line = source1.GetLine(y);
+            for (unsigned x = 0; x < n; x++) {
+                if (line == source2.GetLine(x)) {
+                    matrix[x + n * y] = MatchType::MATCH;
+                }
+            }
+        }
+
+        // support reporting filtering by both:
+        // - "lines of code duplicated", &
+        // - "percentage of file duplicated"
+        unsigned lMinBlockSize = std::max(
+            options.GetMinBlockSize(),
+            std::min(
+                options.GetMinBlockSize(),
+                (std::max(n, m) * 100) / options.GetBlockPercentThreshold()));
+
+        unsigned blocks = 0;
+        unsigned duplicateLines = 0;
+
+        // Scan vertical part
+        for (unsigned y = 0; y < m; y++) {
+            unsigned seqLen = 0;
+            int maxX = std::min(n, m - y);
+            for (int x = 0; x < maxX; x++) {
+                if (matrix[x + n * (y + x)] == MatchType::MATCH) {
                     seqLen++;
                 } else {
-                    if(seqLen >= lMinBlockSize){
-                        reportSeq(y-seqLen, x+y-seqLen, seqLen, pSource1, pSource2, outFile);
-                        blocks++;
+                    if (seqLen >= lMinBlockSize) {
+                        int line1 = y + x - seqLen;
+                        int line2 = x - seqLen;
+                        if (line1 != line2 || source1 != source2) {
+                            duplicateLines +=
+                                ReportSeq(
+                                    line1,
+                                    line2,
+                                    seqLen,
+                                    options.GetOutputXml(),
+                                    source1,
+                                    source2,
+                                    outFile);
+                            blocks++;
+                        }
                     }
-                    seqLen=0;
+
+                    seqLen = 0;
                 }
             }
 
-            if(seqLen >= lMinBlockSize){
-                reportSeq(m-seqLen, n-seqLen, seqLen, pSource1, pSource2, outFile);
-                blocks++;
-            }
-        }
-    }
-
-    return blocks;
-}
-
-const std::string Duplo::getFilenamePart(const std::string& fullpath) const {
-    std::string path = StringUtil::substitute('\\', '/', fullpath);
-
-    std::string filename = path;
-
-    std::string::size_type idx = path.rfind('/');
-    if(idx != std::string::npos){
-        filename = path.substr(idx+1, path.size()-idx-1);
-    }
-
-    return filename;
-}
-
-bool Duplo::isSameFilename(const std::string& filename1, const std::string& filename2) const {
-    return (getFilenamePart(filename1) == getFilenamePart(filename2));
-}
-
-void Duplo::run(std::string outputFileName){
-    std::ofstream outfile(outputFileName.c_str(), std::ios::out|std::ios::binary);
-
-    if (m_Xml)
-    {
-        outfile << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
-        outfile << "<?xml-stylesheet href=\"duplo.xsl\" type=\"text/xsl\"?>" << std::endl;
-        outfile << "<duplo version=\"" << VERSION << "\">" << std::endl;
-        outfile << "    <check Min_block_size=\"" << m_minBlockSize <<
-            "\" Min_char_line=\"" << m_minChars <<
-            "\" Ignore_prepro=\"" << (m_ignorePrepStuff ? "true" : "false") <<
-            "\" Ignore_same_filename=\"" << (m_ignoreSameFilename ? "true" : "false") << "\">" << std::endl;
-    }
-
-    if(!outfile.is_open()){
-        std::cout << "Error: Can't open file: " << outputFileName << std::endl;
-        return;
-    }
-
-    clock_t start, finish;
-    double  duration;
-
-    start = clock();
-
-    std::cout << "Loading and hashing files ... ";
-    std::cout.flush();
-
-    std::vector<SourceFile*> sourceFiles;
-
-    TextFile listOfFiles(m_listFileName.c_str());
-    std::vector<std::string> lines;
-    listOfFiles.readLines(lines, true);
-
-    int files = 0;
-    unsigned long locsTotal = 0;
-
-    // Create vector with all source files
-    for(int i=0;i<(int)lines.size();i++){
-        if(lines[i].size() > 5){
-            SourceFile* pSourceFile = new SourceFile(lines[i], m_minChars, m_ignorePrepStuff);
-            int numLines = pSourceFile->getNumOfLines();
-            if(numLines > 0){
-                files++;
-                sourceFiles.push_back(pSourceFile);
-                locsTotal+=numLines;
-                if(m_maxLinesPerFile < numLines){
-                    m_maxLinesPerFile = numLines;
+            if (seqLen >= lMinBlockSize) {
+                int line1 = m - seqLen;
+                int line2 = n - seqLen;
+                if (line1 != line2 || source1 != source2) {
+                    duplicateLines +=
+                        ReportSeq(
+                            line1,
+                            line2,
+                            seqLen,
+                            options.GetOutputXml(),
+                            source1,
+                            source2,
+                            outFile);
+                    blocks++;
                 }
             }
         }
+
+        if (source1 != source2) {
+            // Scan horizontal part
+            for (unsigned x = 1; x < n; x++) {
+                unsigned seqLen = 0;
+                int maxY = std::min(m, n - x);
+                for (int y = 0; y < maxY; y++) {
+                    if (matrix[x + y + n * y] == MatchType::MATCH) {
+                        seqLen++;
+                    } else {
+                        if (seqLen >= lMinBlockSize) {
+                            duplicateLines +=
+                                ReportSeq(
+                                    y - seqLen,
+                                    x + y - seqLen,
+                                    seqLen,
+                                    options.GetOutputXml(),
+                                    source1,
+                                    source2,
+                                    outFile);
+                            blocks++;
+                        }
+                        seqLen = 0;
+                    }
+                }
+
+                if (seqLen >= lMinBlockSize) {
+                    duplicateLines +=
+                        ReportSeq(
+                            m - seqLen,
+                            n - seqLen,
+                            seqLen,
+                            options.GetOutputXml(),
+                            source1,
+                            source2,
+                            outFile);
+                    blocks++;
+                }
+            }
+        }
+
+        return ProcessResult(blocks, duplicateLines);
+    }
+}
+
+void Duplo::Run(const Options& options) {
+    std::ofstream outfile(
+        options.GetOutputFilename().c_str(), std::ios::out | std::ios::binary);
+    if (!outfile) {
+        std::ostringstream stream;
+        stream
+            << "Error: Can't open file: "
+            << options.GetOutputFilename()
+            << std::endl;
+        throw std::runtime_error(stream.str().c_str());
     }
 
-    std::cout << "done.\n\n";
+    std::cout << "Loading and hashing files ... " << std::flush;
 
-    // Generate matrix large enough for all files
-    m_pMatrix = new unsigned char[m_maxLinesPerFile*m_maxLinesPerFile];
+    auto lines = LoadFileList(options.GetListFilename());
+    auto [sourceFiles, matrix, files, locsTotal] =
+        LoadSourceFiles(lines, options.GetMinChars(), options.GetIgnorePrepStuff());
 
-
-    int blocksTotal = 0;
+    // hash maps
+    HashToFiles hashToFiles;
+    for (const auto& s : sourceFiles) {
+        for (size_t i = 0; i < s.GetNumOfLines(); i++) {
+            hashToFiles[s.GetLine(i).GetHash()].push_back(&s.GetFilename());
+        }
+    }
 
     // Compare each file with each other
-    for(int i=0;i<(int)sourceFiles.size();i++){
-        std::cout << sourceFiles[i]->getFilename();
-        int blocks = 0;
+    ProcessResult processResultTotal;
+    for (unsigned i = 0; i < sourceFiles.size(); i++) {
+        const auto& left = sourceFiles[i];
 
-        blocks+=process(sourceFiles[i], sourceFiles[i], outfile);
-        for(int j=i+1;j<(int)sourceFiles.size();j++){
-            if ((m_ignoreSameFilename && isSameFilename(sourceFiles[i]->getFilename(), sourceFiles[j]->getFilename()))==false){
-                blocks+=process(sourceFiles[i], sourceFiles[j], outfile);
+        // get matching files
+        std::unordered_set<StringPtr> matchingFiles;
+        for (std::size_t k = 0; k < left.GetNumOfLines(); k++) {
+            auto hash = left.GetLine(k).GetHash();
+            const auto& filenames = hashToFiles[hash];
+            matchingFiles.reserve(filenames.size());
+            for (auto& x : filenames) {
+                matchingFiles.insert(x);
             }
         }
 
-        if(blocks > 0){
-            std::cout << " found: " << blocks << " block(s)" << std::endl;
+        std::cout << left.GetFilename();
+        ProcessResult processResult =
+            Process(
+                left,
+                left,
+                matrix,
+                options,
+                outfile);
+
+        // files to compare are those that have matching lines
+        for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
+            const auto& right = sourceFiles[j];
+            if ((!options.GetIgnoreSameFilename() || !IsSameFilename(left, right))
+                && matchingFiles.find(&right.GetFilename()) != matchingFiles.end()) {
+                processResult
+                    << Process(
+                        left,
+                        right,
+                        matrix,
+                        options,
+                        outfile);
+            }
+        }
+
+        if (processResult.Blocks() > 0) {
+            std::cout << " found: " << processResult.Blocks() << " block(s)" << std::endl;
         } else {
             std::cout << " nothing found." << std::endl;
         }
 
-        blocksTotal+=blocks;
+        processResultTotal << processResult;
     }
 
-
-    finish = clock();
-    duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    std::cout << "Time: "<< duration << " seconds" << std::endl;
-
-    if (m_Xml)
-    {
-        outfile << "        <summary Num_files=\"" << files <<
-            "\" Duplicate_blocks=\"" << blocksTotal <<
-            "\" Total_lines_of_code=\"" << locsTotal <<
-            "\" Duplicate_lines_of_code=\"" << m_DuplicateLines <<
-            "\" Time=\"" << duration <<
-            "\"/>" << std::endl;
-        outfile << "    </check>" << std::endl;
-        outfile << "</duplo>" << std::endl;
-    }
-    else
-    {
-        outfile << "Configuration: " << std::endl;
-        outfile << "  Number of files: " << files << std::endl;
-        outfile << "  Minimal block size: " << m_minBlockSize << std::endl;
-        outfile << "  Minimal characters in line: " << m_minChars << std::endl;
-        outfile << "  Ignore preprocessor directives: " << m_ignorePrepStuff << std::endl;
-        outfile << "  Ignore same filenames: " << m_ignoreSameFilename << std::endl;
-        outfile << std::endl;
-        outfile << "Results: " << std::endl;
-        outfile << "  Lines of code: " << locsTotal << std::endl;
-        outfile << "  Duplicate lines of code: " << m_DuplicateLines << std::endl;
-        outfile << "  Total " << blocksTotal << " duplicate block(s) found." << std::endl << std::endl;
-        outfile << "  Time: " << duration << " seconds" << std::endl;
-    }
-}
-
-int Clamp (int upper, int lower, int value)
-{
-    return std::max( lower, std::min( upper, value ) );
-}
-
-/**
- * Main routine
- *
- * @param argc  number of arguments
- * @param argv  arguments
- */
-int main(int argc, const char* argv[]){
-    ArgumentParser ap(argc, argv);
-
-    const int MIN_BLOCK_SIZE = 4;
-    const int MIN_CHARS = 3;
-
-    if(!ap.is("--help") && argc > 2){
-        Duplo duplo(
-            argv[argc-2],
-            ap.getInt("-ml", MIN_BLOCK_SIZE),
-            Clamp( 100, 0, ap.getInt("-pt", 100) ),
-            ap.getInt("-mc", MIN_CHARS),
-            ap.is("-ip"), ap.is("-d"), ap.is("-xml")
-        );
-        duplo.run(argv[argc-1]);
+    if (options.GetOutputXml()) {
+        outfile
+            << "</duplo>"
+            << std::endl;
     } else {
-        std::cout << "\nNAME\n";
-        std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";
-
-        std::cout << "\nSYNOPSIS\n";
-        std::cout << "       duplo [OPTIONS] [INTPUT_FILELIST] [OUTPUT_FILE]\n";
-
-        std::cout << "\nDESCRIPTION\n";
-        std::cout << "       Duplo is a tool to find duplicated code blocks in large\n";
-        std::cout << "       C/C++/Java/C#/VB.Net software systems.\n\n";
-
-        std::cout << "       -ml              minimal block size in lines (default is " << MIN_BLOCK_SIZE << ")\n";
-        std::cout << "       -pt              percentage of lines of duplication threshold to override -ml\n";
-        std::cout << "                        (default is 100%)\n";
-        std::cout << "                        useful for identifying whole file class duplication\n";
-        std::cout << "       -mc              minimal characters in line (default is " << MIN_CHARS << ")\n";
-        std::cout << "                        lines with less characters are ignored\n";
-        std::cout << "       -ip              ignore preprocessor directives\n";
-        std::cout << "       -d               ignore file pairs with same name\n";
-        std::cout << "       -xml             output file in XML\n";
-        std::cout << "       INTPUT_FILELIST  input filelist\n";
-        std::cout << "       OUTPUT_FILE      output file\n";
-
-        std::cout << "\nVERSION\n";
-        std::cout << "       " << VERSION << "\n";
-
-        std::cout << "\nAUTHORS\n";
-        std::cout << "       Christian M. Ammann (cammann@giants.ch)\n";
-        std::cout << "       Trevor D'Arcy-Evans (tdarcyevans@hotmail.com)\n\n";
+        outfile
+            << "Configuration: "
+            << std::endl
+            << "  Number of files: "
+            << files
+            << std::endl
+            << "  Minimal block size: "
+            << options.GetMinBlockSize()
+            << std::endl
+            << "  Minimal characters in line: "
+            << options.GetMinChars()
+            << std::endl
+            << "  Ignore preprocessor directives: "
+            << options.GetIgnorePrepStuff()
+            << std::endl
+            << "  Ignore same filenames: "
+            << options.GetIgnoreSameFilename()
+            << std::endl
+            << std::endl
+            << "Results: "
+            << std::endl
+            << "  Lines of code: "
+            << locsTotal
+            << std::endl
+            << "  Duplicate lines of code: "
+            << processResultTotal.DuplicateLines()
+            //<< " ("
+            //<< 100 * processResultTotal.DuplicateLines() / locsTotal
+            //<< "%)"
+            << std::endl
+            << "  Total "
+            << processResultTotal.Blocks()
+            << " duplicate block(s) found."
+            << std::endl
+            << std::endl;
     }
-
-    return 0;
 }
-
