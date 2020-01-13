@@ -22,8 +22,8 @@ enum class MatchType : unsigned char {
     MATCH
 };
 typedef std::tuple<unsigned, std::string> FileLength;
-
-typedef std::unordered_map<unsigned long, std::vector<std::string>> HashToFiles;
+typedef const std::string* StringPtr;
+typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
 
 class ProcessResult {
     unsigned m_blocks;
@@ -358,7 +358,7 @@ void Duplo::Run(const Options& options) {
     HashToFiles hashToFiles;
     for (const auto& s : sourceFiles) {
         for (size_t i = 0; i < s.GetNumOfLines(); i++) {
-            hashToFiles[s.GetLine(i).GetHash()].push_back(s.GetFilename());
+            hashToFiles[s.GetLine(i).GetHash()].push_back(&s.GetFilename());
         }
     }
 
@@ -368,16 +368,14 @@ void Duplo::Run(const Options& options) {
         const auto& left = sourceFiles[i];
 
         // get matching files
-        std::unordered_set<std::string> matchingFiles;
+        std::unordered_set<StringPtr> matchingFiles;
         for (std::size_t k = 0; k < left.GetNumOfLines(); k++) {
             auto hash = left.GetLine(k).GetHash();
             const auto& filenames = hashToFiles[hash];
-            std::for_each(
-                std::begin(filenames),
-                std::end(filenames),
-                [&matchingFiles](auto s) {
-                    matchingFiles.insert(s);
-            });
+            matchingFiles.reserve(filenames.size());
+            for (auto& x : filenames) {
+                matchingFiles.insert(x);
+            }
         }
 
         std::cout << left.GetFilename();
@@ -393,7 +391,7 @@ void Duplo::Run(const Options& options) {
         for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
             const auto& right = sourceFiles[j];
             if ((!options.GetIgnoreSameFilename() || !IsSameFilename(left, right))
-                && matchingFiles.find(right.GetFilename()) != matchingFiles.end()) {
+                && matchingFiles.find(&right.GetFilename()) != matchingFiles.end()) {
                 processResult
                     << Process(
                         left,
