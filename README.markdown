@@ -5,12 +5,14 @@
   - [Maintainer](#maintainer)
   - [File Format Support](#file-format-support)
   - [Usage](#usage)
-    - [Passing files using `stdin`](#passing-files-using-stdin)
+    - [Passing files using stdin](#passing-files-using-stdin)
     - [Passing files using file](#passing-files-using-file)
     - [Xml output](#xml-output)
   - [Feedback and Bug Reporting](#feedback-and-bug-reporting)
   - [Performance Measurements](#performance-measurements)
-  - [Background](#background)
+  - [Algorithm Background](#algorithm-background)
+  - [Developing Additional Language Support](#developing-additional-language-support)
+    - [Language Suggestions](#language-suggestions)
   - [Changes](#changes)
   - [License](#license)
 
@@ -110,16 +112,35 @@ feature requests and bug reports.
 
 | System | Files | Loc's | Time |
 |-|-|-|-|
-| 3D Game Engine | 275 | 12211 | 4sec |
-| Quake2 | 266 | 102740 | 58sec |
-| Computer Game | 5639 | 754320 | 34min |
-| Linux Kernel 2.6.11.10 | 17034 | 4184356 | 16h |
+| Quake2 | 266 | 102740 | 18sec |
 
-## Background
+## Algorithm Background
 
 Duplo uses the same techniques as Duploc to detect duplicated code blocks. See
 [Duca99bCodeDuplication](http://scg.unibe.ch/archive/papers/Duca99bCodeDuplication.pdf) for
 further information.
+
+## Developing Additional Language Support
+
+Duplo can analyze all text files regardless of format, but it has special support for some programming languages (C++, C#, Java, for example). This allows Duplo to improve the duplication detection as it can ignore preprocessor directives and/or comments.
+
+To implement support for a new language, there are a couple of options (in order of complexity):
+
+1. Implement `FileTypeBase` which has support for handling comments and preprocessor directives. You just need to decide what is a comment. With this option you need to implement a couple of methods, one which is `CreateLineFilter`. This is to remove multiline comments. Look at `CstyleCommentsFilter` for an example.
+2. Implement `IFileType` interface directly. This gives you the most freedom but also is the hardest option of course.
+
+### Language Suggestions
+
+- JavaScript (easy, just look at the existing C-based ones)
+- Ruby
+- Perl
+- PHP
+- F#
+- Scala
+- Haskell
+- Erlang
+
+Send me a pull request!
 
 ## Changes
 
