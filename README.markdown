@@ -11,7 +11,10 @@
   - [Feedback and Bug Reporting](#feedback-and-bug-reporting)
   - [Performance Measurements](#performance-measurements)
   - [Algorithm Background](#algorithm-background)
-  - [Developing Additional Language Support](#developing-additional-language-support)
+  - [Developing](#developing)
+    - [Compiling on Unix](#compiling-on-unix)
+    - [Compiling on Windows](#compiling-on-windows)
+    - [Additional Language Support](#additional-language-support)
     - [Language Suggestions](#language-suggestions)
   - [Changes](#changes)
   - [License](#license)
@@ -120,7 +123,31 @@ Duplo uses the same techniques as Duploc to detect duplicated code blocks. See
 [Duca99bCodeDuplication](http://scg.unibe.ch/archive/papers/Duca99bCodeDuplication.pdf) for
 further information.
 
-## Developing Additional Language Support
+## Developing
+
+### Compiling on Unix
+
+There are two options, a legacy using `make` and one using `CMake` that will probably replace.
+
+```bash
+# legacy
+> make
+# continuous build (needs fswatch)
+> ./watch.sh
+
+# or CMake
+> mkdir build
+> cd build
+> cmake ..
+# now issue make
+> make
+```
+
+### Compiling on Windows
+
+Use Visual Studio 2019 to open the included solution file (or try `CMake`).
+
+### Additional Language Support
 
 Duplo can analyze all text files regardless of format, but it has special support for some programming languages (C++, C#, Java, for example). This allows Duplo to improve the duplication detection as it can ignore preprocessor directives and/or comments.
 
