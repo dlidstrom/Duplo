@@ -11,8 +11,8 @@
 - [Algorithm Background](#algorithm-background)
   - [Performance Measurements](#performance-measurements)
 - [Developing](#developing)
-  - [Compiling on Unix](#compiling-on-unix)
-  - [Compiling on Windows](#compiling-on-windows)
+  - [Unix](#unix)
+  - [Windows](#windows)
   - [Additional Language Support](#additional-language-support)
   - [Language Suggestions](#language-suggestions)
 - [Changes](#changes)
@@ -124,26 +124,32 @@ further information.
 
 ## Developing
 
-### Compiling on Unix
+### Unix
 
-There are two options, a legacy using `make` and one using `CMake` that will probably replace.
+You need `CMake` and preferrably `fswatch` for the best experience.
 
 ```bash
-# legacy
-/> make
+# build dependencies
+/> brew install cmake
+/> brew install fswatch
+```
 
-# or CMake
+Compiling is best done using the continuous file watcher:
+
+```bash
+# CMake builds in the build folder
 /> mkdir build
-/> cd build
+/> pushd build
 build /> cmake ..
 # now issue make
 build /> make
+build /> popd
 # continuous build can now be used in root folder
 # (needs fswatch)
 > ./watch.sh
 ```
 
-### Compiling on Windows
+### Windows
 
 Use Visual Studio 2019 to open the included solution file (or try `CMake`).
 
