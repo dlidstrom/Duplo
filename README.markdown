@@ -1,23 +1,22 @@
-# Duplo (C/C++/Java Duplicate Source Code Block Finder)
+# Duplo (C/C++/Java Duplicate Source Code Block Finder) <!-- omit in toc -->
 
-- [Duplo (C/C++/Java Duplicate Source Code Block Finder)](#duplo-ccjava-duplicate-source-code-block-finder)
-  - [General Information](#general-information)
+- [General Information](#general-information)
   - [Maintainer](#maintainer)
-  - [File Format Support](#file-format-support)
-  - [Usage](#usage)
-    - [Passing files using stdin](#passing-files-using-stdin)
-    - [Passing files using file](#passing-files-using-file)
-    - [Xml output](#xml-output)
-  - [Feedback and Bug Reporting](#feedback-and-bug-reporting)
+- [File Format Support](#file-format-support)
+- [Usage](#usage)
+  - [Passing files using `stdin`](#passing-files-using-stdin)
+  - [Passing files using file](#passing-files-using-file)
+  - [Xml output](#xml-output)
+- [Feedback and Bug Reporting](#feedback-and-bug-reporting)
+- [Algorithm Background](#algorithm-background)
   - [Performance Measurements](#performance-measurements)
-  - [Algorithm Background](#algorithm-background)
-  - [Developing](#developing)
-    - [Compiling on Unix](#compiling-on-unix)
-    - [Compiling on Windows](#compiling-on-windows)
-    - [Additional Language Support](#additional-language-support)
-    - [Language Suggestions](#language-suggestions)
-  - [Changes](#changes)
-  - [License](#license)
+- [Developing](#developing)
+  - [Compiling on Unix](#compiling-on-unix)
+  - [Compiling on Windows](#compiling-on-windows)
+  - [Additional Language Support](#additional-language-support)
+  - [Language Suggestions](#language-suggestions)
+- [Changes](#changes)
+- [License](#license)
 
 ## General Information
 
@@ -25,7 +24,7 @@ Duplicated source code blocks can harm maintainability of software systems.
 Duplo is a tool to find duplicated code blocks in large C, C++, Java, C# and
 VB.Net systems.
 
-## Maintainer
+### Maintainer
 
 Duplo was originally developed by Christian
 M. Ammann and is now maintained by Daniel
@@ -111,17 +110,17 @@ Duplo can also output xml and there is a stylesheet that will format the result 
 Please open an issue to discuss feedback,
 feature requests and bug reports.
 
-## Performance Measurements
-
-| System | Files | Loc's | Time |
-|-|-|-|-|
-| Quake2 | 266 | 102740 | 18sec |
-
 ## Algorithm Background
 
 Duplo uses the same techniques as Duploc to detect duplicated code blocks. See
 [Duca99bCodeDuplication](http://scg.unibe.ch/archive/papers/Duca99bCodeDuplication.pdf) for
 further information.
+
+### Performance Measurements
+
+| System | Files | Loc's | Time |
+|-|-|-|-|
+| Quake2 | 266 | 102740 | 18sec |
 
 ## Developing
 
@@ -131,16 +130,17 @@ There are two options, a legacy using `make` and one using `CMake` that will pro
 
 ```bash
 # legacy
-> make
-# continuous build (needs fswatch)
-> ./watch.sh
+/> make
 
 # or CMake
-> mkdir build
-> cd build
-> cmake ..
+/> mkdir build
+/> cd build
+build /> cmake ..
 # now issue make
-> make
+build /> make
+# continuous build can now be used in root folder
+# (needs fswatch)
+> ./watch.sh
 ```
 
 ### Compiling on Windows
@@ -160,12 +160,15 @@ To implement support for a new language, there are a couple of options (in order
 
 - JavaScript (easy, just look at the existing C-based ones)
 - Ruby
+- Python
 - Perl
 - PHP
+- Rust
 - F#
 - Scala
 - Haskell
 - Erlang
+- What else?
 
 Send me a pull request!
 
