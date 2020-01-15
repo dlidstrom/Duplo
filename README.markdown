@@ -140,10 +140,10 @@ Compiling is best done using the continuous file watcher:
 # CMake builds in the build folder
 /> mkdir build
 /> pushd build
-build /> cmake ..
+build/> cmake ..
 # now issue make
-build /> make
-build /> popd
+build/> make
+build/> popd
 # continuous build can now be used in root folder
 # (needs fswatch)
 > ./watch.sh
