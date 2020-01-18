@@ -17,6 +17,6 @@ fi
 p "compiling..." &&
 pushd build
 make &&
-
-p "OK!" &&
-popd;
+popd &&
+bats ./test.bats &&
+p "OK!";
