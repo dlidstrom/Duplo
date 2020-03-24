@@ -11,7 +11,7 @@ namespace {
         return std::max(lower, std::min(upper, value));
     }
 
-    void run(long argc, const char* argv[]) {
+    int run(long argc, const char* argv[]) {
         ArgumentParser ap(argc, argv);
 
         const int MIN_BLOCK_SIZE = 4;
@@ -41,6 +41,7 @@ namespace {
                 listFilename,
                 outputFilename);
             Duplo::Run(options);
+            return EXIT_SUCCESS;
         } else {
             std::cout << "\nNAME\n";
             std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";
@@ -55,7 +56,7 @@ namespace {
             std::cout << "       -ml              minimal block size in lines (default is " << MIN_BLOCK_SIZE << ")\n";
             std::cout << "       -pt              percentage of lines of duplication threshold to override -ml\n";
             std::cout << "                        (default is 100%)\n";
-            std::cout << "                        useful for identifying whole file class duplication\n";
+            std::cout << "                        useful for identifying whole file duplication\n";
             std::cout << "       -mc              minimal characters in line (default is " << MIN_CHARS << ")\n";
             std::cout << "                        lines with less characters are ignored\n";
             std::cout << "       -ip              ignore preprocessor directives\n";
@@ -75,14 +76,14 @@ namespace {
             };
             std::copy(std::begin(authors), std::end(authors), std::ostream_iterator<const char*>(std::cout, "\n"));
             std::cout << "\n";
+            return EXIT_FAILURE;
         }
     }
 }
 
 int main(int argc, const char* argv[]) {
     try {
-        run(argc, argv);
-        return EXIT_SUCCESS;
+        return run(argc, argv);
     }
     catch (const std::exception& ex) {
         std::cerr << ex.what() << std::endl;

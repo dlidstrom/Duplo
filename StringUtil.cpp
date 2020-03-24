@@ -18,13 +18,13 @@ std::string StringUtil::Trim(const std::string& input) {
     std::string final = input;
 
     // Remove spaces at beginning
-    int i = 0;
-    while (i < (int)input.length() && input[i] <= ' ') {
+    decltype(input.length()) i = 0;
+    while (i < input.length() && input[i] <= ' ') {
         i++;
     }
 
     // String full of spaces, return nothing.
-    if (i >= (int)input.length()) {
+    if (i >= input.length()) {
         return "";
     }
 
@@ -33,7 +33,7 @@ std::string StringUtil::Trim(const std::string& input) {
     }
 
     // Remove spaces at end
-    i = (int)final.length() - 1;
+    i = final.length() - 1;
     while (i >= 0 && final[i] <= ' ') {
         i--;
     }
@@ -45,42 +45,35 @@ std::string StringUtil::Trim(const std::string& input) {
 }
 
 int StringUtil::Split(const std::string& input, const std::string& delimiter, std::vector<std::string>& results, bool doTrim) {
-    int sizeDelim = (int)delimiter.size();
+    auto sizeDelim = delimiter.size();
+    auto newPos = input.find(delimiter, 0);
 
-    int newPos = (int)input.find(delimiter, 0);
-
-    if (newPos < 0) {
+    if (newPos == std::string::npos) {
         if (doTrim) {
             results.push_back(Trim(input));
         } else {
             results.push_back(input);
         }
+
         return 0;
     }
 
-    int numFound = 0;
-
-    std::vector<int> positions;
-
-    // At the begin is always a marker
-    positions.push_back(-sizeDelim);
-    int pos = 0;
-    while (pos != -1) {
-        numFound++;
-        pos = (int)input.find(delimiter, pos + sizeDelim);
-        if (pos != -1) {
-            positions.push_back(pos);
-        }
+    // At the beginning is always a marker
+    std::vector<int> positions(1, -sizeDelim);
+    auto pos = input.find(delimiter);
+    while (pos != std::string::npos) {
+        positions.push_back(pos);
+        pos = input.find(delimiter, pos + sizeDelim);
     }
 
     // At the end is always a marker
-    positions.push_back((int)input.size());
+    positions.push_back(input.size());
 
-    for (int i = 0; i < (int)positions.size() - 1; i++) {
+    for (auto i = 0; i < positions.size() - 1; i++) {
         std::string s;
 
-        int start = positions[i] + sizeDelim;
-        int size = positions[i + 1] - positions[i] - sizeDelim;
+        auto start = positions[i] + sizeDelim;
+        auto size = positions[i + 1] - positions[i] - sizeDelim;
 
         if (size > 0) {
             s = input.substr(start, size);
@@ -93,7 +86,7 @@ int StringUtil::Split(const std::string& input, const std::string& delimiter, st
         }
     }
 
-    return numFound;
+    return positions.size() - 2;
 }
 
 std::string StringUtil::Substitute(char s, char d, const std::string& str) {

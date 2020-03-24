@@ -7,7 +7,11 @@ p() {
 
 ./compile.sh &
 
-fswatch --extended --latency 0.5 --exclude ".*" --include "Makefile|(\.(h|cpp)$)" . |
+fswatch \
+    --extended \
+    --latency 0.5 \
+    --exclude ".*" \
+    --include "Makefile|(\.(h|cpp|bats)$)" . |
 while read line; do
     p "new changes received: $line"
 
