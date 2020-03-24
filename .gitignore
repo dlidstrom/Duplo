@@ -12,3 +12,5 @@ duplo
 .ionide
 build
 .vscode
+out.txt
+files.lst

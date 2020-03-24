@@ -18,5 +18,5 @@ p "compiling..." &&
 pushd build
 make &&
 popd &&
-bats ./test.bats &&
+bats --recursive tests &&
 p "OK!";
