@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 project(duplo)
-file(GLOB SOURCES *.cpp)
+file(GLOB SOURCES src/*.cpp)
 if(MSVC)
 else()
     add_compile_options(-O3 -Wall -Werror -std=c++17)
