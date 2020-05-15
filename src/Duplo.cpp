@@ -116,7 +116,8 @@ namespace {
                     if (longestFiles.size() < 10) {
                         addSorted(numLines, lines[i]);
                     } else {
-                        auto [l, _] = longestFiles.back();
+                        auto [l, r] = longestFiles.back();
+                        (void)r;
                         if (l < numLines) {
                             addSorted(numLines, lines[i]);
                         }

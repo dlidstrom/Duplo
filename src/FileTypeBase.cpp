@@ -4,6 +4,7 @@
 #include "StringUtil.h"
 
 #include <algorithm>
+#include <cctype>
 
 FileTypeBase::FileTypeBase(bool ignorePrepStuff, unsigned minChars)
     : m_ignorePrepStuff(ignorePrepStuff),
@@ -23,7 +24,11 @@ bool FileTypeBase::IsSourceLine(const std::string& line) const {
 
     // must be at least one alpha-numeric character
     bool isSourceLine =
-        tmp.size() >= m_minChars && std::find_if(std::begin(tmp), std::end(tmp), std::isalpha) != std::end(tmp);
+        tmp.size() >= m_minChars
+        && std::find_if(
+            std::begin(tmp),
+            std::end(tmp),
+            [](int c) { return std::isalpha(c); }) != std::end(tmp);
     return isSourceLine;
 }
 

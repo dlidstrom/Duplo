@@ -2,18 +2,85 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
-  build:
-
+  build-linux:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
-    - name: init
-      run: mkdir -p build && popd build && cmake .. && popd
-    - name: compile
-      run: ./compile
+    - name: build
+      run: |
+        sudo npm install -g bats
+        mkdir -p build && pushd build && cmake .. && popd
+        ./compile.sh
+        zip --junk-paths duplo-linux build/duplo
+    - name: upload linux artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: uploads
+        path: duplo-linux.zip
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        brew unlink bats && brew install bats-core
+        mkdir -p build && pushd build && cmake .. && popd
+        ./compile.sh
+        zip --junk-paths duplo-macos build/duplo
+    - name: upload macos artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: uploads
+        path: duplo-macos.zip
+  upload-release:
+    runs-on: ubuntu-latest
+    needs: [build-linux, build-macos]
+    steps:
+    - uses: actions/checkout@master
+      with:
+        fetch-depth: '0'
+    - name: Bump version and push tag
+      id: tag
+      uses: anothrNick/github-tag-action@1.17.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
+        DEFAULT_BUMP: patch
+    - name: create release
+      id: create_release
+      uses: actions/create-release@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.tag.outputs.new_tag }}
+        release_name: Release ${{ steps.tag.outputs.new_tag }}
+        draft: false
+        prerelease: false
+    - name: download artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: uploads
+    - name: upload macos
+      id: upload-macos
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./uploads/duplo-macos.zip
+        asset_name: duplo-macos.zip
+        asset_content_type: application/zip
+    - name: upload linux
+      id: upload-linux
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./uploads/duplo-linux.zip
+        asset_name: duplo-linux.zip
+        asset_content_type: application/zip

@@ -3,6 +3,8 @@
 #include "NoopLineFilter.h"
 #include "SourceLine.h"
 
+#include <cstring>
+
 FileType_S::FileType_S(bool ignorePrepStuff, unsigned minChars)
     : FileTypeBase(ignorePrepStuff, minChars) {
 }

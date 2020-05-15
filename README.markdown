@@ -1,5 +1,7 @@
 # Duplo (C/C++/Java Duplicate Source Code Block Finder) <!-- omit in toc -->
 
+![C/C++ CI](https://github.com/dlidstrom/Duplo/workflows/C/C++%20CI/badge.svg)
+
 - [General Information](#general-information)
   - [Maintainer](#maintainer)
 - [File Format Support](#file-format-support)

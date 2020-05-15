@@ -69,7 +69,7 @@ int StringUtil::Split(const std::string& input, const std::string& delimiter, st
     // At the end is always a marker
     positions.push_back(input.size());
 
-    for (auto i = 0; i < positions.size() - 1; i++) {
+    for (auto i = 0U; i < positions.size() - 1; i++) {
         std::string s;
 
         auto start = positions[i] + sizeDelim;

@@ -3,6 +3,8 @@
 #include "CstyleUtils.h"
 #include "SourceLine.h"
 
+#include <cstring>
+
 FileType_CS::FileType_CS(bool ignorePrepStuff, unsigned minChars)
     : FileTypeBase(ignorePrepStuff, minChars) {
 }

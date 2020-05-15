@@ -14,3 +14,7 @@ build
 .vscode
 out.txt
 files.lst
+CMakeFiles
+CMakeCache.txt
+Makefile
+cmake_install.cmake
