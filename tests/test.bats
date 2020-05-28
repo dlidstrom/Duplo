@@ -4,7 +4,7 @@
     echo "status = $status"
     [ "$status" -eq 1 ]
     [ "${lines[0]}" = "NAME" ]
-    [ "${lines[1]}" = "       Duplo 0.4.0 - duplicate source code block finder" ]
+    [ "${lines[1]}" = "       Duplo $DUPLO_VERSION - duplicate source code block finder" ]
     [ "${lines[2]}" = "SYNOPSIS" ]
     [ "${lines[3]}" = "       duplo [OPTIONS] [INTPUT_FILELIST] [OUTPUT_FILE]" ]
     [ "${lines[4]}" = "DESCRIPTION" ]
@@ -22,7 +22,7 @@
     [ "${lines[16]}" = "       INPUT_FILELIST   input filelist (specify '-' to read from stdin)" ]
     [ "${lines[17]}" = "       OUTPUT_FILE      output file" ]
     [ "${lines[18]}" = "VERSION" ]
-    [ "${lines[19]}" = "       0.4.0" ]
+    [ "${lines[19]}" = "       $DUPLO_VERSION" ]
     [ "${lines[20]}" = "AUTHORS" ]
     [ "${lines[21]}" = "       Daniel Lidstrom (dlidstrom@gmail.com)" ]
     [ "${lines[22]}" = "       Christian M. Ammann (cammann@giants.ch)" ]

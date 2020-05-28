@@ -1,38 +1,40 @@
-# Duplo (C/C++/Java Duplicate Source Code Block Finder) <!-- omit in toc -->
+# 1. Duplo (C/C++/Java Duplicate Source Code Block Finder)
 
 ![C/C++ CI](https://github.com/dlidstrom/Duplo/workflows/C/C++%20CI/badge.svg)
 
-- [General Information](#general-information)
-  - [Maintainer](#maintainer)
-- [File Format Support](#file-format-support)
-- [Usage](#usage)
-  - [Passing files using `stdin`](#passing-files-using-stdin)
-  - [Passing files using file](#passing-files-using-file)
-  - [Xml output](#xml-output)
-- [Feedback and Bug Reporting](#feedback-and-bug-reporting)
-- [Algorithm Background](#algorithm-background)
-  - [Performance Measurements](#performance-measurements)
-- [Developing](#developing)
-  - [Unix](#unix)
-  - [Windows](#windows)
-  - [Additional Language Support](#additional-language-support)
-  - [Language Suggestions](#language-suggestions)
-- [Changes](#changes)
-- [License](#license)
+- [1. Duplo (C/C++/Java Duplicate Source Code Block Finder)](#1-duplo-ccjava-duplicate-source-code-block-finder)
+  - [1.1. General Information](#11-general-information)
+  - [1.2. Maintainer](#12-maintainer)
+  - [1.3. File Format Support](#13-file-format-support)
+  - [1.4. Installation](#14-installation)
+  - [1.5. Usage](#15-usage)
+    - [1.5.1. Passing files using `stdin`](#151-passing-files-using-stdin)
+    - [1.5.2. Passing files using file](#152-passing-files-using-file)
+    - [1.5.3. Xml output](#153-xml-output)
+  - [1.6. Feedback and Bug Reporting](#16-feedback-and-bug-reporting)
+  - [1.7. Algorithm Background](#17-algorithm-background)
+    - [1.7.1. Performance Measurements](#171-performance-measurements)
+  - [1.8. Developing](#18-developing)
+    - [1.8.1. Unix](#181-unix)
+    - [1.8.2. Windows](#182-windows)
+    - [1.8.3. Additional Language Support](#183-additional-language-support)
+    - [1.8.4. Language Suggestions](#184-language-suggestions)
+  - [1.9. Changes](#19-changes)
+  - [1.10. License](#110-license)
 
-## General Information
+## 1.1. General Information
 
 Duplicated source code blocks can harm maintainability of software systems.
 Duplo is a tool to find duplicated code blocks in large C, C++, Java, C# and
 VB.Net systems.
 
-### Maintainer
+## 1.2. Maintainer
 
 Duplo was originally developed by Christian
-M. Ammann and is now maintained by Daniel
+M. Ammann and is now maintained and developed by Daniel
 Lidström.
 
-## File Format Support
+## 1.3. File Format Support
 
 Duplo has built in support for the following
 file formats:
@@ -71,13 +73,19 @@ src\engine\geometry\SkinnedMeshGeometry.cpp(45)
 ...
 ```
 
-## Usage
+## 1.4. Installation
+
+Duplo is currently available prebuilt for linux and macos. Grab the executable from the [releases](https://github.com/dlidstrom/Duplo/releases) page.
+
+You can of course build from source as well, and you'll currently have to do so for Windows.
+
+## 1.5. Usage
 
 Duplo works with a list of files. You can either specify a file that contains the list of files, or you can pass them using `stdin`.
 
 Run `duplo --help` on the command line to see the detailed options.
 
-### Passing files using `stdin`
+### 1.5.1. Passing files using `stdin`
 
 ```bash
 # unix
@@ -89,7 +97,7 @@ Run `duplo --help` on the command line to see the detailed options.
 
 `duplo` will write the duplicated blocks into `out.txt`.
 
-### Passing files using file
+### 1.5.2. Passing files using file
 
 `duplo` can analyze files specified in a separate file:
 
@@ -103,30 +111,30 @@ Run `duplo --help` on the command line to see the detailed options.
 > Duplo.exe files.lst out.txt
 ```
 
-### Xml output
+### 1.5.3. Xml output
 
 Duplo can also output xml and there is a stylesheet that will format the result for viewing in a browser. This can be used as a report tab in your continuous integration tool (TeamCity, etc).
 
-## Feedback and Bug Reporting
+## 1.6. Feedback and Bug Reporting
 
 Please open an issue to discuss feedback,
 feature requests and bug reports.
 
-## Algorithm Background
+## 1.7. Algorithm Background
 
 Duplo uses the same techniques as Duploc to detect duplicated code blocks. See
 [Duca99bCodeDuplication](http://scg.unibe.ch/archive/papers/Duca99bCodeDuplication.pdf) for
 further information.
 
-### Performance Measurements
+### 1.7.1. Performance Measurements
 
 | System | Files | Loc's | Time |
 |-|-|-|-|
 | Quake2 | 266 | 102740 | 18sec |
 
-## Developing
+## 1.8. Developing
 
-### Unix
+### 1.8.1. Unix
 
 You need `CMake` and preferrably `fswatch` for the best experience.
 
@@ -151,11 +159,11 @@ build/> popd
 > ./watch.sh
 ```
 
-### Windows
+### 1.8.2. Windows
 
 Use Visual Studio 2019 to open the included solution file (or try `CMake`).
 
-### Additional Language Support
+### 1.8.3. Additional Language Support
 
 Duplo can analyze all text files regardless of format, but it has special support for some programming languages (C++, C#, Java, for example). This allows Duplo to improve the duplication detection as it can ignore preprocessor directives and/or comments.
 
@@ -164,7 +172,7 @@ To implement support for a new language, there are a couple of options (in order
 1. Implement `FileTypeBase` which has support for handling comments and preprocessor directives. You just need to decide what is a comment. With this option you need to implement a couple of methods, one which is `CreateLineFilter`. This is to remove multiline comments. Look at `CstyleCommentsFilter` for an example.
 2. Implement `IFileType` interface directly. This gives you the most freedom but also is the hardest option of course.
 
-### Language Suggestions
+### 1.8.4. Language Suggestions
 
 - JavaScript (easy, just look at the existing C-based ones)
 - Ruby
@@ -180,7 +188,7 @@ To implement support for a new language, there are a couple of options (in order
 
 Send me a pull request!
 
-## Changes
+## 1.9. Changes
 
 - 0.4
   - Significant performance improvements
@@ -194,7 +202,7 @@ Send me a pull request!
   - Fixed limitation of total number of lines of code
   - Checking of arbitrary files
 
-## License
+## 1.10. License
 
 Duplo is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
