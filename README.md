@@ -7,6 +7,8 @@
   - [1.2. Maintainer](#12-maintainer)
   - [1.3. File Format Support](#13-file-format-support)
   - [1.4. Installation](#14-installation)
+    - [1.4.1. Docker](#141-docker)
+    - [1.4.2. Pre-built binaries](#142-pre-built-binaries)
   - [1.5. Usage](#15-usage)
     - [1.5.1. Passing files using `stdin`](#151-passing-files-using-stdin)
     - [1.5.2. Passing files using file](#152-passing-files-using-file)
@@ -20,7 +22,7 @@
     - [1.8.3. Additional Language Support](#183-additional-language-support)
     - [1.8.4. Language Suggestions](#184-language-suggestions)
   - [1.9. Changes](#19-changes)
-  - [1.10. License](#110-license)
+  - [1.10. 1.10. License](#110-110-license)
 
 ## 1.1. General Information
 
@@ -75,9 +77,21 @@ src\engine\geometry\SkinnedMeshGeometry.cpp(45)
 
 ## 1.4. Installation
 
-Duplo is currently available prebuilt for linux and macos. Grab the executable from the [releases](https://github.com/dlidstrom/Duplo/releases) page.
+### 1.4.1. Docker
 
-You can of course build from source as well, and you'll currently have to do so for Windows.
+If you have Docker, the easiest way to run Duplo is to:
+
+```bash
+> docker run dlidstrom/duplo
+```
+
+This pulls the latest image and runs duplo. In the usage section below, use this command in place of `duplo` or `Duplo.exe`.
+
+### 1.4.2. Pre-built binaries
+
+Duplo is also available as a pre-built binary for (alpine) linux and macos. Grab the executable from the [releases](https://github.com/dlidstrom/Duplo/releases) page.
+
+You can of course build from source as well, and you'll have to do so to get a binary for Windows.
 
 ## 1.5. Usage
 
@@ -202,7 +216,7 @@ Send me a pull request!
   - Fixed limitation of total number of lines of code
   - Checking of arbitrary files
 
-## 1.10. License
+## 1.10. 1.10. License
 
 Duplo is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
