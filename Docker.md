@@ -23,11 +23,8 @@ Run `duplo --help` on the command line to see the detailed options.
 ### Passing files using `stdin`
 
 ```bash
-# unix
-> find . \( -iname "*.cpp" -or -iname "*.h" \) | docker run --rm -i -w /src -v $(pwd):/src duplo - out.txt
-
-# windows
-> Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | docker run --rm -i -w /src -v $(pwd):/src duplo - out.txt
+# Docker on unix
+> find . -type f \( -iname "*.cpp" -or -iname "*.h" \) | docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo - out.txt
 ```
 
 `duplo` will write the duplicated blocks into `out.txt`.
@@ -37,14 +34,12 @@ Run `duplo --help` on the command line to see the detailed options.
 `duplo` can analyze files specified in a separate file:
 
 ```bash
-# unix
+# Docker on unix
 > find . -type f \( -iname "*.cpp" -o -iname "*.h" \) > files.lst
-> docker run dlidstrom/duplo files.lst out.txt
-
-# windows
-> Get-ChildItem -Include "*.cpp", "*.h" -Recurse |  % { $_.FullName } | Out-File -encoding ascii files.lst
-> docker run dlidstrom/duplo.exe files.lst out.txt
+> docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo files.lst out.txt
 ```
+
+Again, `duplo` will write the duplicated blocks into `out.txt`.
 
 ## Feedback and Bug Reporting
 
