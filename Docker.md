@@ -24,10 +24,10 @@ Run `duplo --help` on the command line to see the detailed options.
 
 ```bash
 # unix
-> find . \( -iname "*.cpp" -o -iname "*.h" \) | docker run dlidstrom/duplo - out.txt
+> find . \( -iname "*.cpp" -or -iname "*.h" \) | docker run --rm -i -w /src -v $(pwd):/src duplo - out.txt
 
 # windows
-> Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | docker run dlidstrom/duplo - out.txt
+> Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | docker run --rm -i -w /src -v $(pwd):/src duplo - out.txt
 ```
 
 `duplo` will write the duplicated blocks into `out.txt`.

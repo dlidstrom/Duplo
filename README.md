@@ -22,7 +22,7 @@
     - [1.8.3. Additional Language Support](#183-additional-language-support)
     - [1.8.4. Language Suggestions](#184-language-suggestions)
   - [1.9. Changes](#19-changes)
-  - [1.10. 1.10. License](#110-110-license)
+  - [1.10. License](#110-license)
 
 ## 1.1. General Information
 
@@ -79,13 +79,14 @@ src\engine\geometry\SkinnedMeshGeometry.cpp(45)
 
 ### 1.4.1. Docker
 
-If you have Docker, the easiest way to run Duplo is to:
+If you have Docker, the way to run Duplo is to use this command:
 
 ```bash
-> docker run dlidstrom/duplo
+# Docker on unix
+> docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo
 ```
 
-This pulls the latest image and runs duplo. In the usage section below, use this command in place of `duplo` or `Duplo.exe`.
+This pulls the latest image and runs duplo. Note that you'll have to pipe the filenames into this command. A complete commandline sample will be shown below.
 
 ### 1.4.2. Pre-built binaries
 
@@ -103,13 +104,16 @@ Run `duplo --help` on the command line to see the detailed options.
 
 ```bash
 # unix
-> find . \( -iname "*.cpp" -o -iname "*.h" \) | duplo - out.txt
+> find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | duplo - out.txt
 
 # windows
 > Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | Duplo.exe - out.txt
+
+# Docker on unix
+> find . -type f \( -iname "*.cpp" -or -iname "*.h" \) | docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo - out.txt
 ```
 
-`duplo` will write the duplicated blocks into `out.txt`.
+In each of the above commands, `duplo` will write the duplicated blocks into `out.txt` in addition to the information written to stdout.
 
 ### 1.5.2. Passing files using file
 
@@ -123,7 +127,13 @@ Run `duplo --help` on the command line to see the detailed options.
 # windows
 > Get-ChildItem -Include "*.cpp", "*.h" -Recurse |  % { $_.FullName } | Out-File -encoding ascii files.lst
 > Duplo.exe files.lst out.txt
+
+# Docker on unix
+> find . -type f \( -iname "*.cpp" -o -iname "*.h" \) > files.lst
+> docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo files.lst out.txt
 ```
+
+Again, the duplicated blocks are written to `out.txt`.
 
 ### 1.5.3. Xml output
 
@@ -216,7 +226,7 @@ Send me a pull request!
   - Fixed limitation of total number of lines of code
   - Checking of arbitrary files
 
-## 1.10. 1.10. License
+## 1.10. License
 
 Duplo is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
