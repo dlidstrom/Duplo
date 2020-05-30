@@ -18,6 +18,8 @@ FROM alpine:3.11
 
 RUN apk --no-cache add libstdc++
 
+WORKDIR /data
+
 COPY --from=build /usr/src/Duplo/build/duplo .
 
-ENTRYPOINT ["./duplo"]
+ENTRYPOINT ["/data/duplo"]
