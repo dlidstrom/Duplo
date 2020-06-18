@@ -351,6 +351,14 @@ void Duplo::Run(const Options& options) {
 
     std::cout << "Loading and hashing files ... " << std::flush;
 
+    if (options.GetOutputXml()) {
+        outfile
+            << "<?xml version=\"1.0\"?>"
+            << std::endl
+            << "<duplo>"
+            << std::endl;
+    }
+
     auto lines = LoadFileList(options.GetListFilename());
     auto [sourceFiles, matrix, files, locsTotal] =
         LoadSourceFiles(lines, options.GetMinChars(), options.GetIgnorePrepStuff());
