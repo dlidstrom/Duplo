@@ -214,6 +214,8 @@ Send me a pull request!
 
 ## 1.9. Changes
 
+- 0.5
+  - Fixed malformed xml (thanks @ArsMasiuk)
 - 0.4
   - Significant performance improvements
   - Using modern C++ techniques
