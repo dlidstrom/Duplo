@@ -172,10 +172,26 @@ namespace {
         std::ostream& outFile) {
         unsigned duplicateLines = 0;
         if (xml) {
-            outFile << "    <set LineCount=\"" << count << "\">" << std::endl;
-            outFile << "        <block SourceFile=\"" << source1.GetFilename() << "\" StartLineNumber=\"" << source1.GetLine(line1).GetLineNumber() << "\"/>" << std::endl;
-            outFile << "        <block SourceFile=\"" << source2.GetFilename() << "\" StartLineNumber=\"" << source2.GetLine(line2).GetLineNumber() << "\"/>" << std::endl;
-            outFile << "        <lines xml:space=\"preserve\">" << std::endl;
+            outFile
+                << "    <set LineCount=\"" << count << "\">"
+                << std::endl;
+            int startLineNumber1 = source1.GetLine(line1).GetLineNumber();
+            int endLineNumber1 = source1.GetLine(line1 + count).GetLineNumber();
+            outFile
+                << "        <block SourceFile=\"" << source1.GetFilename()
+                << "\" StartLineNumber=\"" << startLineNumber1
+                << "\" EndLineNumber=\"" << endLineNumber1 << "\"/>"
+                << std::endl;
+            int startLineNumber2 = source2.GetLine(line2).GetLineNumber();
+            int endLineNumber2 = source2.GetLine(line2 + count).GetLineNumber();
+            outFile
+                << "        <block SourceFile=\"" << source2.GetFilename()
+                << "\" StartLineNumber=\"" << startLineNumber2
+                << "\" EndLineNumber=\"" << endLineNumber2 << "\"/>"
+                << std::endl;
+            outFile
+                << "        <lines xml:space=\"preserve\">"
+                << std::endl;
             for (int j = 0; j < count; j++) {
                 // replace various characters/ strings so that it doesn't upset the XML parser
                 std::string tmpstr = source1.GetLine(j + line1).GetLine();
@@ -199,8 +215,14 @@ namespace {
             outFile << "        </lines>" << std::endl;
             outFile << "    </set>" << std::endl;
         } else {
-            outFile << source1.GetFilename() << "(" << source1.GetLine(line1).GetLineNumber() << ")" << std::endl;
-            outFile << source2.GetFilename() << "(" << source2.GetLine(line2).GetLineNumber() << ")" << std::endl;
+            outFile
+                << source1.GetFilename()
+                << "(" << source1.GetLine(line1).GetLineNumber() << ")"
+                << std::endl;
+            outFile
+                << source2.GetFilename()
+                << "(" << source2.GetLine(line2).GetLineNumber() << ")"
+                << std::endl;
             for (int j = 0; j < count; j++) {
                 outFile << source1.GetLine(j + line1).GetLine() << std::endl;
                 duplicateLines++;
@@ -426,7 +448,7 @@ void Duplo::Run(const Options& options) {
             << std::endl;
     } else {
         outfile
-            << "Configuration: "
+            << "Configuration:"
             << std::endl
             << "  Number of files: "
             << files
@@ -444,7 +466,7 @@ void Duplo::Run(const Options& options) {
             << options.GetIgnoreSameFilename()
             << std::endl
             << std::endl
-            << "Results: "
+            << "Results:"
             << std::endl
             << "  Lines of code: "
             << locsTotal
