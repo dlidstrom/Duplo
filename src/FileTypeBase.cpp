@@ -35,7 +35,7 @@ bool FileTypeBase::IsSourceLine(const std::string& line) const {
 std::vector<SourceLine> FileTypeBase::GetCleanedSourceLines(const std::vector<std::string>& lines) const {
     auto lineFilter = CreateLineFilter();
     std::vector<SourceLine> filteredLines;
-    for (auto i = 0; i < lines.size(); i++) {
+    for (std::vector<std::string>::size_type i = 0; i < lines.size(); i++) {
         auto filteredLine = GetCleanLine(lineFilter->ProcessSourceLine(lines[i]));
         if (IsSourceLine(filteredLine)) {
             filteredLines.emplace_back(filteredLine, i);
