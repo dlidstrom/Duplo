@@ -20,7 +20,7 @@ SourceLine::SourceLine(const std::string& line, int lineNumber) {
 }
 
 int SourceLine::GetLineNumber() const {
-    return m_lineNumber;
+    return m_lineNumber + 1;
 }
 
 bool SourceLine::operator==(const SourceLine& other) const {

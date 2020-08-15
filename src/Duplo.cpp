@@ -426,7 +426,7 @@ void Duplo::Run(const Options& options) {
             << std::endl;
     } else {
         outfile
-            << "Configuration: "
+            << "Configuration:"
             << std::endl
             << "  Number of files: "
             << files
@@ -444,7 +444,7 @@ void Duplo::Run(const Options& options) {
             << options.GetIgnoreSameFilename()
             << std::endl
             << std::endl
-            << "Results: "
+            << "Results:"
             << std::endl
             << "  Lines of code: "
             << locsTotal
