@@ -11,7 +11,7 @@ fswatch \
     --extended \
     --latency 0.5 \
     --exclude ".*" \
-    --include "Makefile|(\.(h|cpp|bats)$)" . |
+    --include "Makefile|(\.(h|cpp|bats|c)$)" . |
 while read line; do
     p "new changes received: $line"
 

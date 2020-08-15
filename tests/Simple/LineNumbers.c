@@ -7,6 +7,7 @@ EEEEE
 AAAAA
 BBBBB
 CCCCC
+// skip this line
 DDDDD
 EEEEE
 FFFFF
