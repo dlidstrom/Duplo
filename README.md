@@ -24,7 +24,8 @@
   - [8.3. Additional Language Support](#83-additional-language-support)
   - [8.4. Language Suggestions](#84-language-suggestions)
 - [9. Changes](#9-changes)
-- [10. License](#10-license)
+- [10. Accompanying Software](#10-accompanying-software)
+- [11. License](#11-license)
 
 ## 1. General Information
 
@@ -234,6 +235,8 @@ Send me a pull request!
 
 ## 9. Changes
 
+- 0.6
+  - Improved integration with [duploq](https://github.com/ArsMasiuk/duploq)
 - 0.5
   - Fixed malformed xml (thanks [@ArsMasiuk](https://github.com/ArsMasiuk)!)
 - 0.4
@@ -248,7 +251,17 @@ Send me a pull request!
   - Fixed limitation of total number of lines of code
   - Checking of arbitrary files
 
-## 10. License
+## 10. Accompanying Software
+
+For a pretty ui you should check out [duploq](https://github.com/ArsMasiuk/duploq) by [ArsMasiuk](https://github.com/ArsMasiuk):
+
+![Duploq](https://github.com/ArsMasiuk/duploq/raw/master/duploq.png)
+
+From duploq's Readme file:
+
+> duploq's approach is a pretty straighforward. First, duploq allows you to choose where to look for the duplicates (files or folders). Then it builds list of input files and passes it to the Duplo engine together with necessary parameters. After the files have been processed, duploq parses Duplo's output and visualises the results in easy and intuitive way. Also it provides additional statistics information which is not a part of Duplo output.
+
+## 11. License
 
 Duplo is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
