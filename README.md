@@ -30,8 +30,9 @@
 ## 1. General Information
 
 Duplicated source code blocks can harm maintainability of software systems.
-Duplo is a tool to find duplicated code blocks in large C, C++, Java, C# and
-VB.Net systems.
+Duplo is a tool to find duplicated code blocks in large code bases. Duplo has special support for some
+programming languages, meaning it can filter out (multi-line) comments and compiler directives.
+For example: C, C++, Java, C#, and VB.NET. Any other text format is also supported.
 
 ## 2. Maintainer
 
