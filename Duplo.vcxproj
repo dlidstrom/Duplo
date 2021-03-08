@@ -91,46 +91,46 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ArgumentParser.cpp" />
-    <ClCompile Include="CstyleCommentsFilter.cpp" />
-    <ClCompile Include="CstyleUtils.cpp" />
-    <ClCompile Include="Duplo.cpp" />
-    <ClCompile Include="FileTypeFactory.cpp" />
-    <ClCompile Include="FileTypeBase.cpp" />
-    <ClCompile Include="FileType_C.cpp" />
-    <ClCompile Include="FileType_CS.cpp" />
-    <ClCompile Include="FileType_S.cpp" />
-    <ClCompile Include="FileType_Unknown.cpp" />
-    <ClCompile Include="FileType_VB.cpp" />
-    <ClCompile Include="HashUtil.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="NoopLineFilter.cpp" />
-    <ClCompile Include="SourceFile.cpp" />
-    <ClCompile Include="SourceLine.cpp" />
-    <ClCompile Include="StringUtil.cpp" />
-    <ClCompile Include="TextFile.cpp" />
+    <ClCompile Include="src/ArgumentParser.cpp" />
+    <ClCompile Include="src/CstyleCommentsFilter.cpp" />
+    <ClCompile Include="src/CstyleUtils.cpp" />
+    <ClCompile Include="src/Duplo.cpp" />
+    <ClCompile Include="src/FileTypeFactory.cpp" />
+    <ClCompile Include="src/FileTypeBase.cpp" />
+    <ClCompile Include="src/FileType_C.cpp" />
+    <ClCompile Include="src/FileType_CS.cpp" />
+    <ClCompile Include="src/FileType_S.cpp" />
+    <ClCompile Include="src/FileType_Unknown.cpp" />
+    <ClCompile Include="src/FileType_VB.cpp" />
+    <ClCompile Include="src/HashUtil.cpp" />
+    <ClCompile Include="src/Main.cpp" />
+    <ClCompile Include="src/NoopLineFilter.cpp" />
+    <ClCompile Include="src/SourceFile.cpp" />
+    <ClCompile Include="src/SourceLine.cpp" />
+    <ClCompile Include="src/StringUtil.cpp" />
+    <ClCompile Include="src/TextFile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ArgumentParser.h" />
-    <ClInclude Include="CstyleCommentsFilter.h" />
-    <ClInclude Include="CstyleUtils.h" />
-    <ClInclude Include="Duplo.h" />
-    <ClInclude Include="FileTypeFactory.h" />
-    <ClInclude Include="FileTypeBase.h" />
-    <ClInclude Include="FileType_C.h" />
-    <ClInclude Include="FileType_CS.h" />
-    <ClInclude Include="FileType_S.h" />
-    <ClInclude Include="FileType_Unknown.h" />
-    <ClInclude Include="FileType_VB.h" />
-    <ClInclude Include="Fwd.h" />
-    <ClInclude Include="HashUtil.h" />
-    <ClInclude Include="IFileType.h" />
-    <ClInclude Include="ILineFilter.h" />
-    <ClInclude Include="NoopLineFilter.h" />
-    <ClInclude Include="SourceFile.h" />
-    <ClInclude Include="SourceLine.h" />
-    <ClInclude Include="StringUtil.h" />
-    <ClInclude Include="TextFile.h" />
+    <ClInclude Include="src/ArgumentParser.h" />
+    <ClInclude Include="src/CstyleCommentsFilter.h" />
+    <ClInclude Include="src/CstyleUtils.h" />
+    <ClInclude Include="src/Duplo.h" />
+    <ClInclude Include="src/FileTypeFactory.h" />
+    <ClInclude Include="src/FileTypeBase.h" />
+    <ClInclude Include="src/src/FileType_C.h" />
+    <ClInclude Include="src/src/FileType_CS.h" />
+    <ClInclude Include="src/FileType_S.h" />
+    <ClInclude Include="src/FileType_Unknown.h" />
+    <ClInclude Include="src/FileType_VB.h" />
+    <ClInclude Include="src/Fwd.h" />
+    <ClInclude Include="src/HashUtil.h" />
+    <ClInclude Include="src/IFileType.h" />
+    <ClInclude Include="src/ILineFilter.h" />
+    <ClInclude Include="src/NoopLineFilter.h" />
+    <ClInclude Include="src/SourceFile.h" />
+    <ClInclude Include="src/SourceLine.h" />
+    <ClInclude Include="src/StringUtil.h" />
+    <ClInclude Include="src/TextFile.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".clang-format" />
