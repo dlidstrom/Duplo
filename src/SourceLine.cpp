@@ -3,11 +3,11 @@
 #include "SourceFile.h"
 
 #include <algorithm>
+#ifdef WIN32
+#include <iterator>
+#endif
 
-SourceLine::SourceLine(const std::string& line, int lineNumber) {
-    m_line = line;
-    m_lineNumber = lineNumber;
-
+SourceLine::SourceLine(const std::string& line, int lineNumber): m_line(line), m_lineNumber(lineNumber) {
     std::string cleanLine;
 
     // Remove all white space and noise (tabs etc)
