@@ -81,7 +81,7 @@ jobs:
       with:
         name: uploads
     - name: set version
-      run: echo "::set-env name=DUPLO_VERSION::$(cat ./uploads/tag.txt)"
+      run: echo "{DUPLO_VERSION}={$(cat ./uploads/tag.txt)}" >> $GITHUB_ENV
     - name: print version
       run: echo $DUPLO_VERSION
     - uses: actions/checkout@master
