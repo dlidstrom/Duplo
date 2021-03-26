@@ -3,10 +3,11 @@
 #include "SourceFile.h"
 
 #include <algorithm>
+#include <iterator>
 
-SourceLine::SourceLine(const std::string& line, int lineNumber) {
-    m_line = line;
-    m_lineNumber = lineNumber;
+SourceLine::SourceLine(const std::string& line, int lineNumber)
+    : m_line(line),
+      m_lineNumber(lineNumber) {
 
     std::string cleanLine;
 

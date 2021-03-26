@@ -116,7 +116,7 @@ namespace {
                     if (longestFiles.size() < 10) {
                         addSorted(numLines, lines[i]);
                     } else {
-                        auto [l, r] = longestFiles.back();
+                        auto& [l, r] = longestFiles.back();
                         (void)r;
                         if (l < numLines) {
                             addSorted(numLines, lines[i]);
@@ -133,7 +133,7 @@ namespace {
                 << std::sqrt(matrix.max_size())
                 << " lines at most." << std::endl
                 << "Longest files:" << std::endl;
-            for (auto [l, f] : longestFiles) {
+            for (auto& [l, f] : longestFiles) {
                 stream << l << ": " << f << std::endl;
             }
 
@@ -152,7 +152,7 @@ namespace {
             stream
                 << ex.what() << std::endl
                 << "Longest files:" << std::endl;
-            for (auto [l, f] : longestFiles) {
+            for (auto& [l, f] : longestFiles) {
                 stream << l << ": " << f << std::endl;
             }
 

@@ -59,6 +59,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpplatest</LanguageStandard>
+      <DisableSpecificWarnings>4146;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)Duplo.exe</OutputFile>
@@ -91,48 +92,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src/ArgumentParser.cpp" />
-    <ClCompile Include="src/CstyleCommentsFilter.cpp" />
-    <ClCompile Include="src/CstyleUtils.cpp" />
-    <ClCompile Include="src/Duplo.cpp" />
-    <ClCompile Include="src/FileTypeFactory.cpp" />
-    <ClCompile Include="src/FileTypeBase.cpp" />
-    <ClCompile Include="src/FileType_C.cpp" />
-    <ClCompile Include="src/FileType_CS.cpp" />
-    <ClCompile Include="src/FileType_S.cpp" />
-    <ClCompile Include="src/FileType_Unknown.cpp" />
-    <ClCompile Include="src/FileType_VB.cpp" />
-    <ClCompile Include="src/HashUtil.cpp" />
-    <ClCompile Include="src/Main.cpp" />
-    <ClCompile Include="src/NoopLineFilter.cpp" />
-    <ClCompile Include="src/SourceFile.cpp" />
-    <ClCompile Include="src/SourceLine.cpp" />
-    <ClCompile Include="src/StringUtil.cpp" />
-    <ClCompile Include="src/TextFile.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src/ArgumentParser.h" />
-    <ClInclude Include="src/CstyleCommentsFilter.h" />
-    <ClInclude Include="src/CstyleUtils.h" />
-    <ClInclude Include="src/Duplo.h" />
-    <ClInclude Include="src/FileTypeFactory.h" />
-    <ClInclude Include="src/FileTypeBase.h" />
-    <ClInclude Include="src/src/FileType_C.h" />
-    <ClInclude Include="src/src/FileType_CS.h" />
-    <ClInclude Include="src/FileType_S.h" />
-    <ClInclude Include="src/FileType_Unknown.h" />
-    <ClInclude Include="src/FileType_VB.h" />
-    <ClInclude Include="src/Fwd.h" />
-    <ClInclude Include="src/HashUtil.h" />
-    <ClInclude Include="src/IFileType.h" />
-    <ClInclude Include="src/ILineFilter.h" />
-    <ClInclude Include="src/NoopLineFilter.h" />
-    <ClInclude Include="src/SourceFile.h" />
-    <ClInclude Include="src/SourceLine.h" />
-    <ClInclude Include="src/StringUtil.h" />
-    <ClInclude Include="src/TextFile.h" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include=".clang-format" />
     <None Include=".editorconfig" />
     <None Include="Copying" />
@@ -141,6 +100,50 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="duplo.xsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ArgumentParser.cpp" />
+    <ClCompile Include="src\CstyleCommentsFilter.cpp" />
+    <ClCompile Include="src\CstyleUtils.cpp" />
+    <ClCompile Include="src\Duplo.cpp" />
+    <ClCompile Include="src\FileTypeBase.cpp" />
+    <ClCompile Include="src\FileTypeFactory.cpp" />
+    <ClCompile Include="src\FileType_C.cpp" />
+    <ClCompile Include="src\FileType_CS.cpp" />
+    <ClCompile Include="src\FileType_S.cpp" />
+    <ClCompile Include="src\FileType_Unknown.cpp" />
+    <ClCompile Include="src\FileType_VB.cpp" />
+    <ClCompile Include="src\HashUtil.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\NoopLineFilter.cpp" />
+    <ClCompile Include="src\Options.cpp" />
+    <ClCompile Include="src\SourceFile.cpp" />
+    <ClCompile Include="src\SourceLine.cpp" />
+    <ClCompile Include="src\StringUtil.cpp" />
+    <ClCompile Include="src\TextFile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\ArgumentParser.h" />
+    <ClInclude Include="src\CstyleCommentsFilter.h" />
+    <ClInclude Include="src\CstyleUtils.h" />
+    <ClInclude Include="src\Duplo.h" />
+    <ClInclude Include="src\FileTypeBase.h" />
+    <ClInclude Include="src\FileTypeFactory.h" />
+    <ClInclude Include="src\FileType_C.h" />
+    <ClInclude Include="src\FileType_CS.h" />
+    <ClInclude Include="src\FileType_S.h" />
+    <ClInclude Include="src\FileType_Unknown.h" />
+    <ClInclude Include="src\FileType_VB.h" />
+    <ClInclude Include="src\Fwd.h" />
+    <ClInclude Include="src\HashUtil.h" />
+    <ClInclude Include="src\IFileType.h" />
+    <ClInclude Include="src\ILineFilter.h" />
+    <ClInclude Include="src\NoopLineFilter.h" />
+    <ClInclude Include="src\Options.h" />
+    <ClInclude Include="src\SourceFile.h" />
+    <ClInclude Include="src\SourceLine.h" />
+    <ClInclude Include="src\StringUtil.h" />
+    <ClInclude Include="src\TextFile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
