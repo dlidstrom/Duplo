@@ -1,7 +1,7 @@
 #!/bin/bash
 # to run this, first set the DUPLO_VERSION environment variable. Otherwise
 # some of the tests might fail. So, do this:
-# > export DUPLO_VERSION=v1.0.0
+# > export DUPLO_VERSION=v1.0.1
 p() {
     now="$(date +'%r')"
     printf "$(tput setaf 1)%s$(tput sgr0) | $(tput bold)$1$(tput sgr0)\n" "$now";

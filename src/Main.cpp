@@ -51,7 +51,7 @@ namespace {
 
             std::cout << "\nDESCRIPTION\n";
             std::cout << "       Duplo is a tool to find duplicated code blocks in large\n";
-            std::cout << "       C/C++/Java/C#/VB.Net software systems.\n\n";
+            std::cout << "       C/C++/Java/C#/VB.Net/Ada software systems.\n\n";
 
             std::cout << "       -ml              minimal block size in lines (default is " << MIN_BLOCK_SIZE << ")\n";
             std::cout << "       -pt              percentage of lines of duplication threshold to override -ml\n";

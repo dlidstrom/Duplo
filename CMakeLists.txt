@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15.5)
 project(duplo)
 file(GLOB SOURCES src/*.cpp)
 
-SET(DUPLO_VERSION "\"v1.0.0\"" CACHE STRING "Duplo version")
+SET(DUPLO_VERSION "\"v1.0.1\"" CACHE STRING "Duplo version")
 
 if(MSVC)
 else()
