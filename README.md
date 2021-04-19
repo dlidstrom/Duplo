@@ -50,6 +50,7 @@ file formats:
 - C#
 - VB
 - GCC assembly
+- Ada
 
 This means that Duplo will remove
 preprocessor directives, block comments, using
@@ -236,6 +237,8 @@ Send me a pull request!
 
 ## 9. Changes
 
+- 0.7
+  - Add support for Ada (thanks [@Knaldgas](https://github.com/Knaldgas)!)
 - 0.6
   - Improved integration with [duploq](https://github.com/ArsMasiuk/duploq)
 - 0.5
@@ -254,9 +257,9 @@ Send me a pull request!
 
 ## 10. Accompanying Software
 
-For a pretty ui you should check out [duploq](https://github.com/ArsMasiuk/duploq) by [ArsMasiuk](https://github.com/ArsMasiuk):
+For a pretty ui you should check out [duploq](https://github.com/duploq/duploq) by [ArsMasiuk](https://github.com/ArsMasiuk):
 
-![Duploq](https://github.com/ArsMasiuk/duploq/raw/master/duploq.png)
+![Duploq](https://user-images.githubusercontent.com/70297699/91775216-d4020c00-ebea-11ea-9b18-ceeb7e05cc2b.PNG)
 
 From duploq's Readme file:
 
