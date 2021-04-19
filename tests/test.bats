@@ -9,7 +9,7 @@
     [ "${lines[3]}" = "       duplo [OPTIONS] [INTPUT_FILELIST] [OUTPUT_FILE]" ]
     [ "${lines[4]}" = "DESCRIPTION" ]
     [ "${lines[5]}" = "       Duplo is a tool to find duplicated code blocks in large" ]
-    [ "${lines[6]}" = "       C/C++/Java/C#/VB.Net software systems." ]
+    [ "${lines[6]}" = "       C/C++/Java/C#/VB.Net/Ada software systems." ]
     [ "${lines[7]}" = "       -ml              minimal block size in lines (default is 4)" ]
     [ "${lines[8]}" = "       -pt              percentage of lines of duplication threshold to override -ml" ]
     [ "${lines[9]}" = "                        (default is 100%)" ]
