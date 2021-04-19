@@ -3,7 +3,7 @@
 # some of the tests might fail. So, do this:
 # > export DUPLO_VERSION=v1.0.1
 p() {
-    now="$(date +'%r')"
+    now="$(date +'%F %T')"
     printf "$(tput setaf 1)%s$(tput sgr0) | $(tput bold)$1$(tput sgr0)\n" "$now";
 }
 
