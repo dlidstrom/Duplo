@@ -25,6 +25,7 @@ namespace {
             }
 
             unsigned char blockPercentThreshold = static_cast<unsigned char>(blockPercentThresholdValue);
+            auto numberOfFiles = ap.getInt("-n", 0);
             auto minChars = ap.getInt("-mc", MIN_CHARS);
             bool ignorePrepStuff = ap.is("-ip");
             bool outputXml = ap.is("-xml");
@@ -36,6 +37,7 @@ namespace {
                 ignorePrepStuff,
                 minBlockSize,
                 blockPercentThreshold,
+                numberOfFiles,
                 outputXml,
                 ignoreSameFilename,
                 listFilename,
@@ -59,6 +61,7 @@ namespace {
             std::cout << "                        useful for identifying whole file duplication\n";
             std::cout << "       -mc              minimal characters in line (default is " << MIN_CHARS << ")\n";
             std::cout << "                        lines with less characters are ignored\n";
+            std::cout << "       -n               only report for first N files\n";
             std::cout << "       -ip              ignore preprocessor directives\n";
             std::cout << "       -d               ignore file pairs with same name\n";
             std::cout << "       -xml             output file in XML\n";

@@ -384,6 +384,7 @@ void Duplo::Run(const Options& options) {
     auto lines = LoadFileList(options.GetListFilename());
     auto [sourceFiles, matrix, files, locsTotal] =
         LoadSourceFiles(lines, options.GetMinChars(), options.GetIgnorePrepStuff());
+    auto numFilesToCheck = options.GetFilesToCheck() > 0 ? std::min(options.GetFilesToCheck(), sourceFiles.size()): sourceFiles.size();
 
     // hash maps
     HashToFiles hashToFiles;
@@ -395,7 +396,7 @@ void Duplo::Run(const Options& options) {
 
     // Compare each file with each other
     ProcessResult processResultTotal;
-    for (unsigned i = 0; i < sourceFiles.size(); i++) {
+    for (unsigned i = 0; i < numFilesToCheck; i++) {
         const auto& left = sourceFiles[i];
 
         // get matching files

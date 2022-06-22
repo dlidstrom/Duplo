@@ -5,6 +5,7 @@ Options::Options(
     bool ignorePrepStuff,
     unsigned minBlockSize,
     unsigned blockPercentThreshold,
+    unsigned filesToCheck,
     bool outputXml,
     bool ignoreSameFilename,
     const std::string& listFilename,
@@ -13,6 +14,7 @@ Options::Options(
     , m_ignorePrepStuff(ignorePrepStuff)
     , m_minBlockSize(minBlockSize)
     , m_blockPercentThreshold(blockPercentThreshold)
+    , m_filesToCheck(filesToCheck)
     , m_outputXml(outputXml)
     , m_ignoreSameFilename(ignoreSameFilename)
     , m_listFilename(listFilename)
@@ -50,4 +52,8 @@ const std::string& Options::GetListFilename() const {
 
 const std::string& Options::GetOutputFilename() const {
     return m_outputFilename;
+}
+
+size_t Options::GetFilesToCheck() const {
+    return m_filesToCheck;
 }
