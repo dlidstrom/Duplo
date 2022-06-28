@@ -8,6 +8,7 @@ class Options {
     bool m_ignorePrepStuff;
     unsigned m_minBlockSize;
     unsigned m_blockPercentThreshold;
+    unsigned m_filesToCheck;
     bool m_outputXml;
     bool m_ignoreSameFilename;
     std::string m_listFilename;
@@ -19,6 +20,7 @@ public:
         bool ignorePrepStuff,
         unsigned minBlockSize,
         unsigned blockPercentThreshold,
+        unsigned m_filesToCheck,
         bool outputXml,
         bool ignoreSameFilename,
         const std::string& listFilename,
@@ -33,6 +35,7 @@ public:
     bool GetIgnorePrepStuff() const;
     unsigned GetMinBlockSize() const;
     unsigned GetBlockPercentThreshold() const;
+    size_t GetFilesToCheck() const;
 };
 
 #endif
