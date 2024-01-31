@@ -26,6 +26,7 @@
 - [9. Changes](#9-changes)
 - [10. Accompanying Software](#10-accompanying-software)
 - [11. License](#11-license)
+- [12. Stargazers over time](#12-stargazers-over-time)
 
 ## 1. General Information
 
@@ -282,3 +283,7 @@ along with Duplo; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 ---
+
+## 12. Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/dlidstrom/Duplo.svg?variant=adaptive)](https://starchart.cc/dlidstrom/Duplo)
