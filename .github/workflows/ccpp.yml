@@ -37,9 +37,14 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: uploads
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+
     - name: build
       run: |
-        sudo npm install -g bats
+        npm install -g bats
         export DUPLO_VERSION=`cat ./uploads/tag.txt`
         mkdir -p build
         pushd build
