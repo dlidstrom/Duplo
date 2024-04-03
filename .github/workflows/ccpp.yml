@@ -49,8 +49,8 @@ jobs:
         mkdir -p build
         pushd build
         cmake .. -DDUPLO_VERSION=\"$DUPLO_VERSION\"
+        make
         popd
-        ./compile.sh
         zip --junk-paths duplo-linux build/duplo
     - name: upload linux artifact
       uses: actions/upload-artifact@v1
