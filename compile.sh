@@ -18,7 +18,7 @@ if [ ! -d "build" ]; then
 fi
 
 p "compiling..." &&
-pushd build
+pushd build || exit 1
 make &&
 popd &&
 bats --recursive tests &&
