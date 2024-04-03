@@ -85,7 +85,7 @@ namespace {
 
         std::vector<SourceFile> sourceFiles;
         std::vector<MatchType> matrix;
-        unsigned maxLinesPerFile = 0;
+        size_t maxLinesPerFile = 0;
         int files = 0;
         unsigned long locsTotal = 0;
         std::vector<FileLength> longestFiles;
@@ -100,10 +100,10 @@ namespace {
         };
 
         // Create vector with all source files
-        for (unsigned i = 0; i < lines.size(); i++) {
+        for (size_t i = 0; i < lines.size(); i++) {
             if (lines[i].size() > 5) {
                 SourceFile sourceFile(lines[i], minChars, ignorePrepStuff);
-                unsigned numLines = sourceFile.GetNumOfLines();
+                size_t numLines = sourceFile.GetNumOfLines();
                 if (numLines > 0) {
                     files++;
                     sourceFiles.push_back(std::move(sourceFile));
@@ -240,16 +240,16 @@ namespace {
         std::vector<MatchType>& matrix,
         const Options& options,
         std::ostream& outFile) {
-        unsigned m = source1.GetNumOfLines();
-        unsigned n = source2.GetNumOfLines();
+        size_t m = source1.GetNumOfLines();
+        size_t n = source2.GetNumOfLines();
 
         // Reset matrix data
         std::fill(std::begin(matrix), std::begin(matrix) + m * n, MatchType::NONE);
 
         // Compute matrix
-        for (unsigned y = 0; y < m; y++) {
+        for (size_t y = 0; y < m; y++) {
             auto& line = source1.GetLine(y);
-            for (unsigned x = 0; x < n; x++) {
+            for (size_t x = 0; x < n; x++) {
                 if (line == source2.GetLine(x)) {
                     matrix[x + n * y] = MatchType::MATCH;
                 }
@@ -260,19 +260,19 @@ namespace {
         // - "lines of code duplicated", &
         // - "percentage of file duplicated"
         unsigned lMinBlockSize = std::max(
-            options.GetMinBlockSize(),
+            (size_t)options.GetMinBlockSize(),
             std::min(
-                options.GetMinBlockSize(),
+                (size_t)options.GetMinBlockSize(),
                 (std::max(n, m) * 100) / options.GetBlockPercentThreshold()));
 
         unsigned blocks = 0;
         unsigned duplicateLines = 0;
 
         // Scan vertical part
-        for (unsigned y = 0; y < m; y++) {
+        for (size_t y = 0; y < m; y++) {
             unsigned seqLen = 0;
-            int maxX = std::min(n, m - y);
-            for (int x = 0; x < maxX; x++) {
+            size_t maxX = std::min(n, m - y);
+            for (size_t x = 0; x < maxX; x++) {
                 if (matrix[x + n * (y + x)] == MatchType::MATCH) {
                     seqLen++;
                 } else {
@@ -317,10 +317,10 @@ namespace {
 
         if (source1 != source2) {
             // Scan horizontal part
-            for (unsigned x = 1; x < n; x++) {
+            for (size_t x = 1; x < n; x++) {
                 unsigned seqLen = 0;
-                int maxY = std::min(m, n - x);
-                for (int y = 0; y < maxY; y++) {
+                size_t maxY = std::min(m, n - x);
+                for (size_t y = 0; y < maxY; y++) {
                     if (matrix[x + y + n * y] == MatchType::MATCH) {
                         seqLen++;
                     } else {
