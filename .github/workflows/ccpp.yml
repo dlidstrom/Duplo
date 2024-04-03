@@ -73,8 +73,8 @@ jobs:
         mkdir -p build
         pushd build
         cmake .. -DDUPLO_VERSION=\"$DUPLO_VERSION\"
+        make
         popd
-        ./compile.sh
         zip --junk-paths duplo-macos build/duplo
     - name: upload macos artifact
       uses: actions/upload-artifact@v1
