@@ -116,9 +116,15 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         push: ${{ github.event_name != 'pull_request' }}
-        tags:
-          dlidstrom/duplo:latest
-          dlidstrom/duplo:${{ steps.version.outputs.DUPLO_VERSION }}
+        tags: "dlidstrom/duplo:latest,dlidstrom/duplo:${{ steps.version.outputs.DUPLO_VERSION }}"
+        build-args: |
+          "DUPLO_VERSION=${{ steps.version.outputs.DUPLO_VERSION }}"
+
+    - name: Docker build and push
+      uses: docker/build-push-action@v5
+      with:
+        push: ${{ github.event_name == 'pull_request' }}
+        tags: "dlidstrom/duplo:${{ steps.version.outputs.DUPLO_VERSION }}"
         build-args: |
           "DUPLO_VERSION=${{ steps.version.outputs.DUPLO_VERSION }}"
 
