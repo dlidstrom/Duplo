@@ -1,5 +1,6 @@
 @test "g_chase.c" {
-    run ./build/duplo tests/Quake2/files.lst out.txt && cat out.txt
+    run ./build/duplo tests/Quake2/files.lst out.txt
+    cat out.txt
     printf 'lines %s\n' "${lines[@]}" >&2
     echo "status = $status"
     [ "$status" -eq 0 ]
