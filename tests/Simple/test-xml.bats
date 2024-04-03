@@ -1,14 +1,12 @@
-setup() {
-    run ./build/duplo -xml tests/Simple/LineNumbers.lst out.xml
-}
-
 @test "LineNumbers.c" {
+    run ./build/duplo -xml tests/Simple/LineNumbers.lst out.xml
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "Loading and hashing files ... 2 done." ]
     [ "${lines[1]}" = "tests/Simple/LineNumbers.c found: 1 block(s)" ]
 }
 
 @test "LineNumbers.c out.xml" {
+    run ./build/duplo -xml tests/Simple/LineNumbers.lst out.xml
     run cat out.xml
     printf 'Lines:\n'
     printf 'lines %s\n' "${lines[@]}" >&2
