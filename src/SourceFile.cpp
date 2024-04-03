@@ -23,7 +23,7 @@ SourceFile::SourceFile(SourceFile&& right) noexcept
     , m_sourceLines(std::move(right.m_sourceLines)) {
 }
 
-unsigned SourceFile::GetNumOfLines() const {
+size_t SourceFile::GetNumOfLines() const {
     return m_sourceLines.size();
 }
 

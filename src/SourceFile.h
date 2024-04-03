@@ -15,7 +15,7 @@ public:
     SourceFile(const std::string& fileName, unsigned minChars, bool ignorePrepStuff);
     SourceFile(SourceFile&& right) noexcept;
 
-    unsigned GetNumOfLines() const;
+    size_t GetNumOfLines() const;
     const SourceLine& GetLine(int index) const;
     const std::string& GetFilename() const;
 
