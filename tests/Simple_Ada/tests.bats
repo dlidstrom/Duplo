@@ -1,14 +1,12 @@
-setup() {
-    run ./build/duplo -ml 2 tests/Simple_Ada/simple_log.lst out.txt
-}
-
 @test "simple_log.adb" {
+    run ./build/duplo -ml 2 tests/Simple_Ada/simple_log.lst out.txt
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "Loading and hashing files ... 2 done." ]
     [ "${lines[1]}" = "tests/Simple_Ada/simple_log.adb found: 6 block(s)" ]
 }
 
 @test "simple_log.adb out.txt" {
+    run ./build/duplo -ml 2 tests/Simple_Ada/simple_log.lst out.txt
     run cat out.txt
     printf 'Lines:\n'
     printf 'lines %s\n' "${lines[@]}" >&2
