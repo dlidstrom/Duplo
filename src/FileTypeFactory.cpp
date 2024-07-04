@@ -5,6 +5,7 @@
 #include "FileType_Unknown.h"
 #include "FileType_VB.h"
 #include "FileType_Ada.h"
+#include "FileType_Java.h"
 #include "StringUtil.h"
 
 #include <algorithm>
@@ -26,6 +27,8 @@ IFileTypePtr FileTypeFactory::CreateFileType(
         fileType.reset(new FileType_VB(ignorePrepStuff, minChars));
     else if (ext == "ads" || ext == "adb")
         fileType.reset(new FileType_Ada(ignorePrepStuff, minChars));
+    else if (ext == "java")
+        fileType.reset(new FileType_Java(ignorePrepStuff, minChars));
     else
         fileType.reset(new FileType_Unknown(minChars));
     return fileType;
