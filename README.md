@@ -220,6 +220,11 @@ To implement support for a new language, there are a couple of options (in order
 1. Implement `FileTypeBase` which has support for handling comments and preprocessor directives. You just need to decide what is a comment. With this option you need to implement a couple of methods, one which is `CreateLineFilter`. This is to remove multiline comments. Look at `CstyleCommentsFilter` for an example.
 2. Implement `IFileType` interface directly. This gives you the most freedom but also is the hardest option of course.
 
+You can see an example where Java support was added very easily. It is a matter of copying one of the existing file type implementations
+and adjusting which lined shoulf be filtered and how comments should be removed. Finally, add a few lines in `FileTypeFactory.cpp` to select
+the correct implementation according to file extension. You can see [this commit](https://github.com/dlidstrom/Duplo/commit/320f9474354d41c3b35c178bb4b7f6c667025976)
+for all details.
+
 ### 8.4. Language Suggestions
 
 - JavaScript (easy, just look at the existing C-based ones)
