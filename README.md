@@ -1,6 +1,14 @@
-# Duplo (C/C++/Java Duplicate Source Code Block Finder) <!-- omit in toc -->
+# Duplo - Duplicate Source Code Block Finder <!-- omit in toc -->
 
 ![C/C++ CI](https://github.com/dlidstrom/Duplo/workflows/C/C++%20CI/badge.svg)
+
+**Updates:**
+
+🔥 v0.8 adds improved Java support
+
+🙌 Help needed! See [8.3](#83-additional-language-support) on how to support more languages.
+
+**Table of Contents:**
 
 - [1. General Information](#1-general-information)
 - [2. Maintainer](#2-maintainer)
@@ -31,15 +39,15 @@
 ## 1. General Information
 
 Duplicated source code blocks can harm maintainability of software systems.
-Duplo is a tool to find duplicated code blocks in large code bases. Duplo has special support for some
-programming languages, meaning it can filter out (multi-line) comments and compiler directives.
-For example: C, C++, Java, C#, and VB.NET. Any other text format is also supported.
+Duplo is a tool to find duplicated code blocks in large code bases. Duplo has
+special support for some programming languages, meaning it can filter out
+(multi-line) comments and compiler directives. For example: C, C++, Java, C#,
+and VB.NET. Any other text format is also supported.
 
 ## 2. Maintainer
 
-Duplo was originally developed by Christian
-M. Ammann and is now maintained and developed by Daniel
-Lidström.
+Duplo was originally developed by Christian M. Ammann and is now maintained and
+developed by Daniel Lidström.
 
 ## 3. File Format Support
 
@@ -53,14 +61,10 @@ file formats:
 - GCC assembly
 - Ada
 
-This means that Duplo will remove
-preprocessor directives, block comments, using
-statements, etc, to only consider duplicates
-in actual code.
-In addition, Duplo can be used as a general
-(without special support) duplicates detector
-in arbitrary text files and will even detect
-duplicates found in the same file.
+This means that Duplo will remove preprocessor directives, block comments, using
+statements, etc, to only consider duplicates in actual code. In addition, Duplo
+can be used as a general (without special support) duplicates detector in
+arbitrary text files and will even detect duplicates found in the same file.
 
 Sample output snippet:
 
@@ -92,23 +96,29 @@ If you have Docker, the way to run Duplo is to use this command:
 > docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo
 ```
 
-This pulls the latest image and runs duplo. Note that you'll have to pipe the filenames into this command. A complete commandline sample will be shown below.
+This pulls the latest image and runs duplo. Note that you'll have to pipe the
+filenames into this command. A complete commandline sample will be shown below.
 
 ### 4.2. Pre-built binaries
 
-Duplo is also available as a pre-built binary for (alpine) linux and macos. Grab the executable from the [releases](https://github.com/dlidstrom/Duplo/releases) page.
+Duplo is also available as a pre-built binary for (alpine) linux and macos. Grab
+the executable from the [releases](https://github.com/dlidstrom/Duplo/releases)
+page.
 
-You can of course build from source as well, and you'll have to do so to get a binary for Windows.
+You can of course build from source as well, and you'll have to do so to get a
+binary for Windows.
 
 ## 5. Usage
 
-Duplo works with a list of files. You can either specify a file that contains the list of files, or you can pass them using `stdin`.
+Duplo works with a list of files. You can either specify a file that contains
+the list of files, or you can pass them using `stdin`.
 
 Run `duplo --help` on the command line to see the detailed options.
 
 ### 5.1. Passing files using `stdin`
 
-In each of the following commands, `duplo` will write the duplicated blocks into `out.txt` in addition to the information written to stdout.
+In each of the following commands, `duplo` will write the duplicated blocks into
+`out.txt` in addition to the information written to stdout.
 
 #### 5.1.1. Bash
 
@@ -117,7 +127,13 @@ In each of the following commands, `duplo` will write the duplicated blocks into
 > find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | duplo - out.txt
 ```
 
-Let's break this down. `find . -type f \( -iname "*.cpp" -o -iname "*.h" \)` is a syntax to look recursively in the current directory (the `.` part) for files (the `-type f` part) matching `*.cpp` or `*.h` (case insensitive). The output from `find` is piped into `duplo` which then reads the filenames from `stdin` (the `-` tells `duplo` to get the filenames from `stdin`, a common unix convention in many commandline applications). The result of the analysis is then written to `out.txt`.
+Let's break this down. `find . -type f \( -iname "*.cpp" -o -iname "*.h" \)` is
+a syntax to look recursively in the current directory (the `.` part) for files
+(the `-type f` part) matching `*.cpp` or `*.h` (case insensitive). The output
+from `find` is piped into `duplo` which then reads the filenames from `stdin`
+(the `-` tells `duplo` to get the filenames from `stdin`, a common unix
+convention in many commandline applications). The result of the analysis is then
+written to `out.txt`.
 
 #### 5.1.2. Windows
 
@@ -126,7 +142,8 @@ Let's break this down. `find . -type f \( -iname "*.cpp" -o -iname "*.h" \)` is 
 > Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | Duplo.exe - out.txt
 ```
 
-This works similarly to the Bash command, but uses PowerShell commands to achieve the same effect.
+This works similarly to the Bash command, but uses PowerShell commands to
+achieve the same effect.
 
 #### 5.1.3. Docker
 
@@ -135,9 +152,22 @@ This works similarly to the Bash command, but uses PowerShell commands to achiev
 > find . -type f \( -iname "*.cpp" -or -iname "*.h" \) | docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo - out.txt
 ```
 
-This command also works in a similar fashion to the Bash command, but instead of piping into a local `duplo` executable, it will pipe into `duplo` running inside Docker. This is very convenient as you do not have to install `duplo` separately. You will have to install Docker though, if you haven't already. That is a good thing to do anyway, since it opens up a lot of possibilities apart from running `duplo`.
+This command also works in a similar fashion to the Bash command, but instead of
+piping into a local `duplo` executable, it will pipe into `duplo` running inside
+Docker. This is very convenient as you do not have to install `duplo`
+separately. You will have to install Docker though, if you haven't already. That
+is a good thing to do anyway, since it opens up a lot of possibilities apart
+from running `duplo`.
 
-Again, similarly to the Bash command, this uses `find` to find files in the current directory, then passes the file list to Docker which will pass it further into an instance of the latest version of `duplo`. The working directory in the `duplo` container should be `/src` (that's where the `duplo` executable is located) and the current path of your host machine will be mapped to `/src` when the container is running. The `-i` allows `stdin` of your host machine to be passed into Docker to allow `duplo` to read the filenames. Any parameters to `duplo` can be placed at the end of the command as you can see `- out.txt` has been.
+Again, similarly to the Bash command, this uses `find` to find files in the
+current directory, then passes the file list to Docker which will pass it
+further into an instance of the latest version of `duplo`. The working directory
+in the `duplo` container should be `/src` (that's where the `duplo` executable
+is located) and the current path of your host machine will be mapped to `/src`
+when the container is running. The `-i` allows `stdin` of your host machine to
+be passed into Docker to allow `duplo` to read the filenames. Any parameters to
+`duplo` can be placed at the end of the command as you can see `- out.txt` has
+been.
 
 ### 5.2. Passing files using file
 
@@ -161,18 +191,19 @@ Again, the duplicated blocks are written to `out.txt`.
 
 ### 5.3. Xml output
 
-Duplo can also output xml and there is a stylesheet that will format the result for viewing in a browser. This can be used as a report tab in your continuous integration tool (TeamCity, etc).
+Duplo can also output xml and there is a stylesheet that will format the result
+for viewing in a browser. This can be used as a report tab in your continuous
+integration tool (GitHub Actions, TeamCity, etc).
 
 ## 6. Feedback and Bug Reporting
 
-Please open an issue to discuss feedback,
-feature requests and bug reports.
+Please open an issue to discuss feedback, feature requests and bug reports.
 
 ## 7. Algorithm Background
 
 Duplo uses the same techniques as Duploc to detect duplicated code blocks. See
-[Duca99bCodeDuplication](http://scg.unibe.ch/archive/papers/Duca99bCodeDuplication.pdf) for
-further information.
+[Duca99bCodeDuplication](http://scg.unibe.ch/archive/papers/Duca99bCodeDuplication.pdf)
+for further information.
 
 ### 7.1. Performance Measurements
 
@@ -213,17 +244,26 @@ Use Visual Studio 2019 to open the included solution file (or try `CMake`).
 
 ### 8.3. Additional Language Support
 
-Duplo can analyze all text files regardless of format, but it has special support for some programming languages (C++, C#, Java, for example). This allows Duplo to improve the duplication detection as it can ignore preprocessor directives and/or comments.
+Duplo can analyze all text files regardless of format, but it has special
+support for some programming languages (C++, C#, Java, for example). This allows
+Duplo to improve the duplication detection as it can ignore preprocessor
+directives and/or comments.
 
-To implement support for a new language, there are a couple of options (in order of complexity):
+To implement support for a new language, there are a couple of options:
 
-1. Implement `FileTypeBase` which has support for handling comments and preprocessor directives. You just need to decide what is a comment. With this option you need to implement a couple of methods, one which is `CreateLineFilter`. This is to remove multiline comments. Look at `CstyleCommentsFilter` for an example.
-2. Implement `IFileType` interface directly. This gives you the most freedom but also is the hardest option of course.
+1. Implement `FileTypeBase` which has support for handling comments and
+   preprocessor directives. You just need to decide what is a comment. With this
+   option you need to implement a couple of methods, one which is
+   `CreateLineFilter`. This is to remove multiline comments. Look at
+   `CstyleCommentsFilter` for an example.
+2. Implement `IFileType` interface directly. This gives you the most freedom but
+   also is the hardest option.
 
-You can see an example where Java support was added very easily. It is a matter of copying one of the existing file type implementations
-and adjusting which lined shoulf be filtered and how comments should be removed. Finally, add a few lines in `FileTypeFactory.cpp` to select
-the correct implementation according to file extension. You can see [this commit](https://github.com/dlidstrom/Duplo/commit/320f9474354d41c3b35c178bb4b7f6c667025976)
-for all details.
+You can see an example of how Java support was added effortlessly. It involves
+copying an existing file type implementation and adjusting the lines that should
+be filtered and how comments should be removed. Finally, add a few lines in
+`FileTypeFactory.cpp` to choose the correct implementation based on the file
+extension. Refer to [this commit](https://github.com/dlidstrom/Duplo/commit/320f9474354d41c3b35c178bb4b7f6c667025976) for all the details.
 
 ### 8.4. Language Suggestions
 
@@ -243,6 +283,8 @@ Send me a pull request!
 
 ## 9. Changes
 
+- 0.8
+  - Add support for Java which was lost or never there in the first place
 - 0.7
   - Add support for Ada (thanks [@Knaldgas](https://github.com/Knaldgas)!)
 - 0.6
@@ -269,7 +311,12 @@ For a pretty ui you should check out [duploq](https://github.com/duploq/duploq) 
 
 From duploq's Readme file:
 
-> duploq's approach is a pretty straighforward. First, duploq allows you to choose where to look for the duplicates (files or folders). Then it builds list of input files and passes it to the Duplo engine together with necessary parameters. After the files have been processed, duploq parses Duplo's output and visualises the results in easy and intuitive way. Also it provides additional statistics information which is not a part of Duplo output.
+> duploq's approach is a pretty straighforward. First, duploq allows you to
+> choose where to look for the duplicates (files or folders). Then it builds
+> list of input files and passes it to the Duplo engine together with necessary
+> parameters. After the files have been processed, duploq parses Duplo's output
+> and visualises the results in easy and intuitive way. Also it provides
+> additional statistics information which is not a part of Duplo output.
 
 ## 11. License
 
