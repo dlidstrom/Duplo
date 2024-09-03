@@ -34,7 +34,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4.1.7
       with:
         name: uploads
 
@@ -63,7 +63,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4.1.7
       with:
         name: uploads
     - name: build
@@ -86,7 +86,7 @@ jobs:
     needs: [bump-tag-dry]
     steps:
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4.1.7
       with:
         name: uploads
 
@@ -156,7 +156,7 @@ jobs:
         draft: false
         prerelease: false
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4.1.7
       with:
         name: uploads
     - name: upload macos
