@@ -26,7 +26,7 @@ jobs:
     - name: upload new tag artifact
       uses: actions/upload-artifact@v4
       with:
-        name: uploads
+        name: uploads/tag.txt
         path: tag.txt
   build-linux:
     runs-on: ubuntu-latest
@@ -55,7 +55,7 @@ jobs:
     - name: upload linux artifact
       uses: actions/upload-artifact@v4
       with:
-        name: uploads
+        name: uploads/duplo-linux.zip
         path: duplo-linux.zip
   build-macos:
     runs-on: macos-latest
@@ -79,7 +79,7 @@ jobs:
     - name: upload macos artifact
       uses: actions/upload-artifact@v4
       with:
-        name: uploads
+        name: uploads/duplo-macos.zip
         path: duplo-macos.zip
   push-docker-image:
     runs-on: ubuntu-latest
