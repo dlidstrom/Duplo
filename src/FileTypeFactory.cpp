@@ -17,7 +17,7 @@ IFileTypePtr FileTypeFactory::CreateFileType(
     unsigned minChars) {
     auto ext = StringUtil::ToLower(StringUtil::GetFileExtension(filename));
     IFileTypePtr fileType;
-    if (ext == "c" || ext == "cpp" || ext == "cxx" || ext == "h" || ext == "cc")
+    if (ext == "c" || ext == "cpp" || ext == "cxx" || ext == "h" || ext == "cc" || ext == "hh")
         fileType.reset(new FileType_C(ignorePrepStuff, minChars));
     else if (ext == "cs")
         fileType.reset(new FileType_CS(ignorePrepStuff, minChars));
