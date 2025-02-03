@@ -24,9 +24,9 @@ jobs:
       run: |
         echo ${{ steps.tag.outputs.new_tag }} > tag.txt
     - name: upload new tag artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: uploads
+        name: uploads/tag.txt
         path: tag.txt
   build-linux:
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: uploads
 
@@ -53,9 +53,9 @@ jobs:
         popd
         zip --junk-paths duplo-linux build/duplo
     - name: upload linux artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: uploads
+        name: uploads/duplo-linux.zip
         path: duplo-linux.zip
   build-macos:
     runs-on: macos-latest
@@ -63,7 +63,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: uploads
     - name: build
@@ -77,16 +77,16 @@ jobs:
         popd
         zip --junk-paths duplo-macos build/duplo
     - name: upload macos artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: uploads
+        name: uploads/duplo-macos.zip
         path: duplo-macos.zip
   push-docker-image:
     runs-on: ubuntu-latest
     needs: [bump-tag-dry]
     steps:
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: uploads
 
@@ -156,7 +156,7 @@ jobs:
         draft: false
         prerelease: false
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
         name: uploads
     - name: upload macos
