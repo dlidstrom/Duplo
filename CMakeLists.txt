@@ -4,9 +4,17 @@ file(GLOB SOURCES src/*.cpp)
 
 SET(DUPLO_VERSION "\"v1.0.1\"" CACHE STRING "Duplo version")
 
-if(MSVC)
-else()
-    add_compile_options(-O3 -Wall -Werror -std=c++17)
-    add_compile_definitions(DUPLO_VERSION=${DUPLO_VERSION})
-endif()
 add_executable(duplo ${SOURCES})
+
+set_target_properties(duplo PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+)
+
+target_compile_definitions(duplo PRIVATE DUPLO_VERSION=${DUPLO_VERSION})
+
+if(NOT MSVC)
+    target_compile_options(duplo PRIVATE -Wall -Werror)
+endif()
+
+
