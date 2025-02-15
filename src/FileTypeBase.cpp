@@ -38,7 +38,7 @@ std::vector<SourceLine> FileTypeBase::GetCleanedSourceLines(const std::vector<st
     for (std::vector<std::string>::size_type i = 0; i < lines.size(); i++) {
         auto filteredLine = GetCleanLine(lineFilter->ProcessSourceLine(lines[i]));
         if (IsSourceLine(filteredLine)) {
-            filteredLines.emplace_back(filteredLine, i);
+            filteredLines.emplace_back(filteredLine, static_cast<int>(i));
         }
     }
 
