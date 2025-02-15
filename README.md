@@ -240,7 +240,7 @@ build/> popd
 
 ### 8.2. Windows
 
-Use Visual Studio 2019 to open the included solution file (or try `CMake`).
+Use Visual Studio 2022 to open the included solution file (or try `CMake`).
 
 ### 8.3. Additional Language Support
 
