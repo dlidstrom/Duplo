@@ -24,9 +24,9 @@ jobs:
       run: |
         echo ${{ steps.tag.outputs.new_tag }} > tag.txt
     - name: upload new tag artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: uploads
+        name: tag-txt
         path: tag.txt
   build-linux:
     runs-on: ubuntu-latest
@@ -34,9 +34,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
-        name: uploads
+        name: tag-txt
+        path: uploads
 
     - uses: actions/setup-node@v4
       with:
@@ -48,14 +49,14 @@ jobs:
         export DUPLO_VERSION=`cat ./uploads/tag.txt`
         mkdir -p build
         pushd build
-        cmake .. -DDUPLO_VERSION=\"$DUPLO_VERSION\"
+        cmake .. -DDUPLO_VERSION=\"$DUPLO_VERSION\" -DCMAKE_BUILD_TYPE=Release
         make
         popd
         zip --junk-paths duplo-linux build/duplo
     - name: upload linux artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: uploads
+        name: linux-build
         path: duplo-linux.zip
   build-macos:
     runs-on: macos-latest
@@ -63,32 +64,58 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
-        name: uploads
+        name: tag-txt
+        path: uploads
     - name: build
       run: |
         brew install bats-core
         export DUPLO_VERSION=`cat ./uploads/tag.txt`
         mkdir -p build
         pushd build
-        cmake .. -DDUPLO_VERSION=\"$DUPLO_VERSION\"
+        cmake .. -DDUPLO_VERSION=\"$DUPLO_VERSION\" -DCMAKE_BUILD_TYPE=Release
         make
         popd
         zip --junk-paths duplo-macos build/duplo
     - name: upload macos artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
-        name: uploads
+        name: macos-build
         path: duplo-macos.zip
+  build-windows:
+    runs-on: windows-latest
+    needs: [bump-tag-dry]
+    steps:
+    - uses: actions/checkout@v4
+    - name: download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: tag-txt
+        path: uploads
+    - name: build
+      run: |
+        $duploVersion = Get-Content .\uploads\tag.txt
+        mkdir build | Out-Null
+        pushd build
+        cmake .. "-DDUPLO_VERSION=`"$duploVersion`"" -G "Visual Studio 17 2022" -A x64
+        cmake --build . --config Release
+        popd
+        Compress-Archive -Path build\Release\duplo.exe -DestinationPath duplo-windows.zip
+    - name: upload windows artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-build
+        path: duplo-windows.zip
   push-docker-image:
     runs-on: ubuntu-latest
     needs: [bump-tag-dry]
     steps:
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
-        name: uploads
+        name: tag-txt
+        path: uploads
 
     - name: set version
       id: version
@@ -133,7 +160,7 @@ jobs:
   upload-release:
     if: success()
     runs-on: ubuntu-latest
-    needs: [build-linux, build-macos]
+    needs: [build-linux, build-macos, build-windows]
     steps:
     - uses: actions/checkout@v4
       with:
@@ -156,9 +183,9 @@ jobs:
         draft: false
         prerelease: false
     - name: download artifacts
-      uses: actions/download-artifact@v1
+      uses: actions/download-artifact@v4
       with:
-        name: uploads
+        path: uploads
     - name: upload macos
       id: upload-macos
       uses: actions/upload-release-asset@v1.0.1
@@ -166,7 +193,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./uploads/duplo-macos.zip
+        asset_path: ./uploads/macos-build/duplo-macos.zip
         asset_name: duplo-macos.zip
         asset_content_type: application/zip
     - name: upload linux
@@ -176,6 +203,17 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./uploads/duplo-linux.zip
+        asset_path: ./uploads/linux-build/duplo-linux.zip
         asset_name: duplo-linux.zip
         asset_content_type: application/zip
+    - name: upload windows
+      id: upload-windows
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./uploads/windows-build/duplo-windows.zip
+        asset_name: duplo-windows.zip
+        asset_content_type: application/zip
+

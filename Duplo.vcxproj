@@ -19,13 +19,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -108,8 +108,10 @@
     <ClCompile Include="src\Duplo.cpp" />
     <ClCompile Include="src\FileTypeBase.cpp" />
     <ClCompile Include="src\FileTypeFactory.cpp" />
+    <ClCompile Include="src\FileType_Ada.cpp" />
     <ClCompile Include="src\FileType_C.cpp" />
     <ClCompile Include="src\FileType_CS.cpp" />
+    <ClCompile Include="src\FileType_Java.cpp" />
     <ClCompile Include="src\FileType_S.cpp" />
     <ClCompile Include="src\FileType_Unknown.cpp" />
     <ClCompile Include="src\FileType_VB.cpp" />
@@ -129,8 +131,10 @@
     <ClInclude Include="src\Duplo.h" />
     <ClInclude Include="src\FileTypeBase.h" />
     <ClInclude Include="src\FileTypeFactory.h" />
+    <ClInclude Include="src\FileType_Ada.h" />
     <ClInclude Include="src\FileType_C.h" />
     <ClInclude Include="src\FileType_CS.h" />
+    <ClInclude Include="src\FileType_Java.h" />
     <ClInclude Include="src\FileType_S.h" />
     <ClInclude Include="src\FileType_Unknown.h" />
     <ClInclude Include="src\FileType_VB.h" />

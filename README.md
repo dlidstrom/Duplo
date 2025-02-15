@@ -101,12 +101,11 @@ filenames into this command. A complete commandline sample will be shown below.
 
 ### 4.2. Pre-built binaries
 
-Duplo is also available as a pre-built binary for (alpine) linux and macos. Grab
-the executable from the [releases](https://github.com/dlidstrom/Duplo/releases)
-page.
+Duplo is also available as a pre-built binary for (Alpine) Linux, macOS and 
+Windows. Grab the executable from the 
+[releases](https://github.com/dlidstrom/Duplo/releases) page.
 
-You can of course build from source as well, and you'll have to do so to get a
-binary for Windows.
+You can of course build from source as well.
 
 ## 5. Usage
 
@@ -240,7 +239,7 @@ build/> popd
 
 ### 8.2. Windows
 
-Use Visual Studio 2019 to open the included solution file (or try `CMake`).
+Use Visual Studio 2022 to open the included solution file (or try `CMake`).
 
 ### 8.3. Additional Language Support
 

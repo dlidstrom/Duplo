@@ -59,7 +59,7 @@ int StringUtil::Split(const std::string& input, const std::string& delimiter, st
     }
 
     // At the beginning is always a marker
-    std::vector<int> positions(1, -sizeDelim);
+    std::vector<int> positions(1, -static_cast<int>(sizeDelim));
     auto pos = input.find(delimiter);
     while (pos != std::string::npos) {
         positions.push_back(pos);
