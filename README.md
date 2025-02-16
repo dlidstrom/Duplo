@@ -4,7 +4,7 @@
 
 **Updates:**
 
-🔥 v1.0 add build on Windows (thanks [@chausner](https://github.com/chausner)!)
+🔥 v1 add build on Windows (thanks [@chausner](https://github.com/chausner)!) <br/>
 v0.8 adds improved Java support
 
 🙌 Help needed! See [8.3](#83-additional-language-support) on how to support more languages.
