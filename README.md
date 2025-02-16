@@ -283,6 +283,8 @@ Send me a pull request!
 
 ## 9. Changes
 
+- 1.0
+  - Add Windows build. Now all major platforms yave binaries ready to run.
 - 0.8
   - Add support for Java which was lost or never there in the first place
 - 0.7
