@@ -17,10 +17,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-enum class MatchType : unsigned char {
-    NONE,
-    MATCH
-};
 typedef std::tuple<unsigned, std::string> FileLength;
 typedef const std::string* StringPtr;
 typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
@@ -78,13 +74,13 @@ namespace {
         }
     }
 
-    std::tuple<std::vector<SourceFile>, std::vector<MatchType>, unsigned, unsigned> LoadSourceFiles(
+    std::tuple<std::vector<SourceFile>, std::vector<bool>, unsigned, unsigned> LoadSourceFiles(
         const std::vector<std::string>& lines,
         unsigned minChars,
         bool ignorePrepStuff) {
 
         std::vector<SourceFile> sourceFiles;
-        std::vector<MatchType> matrix;
+        std::vector<bool> matrix;
         size_t maxLinesPerFile = 0;
         int files = 0;
         unsigned long locsTotal = 0;
@@ -237,21 +233,21 @@ namespace {
     ProcessResult Process(
         const SourceFile& source1,
         const SourceFile& source2,
-        std::vector<MatchType>& matrix,
+        std::vector<bool>& matrix,
         const Options& options,
         std::ostream& outFile) {
         size_t m = source1.GetNumOfLines();
         size_t n = source2.GetNumOfLines();
 
         // Reset matrix data
-        std::fill(std::begin(matrix), std::begin(matrix) + m * n, MatchType::NONE);
+        std::fill(std::begin(matrix), std::begin(matrix) + m * n, false);
 
         // Compute matrix
         for (size_t y = 0; y < m; y++) {
             auto& line = source1.GetLine(y);
             for (size_t x = 0; x < n; x++) {
                 if (line == source2.GetLine(x)) {
-                    matrix[x + n * y] = MatchType::MATCH;
+                    matrix[x + n * y] = true;
                 }
             }
         }
@@ -273,7 +269,7 @@ namespace {
             unsigned seqLen = 0;
             size_t maxX = std::min(n, m - y);
             for (size_t x = 0; x < maxX; x++) {
-                if (matrix[x + n * (y + x)] == MatchType::MATCH) {
+                if (matrix[x + n * (y + x)]) {
                     seqLen++;
                 } else {
                     if (seqLen >= lMinBlockSize) {
@@ -321,7 +317,7 @@ namespace {
                 unsigned seqLen = 0;
                 size_t maxY = std::min(m, n - x);
                 for (size_t y = 0; y < maxY; y++) {
-                    if (matrix[x + y + n * y] == MatchType::MATCH) {
+                    if (matrix[x + y + n * y]) {
                         seqLen++;
                     } else {
                         if (seqLen >= lMinBlockSize) {
