@@ -77,7 +77,8 @@ namespace {
     std::tuple<std::vector<SourceFile>, std::vector<bool>, unsigned, unsigned> LoadSourceFiles(
         const std::vector<std::string>& lines,
         unsigned minChars,
-        bool ignorePrepStuff) {
+        bool ignorePrepStuff,
+        std::ostream& log) {
 
         std::vector<SourceFile> sourceFiles;
         std::vector<bool> matrix;
@@ -136,7 +137,7 @@ namespace {
             throw std::runtime_error(stream.str().c_str());
         }
 
-        std::cout
+        log
             << lines.size()
             << " done.\n\n";
         // Generate matrix large enough for all files
@@ -357,15 +358,25 @@ namespace {
 
 void Duplo::Run(const Options& options) {
     std::streambuf* buf;
+    std::streambuf* logbuf;
     std::ofstream of;
-    if (options.GetOutputFilename() == "-")
+    if (options.GetOutputFilename() == "-") {
         buf = std::cout.rdbuf();
+        if (options.GetOutputXml() == false) {
+            logbuf = std::cout.rdbuf();
+        }
+        else {
+          logbuf = 0;
+        }
+    }
     else {
         of.open(options.GetOutputFilename().c_str(), std::ios::out | std::ios::binary);
         buf = of.rdbuf();
+        logbuf = std::cout.rdbuf();
     }
 
     std::ostream out(buf);
+    std::ostream log(logbuf);
     if (!out) {
         std::ostringstream stream;
         stream
@@ -375,7 +386,7 @@ void Duplo::Run(const Options& options) {
         throw std::runtime_error(stream.str().c_str());
     }
 
-    std::cout << "Loading and hashing files ... " << std::flush;
+    log << "Loading and hashing files ... " << std::flush;
 
     if (options.GetOutputXml()) {
         out
@@ -386,8 +397,11 @@ void Duplo::Run(const Options& options) {
     }
 
     auto lines = LoadFileList(options.GetListFilename());
-    auto [sourceFiles, matrix, files, locsTotal] =
-        LoadSourceFiles(lines, options.GetMinChars(), options.GetIgnorePrepStuff());
+    auto [sourceFiles, matrix, files, locsTotal] = LoadSourceFiles(
+        lines,
+        options.GetMinChars(),
+        options.GetIgnorePrepStuff(),
+        log);
     auto numFilesToCheck = options.GetFilesToCheck() > 0 ? std::min(options.GetFilesToCheck(), sourceFiles.size()): sourceFiles.size();
 
     // hash maps
@@ -437,14 +451,16 @@ void Duplo::Run(const Options& options) {
             }
         }
 
-        if (processResult.Blocks() > 0) {
-            std::cout
-                << left.GetFilename()
-                << " found: " << processResult.Blocks() << " block(s)" << std::endl;
-        } else {
-            std::cout
-                << left.GetFilename()
-                << " nothing found." << std::endl;
+        if (options.GetOutputXml() == false) {
+            if (processResult.Blocks() > 0) {
+                log
+                    << left.GetFilename()
+                    << " found: " << processResult.Blocks() << " block(s)" << std::endl;
+            } else {
+                log
+                    << left.GetFilename()
+                    << " nothing found." << std::endl;
+            }
         }
 
         processResultTotal << processResult;
