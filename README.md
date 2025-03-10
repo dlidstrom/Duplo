@@ -102,8 +102,8 @@ filenames into this command. A complete commandline sample will be shown below.
 
 ### 4.2. Pre-built binaries
 
-Duplo is also available as a pre-built binary for (Alpine) Linux, macOS and 
-Windows. Grab the executable from the 
+Duplo is also available as a pre-built binary for (Alpine) Linux, macOS and
+Windows. Grab the executable from the
 [releases](https://github.com/dlidstrom/Duplo/releases) page.
 
 You can of course build from source as well.
