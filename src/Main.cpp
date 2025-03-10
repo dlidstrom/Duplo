@@ -66,7 +66,7 @@ namespace {
             std::cout << "       -d               ignore file pairs with same name\n";
             std::cout << "       -xml             output file in XML\n";
             std::cout << "       INPUT_FILELIST   input filelist (specify '-' to read from stdin)\n";
-            std::cout << "       OUTPUT_FILE      output file\n";
+            std::cout << "       OUTPUT_FILE      output file (specify '-' to output to stdout)\n";
 
             std::cout << "\nVERSION\n";
             std::cout << "       " << VERSION << "\n";
