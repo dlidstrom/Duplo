@@ -165,27 +165,27 @@ namespace {
         bool xml,
         const SourceFile& source1,
         const SourceFile& source2,
-        std::ostream& outFile) {
+        std::ostream& out) {
         unsigned duplicateLines = 0;
         if (xml) {
-            outFile
+            out
                 << "    <set LineCount=\"" << count << "\">"
                 << std::endl;
             int startLineNumber1 = source1.GetLine(line1).GetLineNumber();
             int endLineNumber1 = source1.GetLine(line1 + count).GetLineNumber();
-            outFile
+            out
                 << "        <block SourceFile=\"" << source1.GetFilename()
                 << "\" StartLineNumber=\"" << startLineNumber1
                 << "\" EndLineNumber=\"" << endLineNumber1 << "\"/>"
                 << std::endl;
             int startLineNumber2 = source2.GetLine(line2).GetLineNumber();
             int endLineNumber2 = source2.GetLine(line2 + count).GetLineNumber();
-            outFile
+            out
                 << "        <block SourceFile=\"" << source2.GetFilename()
                 << "\" StartLineNumber=\"" << startLineNumber2
                 << "\" EndLineNumber=\"" << endLineNumber2 << "\"/>"
                 << std::endl;
-            outFile
+            out
                 << "        <lines xml:space=\"preserve\">"
                 << std::endl;
             for (int j = 0; j < count; j++) {
@@ -204,27 +204,27 @@ namespace {
                 // > --> &gt;
                 StringUtil::StrSub(tmpstr, "&gt;", ">", -1);
 
-                outFile << "            <line Text=\"" << tmpstr << "\"/>" << std::endl;
+                out << "            <line Text=\"" << tmpstr << "\"/>" << std::endl;
                 duplicateLines++;
             }
 
-            outFile << "        </lines>" << std::endl;
-            outFile << "    </set>" << std::endl;
+            out << "        </lines>" << std::endl;
+            out << "    </set>" << std::endl;
         } else {
-            outFile
+            out
                 << source1.GetFilename()
                 << "(" << source1.GetLine(line1).GetLineNumber() << ")"
                 << std::endl;
-            outFile
+            out
                 << source2.GetFilename()
                 << "(" << source2.GetLine(line2).GetLineNumber() << ")"
                 << std::endl;
             for (int j = 0; j < count; j++) {
-                outFile << source1.GetLine(j + line1).GetLine() << std::endl;
+                out << source1.GetLine(j + line1).GetLine() << std::endl;
                 duplicateLines++;
             }
 
-            outFile << std::endl;
+            out << std::endl;
         }
 
         return duplicateLines;
@@ -356,9 +356,17 @@ namespace {
 }
 
 void Duplo::Run(const Options& options) {
-    std::ofstream outfile(
-        options.GetOutputFilename().c_str(), std::ios::out | std::ios::binary);
-    if (!outfile) {
+    std::streambuf* buf;
+    std::ofstream of;
+    if (options.GetOutputFilename() == "-")
+        buf = std::cout.rdbuf();
+    else {
+        of.open(options.GetOutputFilename().c_str(), std::ios::out | std::ios::binary);
+        buf = of.rdbuf();
+    }
+
+    std::ostream out(buf);
+    if (!out) {
         std::ostringstream stream;
         stream
             << "Error: Can't open file: "
@@ -370,7 +378,7 @@ void Duplo::Run(const Options& options) {
     std::cout << "Loading and hashing files ... " << std::flush;
 
     if (options.GetOutputXml()) {
-        outfile
+        out
             << "<?xml version=\"1.0\"?>"
             << std::endl
             << "<duplo>"
@@ -406,14 +414,13 @@ void Duplo::Run(const Options& options) {
             }
         }
 
-        std::cout << left.GetFilename();
         ProcessResult processResult =
             Process(
                 left,
                 left,
                 matrix,
                 options,
-                outfile);
+                out);
 
         // files to compare are those that have matching lines
         for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
@@ -426,25 +433,29 @@ void Duplo::Run(const Options& options) {
                         right,
                         matrix,
                         options,
-                        outfile);
+                        out);
             }
         }
 
         if (processResult.Blocks() > 0) {
-            std::cout << " found: " << processResult.Blocks() << " block(s)" << std::endl;
+            std::cout
+                << left.GetFilename()
+                << " found: " << processResult.Blocks() << " block(s)" << std::endl;
         } else {
-            std::cout << " nothing found." << std::endl;
+            std::cout
+                << left.GetFilename()
+                << " nothing found." << std::endl;
         }
 
         processResultTotal << processResult;
     }
 
     if (options.GetOutputXml()) {
-        outfile
+        out
             << "</duplo>"
             << std::endl;
     } else {
-        outfile
+        out
             << "Configuration:"
             << std::endl
             << "  Number of files: "
