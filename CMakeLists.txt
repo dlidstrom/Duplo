@@ -12,9 +12,8 @@ set_target_properties(duplo PROPERTIES
 )
 
 target_compile_definitions(duplo PRIVATE DUPLO_VERSION=${DUPLO_VERSION})
+target_include_directories(duplo PRIVATE src/include/)
 
 if(NOT MSVC)
     target_compile_options(duplo PRIVATE -Wall -Werror)
 endif()
-
-
