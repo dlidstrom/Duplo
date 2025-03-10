@@ -1,0 +1,45 @@
+Loading and hashing files ... 2 done.
+
+tests/Simple_Ada/simple_log.adb(29)
+tests/Simple_Ada/simple_log.adb(20)
+         Put_Line (Standard_Error, Message);  
+      end if;
+
+tests/Simple_Ada/simple_log.adb(37)
+tests/Simple_Ada/simple_log.adb(29)
+         Put_Line (Standard_Error, Message);  
+      end if;
+
+tests/Simple_Ada/simple_log.adb(45)
+tests/Simple_Ada/simple_log.adb(37)
+         Put_Line (Standard_Error, Message);  
+      end if;
+
+tests/Simple_Ada/simple_log.adb(37)
+tests/Simple_Ada/simple_log.adb(20)
+         Put_Line (Standard_Error, Message);  
+      end if;
+
+tests/Simple_Ada/simple_log.adb(45)
+tests/Simple_Ada/simple_log.adb(29)
+         Put_Line (Standard_Error, Message);  
+      end if;
+
+tests/Simple_Ada/simple_log.adb(45)
+tests/Simple_Ada/simple_log.adb(20)
+         Put_Line (Standard_Error, Message);  
+      end if;
+
+tests/Simple_Ada/simple_log.adb found: 6 block(s)
+Configuration:
+  Number of files: 1
+  Minimal block size: 2
+  Minimal characters in line: 3
+  Ignore preprocessor directives: 0
+  Ignore same filenames: 0
+
+Results:
+  Lines of code: 33
+  Duplicate lines of code: 12
+  Total 6 duplicate block(s) found.
+
