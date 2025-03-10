@@ -1,3 +1,5 @@
+#!/bin/bash
+
 @test "invoking without arguments will show help text" {
     run ./build/duplo
     printf 'lines %s\n' "${lines[@]}" >&2
@@ -20,13 +22,10 @@
     [ "${lines[15]}" = "       -d               ignore file pairs with same name" ]
     [ "${lines[16]}" = "       -xml             output file in XML" ]
     [ "${lines[17]}" = "       INPUT_FILELIST   input filelist (specify '-' to read from stdin)" ]
-    [ "${lines[18]}" = "       OUTPUT_FILE      output file" ]
+    [ "${lines[18]}" = "       OUTPUT_FILE      output file (specify '-' to output to stdout)" ]
     [ "${lines[19]}" = "VERSION" ]
     [ "${lines[21]}" = "AUTHORS" ]
     [ "${lines[22]}" = "       Daniel Lidstrom (dlidstrom@gmail.com)" ]
     [ "${lines[23]}" = "       Christian M. Ammann (cammann@giants.ch)" ]
     [ "${lines[24]}" = "       Trevor D'Arcy-Evans (tdarcyevans@hotmail.com)" ]
-}
-
-@test "simple" {
 }
