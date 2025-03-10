@@ -4,8 +4,9 @@
 
 **Updates:**
 
-🔥 v1 add build on Windows (thanks [@chausner](https://github.com/chausner)!) <br/>
-v0.8 adds improved Java support
+- 🔥 v1.1 improve memory usage (grabbed from [@nachose fork](https://github.com/nachose/Duplo)), also re-enabled tests and organized code
+- 🚀 v1.0 add build on Windows (thanks [@chausner](https://github.com/chausner)!)
+- v0.8 adds improved Java support
 
 🙌 Help needed! See [8.3](#83-additional-language-support) on how to support more languages.
 
