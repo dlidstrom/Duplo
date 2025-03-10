@@ -17,10 +17,6 @@
 #include <unordered_map>
 #include <unordered_set>
 
-enum class MatchType : unsigned char {
-    NONE,
-    MATCH
-};
 typedef std::tuple<unsigned, std::string> FileLength;
 typedef const std::string* StringPtr;
 typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
@@ -78,13 +74,14 @@ namespace {
         }
     }
 
-    std::tuple<std::vector<SourceFile>, std::vector<MatchType>, unsigned, unsigned> LoadSourceFiles(
+    std::tuple<std::vector<SourceFile>, std::vector<bool>, unsigned, unsigned> LoadSourceFiles(
         const std::vector<std::string>& lines,
         unsigned minChars,
-        bool ignorePrepStuff) {
+        bool ignorePrepStuff,
+        std::ostream& log) {
 
         std::vector<SourceFile> sourceFiles;
-        std::vector<MatchType> matrix;
+        std::vector<bool> matrix;
         size_t maxLinesPerFile = 0;
         int files = 0;
         unsigned long locsTotal = 0;
@@ -140,7 +137,7 @@ namespace {
             throw std::runtime_error(stream.str().c_str());
         }
 
-        std::cout
+        log
             << lines.size()
             << " done.\n\n";
         // Generate matrix large enough for all files
@@ -169,27 +166,27 @@ namespace {
         bool xml,
         const SourceFile& source1,
         const SourceFile& source2,
-        std::ostream& outFile) {
+        std::ostream& out) {
         unsigned duplicateLines = 0;
         if (xml) {
-            outFile
+            out
                 << "    <set LineCount=\"" << count << "\">"
                 << std::endl;
             int startLineNumber1 = source1.GetLine(line1).GetLineNumber();
             int endLineNumber1 = source1.GetLine(line1 + count).GetLineNumber();
-            outFile
+            out
                 << "        <block SourceFile=\"" << source1.GetFilename()
                 << "\" StartLineNumber=\"" << startLineNumber1
                 << "\" EndLineNumber=\"" << endLineNumber1 << "\"/>"
                 << std::endl;
             int startLineNumber2 = source2.GetLine(line2).GetLineNumber();
             int endLineNumber2 = source2.GetLine(line2 + count).GetLineNumber();
-            outFile
+            out
                 << "        <block SourceFile=\"" << source2.GetFilename()
                 << "\" StartLineNumber=\"" << startLineNumber2
                 << "\" EndLineNumber=\"" << endLineNumber2 << "\"/>"
                 << std::endl;
-            outFile
+            out
                 << "        <lines xml:space=\"preserve\">"
                 << std::endl;
             for (int j = 0; j < count; j++) {
@@ -208,27 +205,27 @@ namespace {
                 // > --> &gt;
                 StringUtil::StrSub(tmpstr, "&gt;", ">", -1);
 
-                outFile << "            <line Text=\"" << tmpstr << "\"/>" << std::endl;
+                out << "            <line Text=\"" << tmpstr << "\"/>" << std::endl;
                 duplicateLines++;
             }
 
-            outFile << "        </lines>" << std::endl;
-            outFile << "    </set>" << std::endl;
+            out << "        </lines>" << std::endl;
+            out << "    </set>" << std::endl;
         } else {
-            outFile
+            out
                 << source1.GetFilename()
                 << "(" << source1.GetLine(line1).GetLineNumber() << ")"
                 << std::endl;
-            outFile
+            out
                 << source2.GetFilename()
                 << "(" << source2.GetLine(line2).GetLineNumber() << ")"
                 << std::endl;
             for (int j = 0; j < count; j++) {
-                outFile << source1.GetLine(j + line1).GetLine() << std::endl;
+                out << source1.GetLine(j + line1).GetLine() << std::endl;
                 duplicateLines++;
             }
 
-            outFile << std::endl;
+            out << std::endl;
         }
 
         return duplicateLines;
@@ -237,21 +234,21 @@ namespace {
     ProcessResult Process(
         const SourceFile& source1,
         const SourceFile& source2,
-        std::vector<MatchType>& matrix,
+        std::vector<bool>& matrix,
         const Options& options,
         std::ostream& outFile) {
         size_t m = source1.GetNumOfLines();
         size_t n = source2.GetNumOfLines();
 
         // Reset matrix data
-        std::fill(std::begin(matrix), std::begin(matrix) + m * n, MatchType::NONE);
+        std::fill(std::begin(matrix), std::begin(matrix) + m * n, false);
 
         // Compute matrix
         for (size_t y = 0; y < m; y++) {
             auto& line = source1.GetLine(y);
             for (size_t x = 0; x < n; x++) {
                 if (line == source2.GetLine(x)) {
-                    matrix[x + n * y] = MatchType::MATCH;
+                    matrix[x + n * y] = true;
                 }
             }
         }
@@ -273,7 +270,7 @@ namespace {
             unsigned seqLen = 0;
             size_t maxX = std::min(n, m - y);
             for (size_t x = 0; x < maxX; x++) {
-                if (matrix[x + n * (y + x)] == MatchType::MATCH) {
+                if (matrix[x + n * (y + x)]) {
                     seqLen++;
                 } else {
                     if (seqLen >= lMinBlockSize) {
@@ -321,7 +318,7 @@ namespace {
                 unsigned seqLen = 0;
                 size_t maxY = std::min(m, n - x);
                 for (size_t y = 0; y < maxY; y++) {
-                    if (matrix[x + y + n * y] == MatchType::MATCH) {
+                    if (matrix[x + y + n * y]) {
                         seqLen++;
                     } else {
                         if (seqLen >= lMinBlockSize) {
@@ -360,9 +357,27 @@ namespace {
 }
 
 void Duplo::Run(const Options& options) {
-    std::ofstream outfile(
-        options.GetOutputFilename().c_str(), std::ios::out | std::ios::binary);
-    if (!outfile) {
+    std::streambuf* buf;
+    std::streambuf* logbuf;
+    std::ofstream of;
+    if (options.GetOutputFilename() == "-") {
+        buf = std::cout.rdbuf();
+        if (options.GetOutputXml() == false) {
+            logbuf = std::cout.rdbuf();
+        }
+        else {
+          logbuf = 0;
+        }
+    }
+    else {
+        of.open(options.GetOutputFilename().c_str(), std::ios::out | std::ios::binary);
+        buf = of.rdbuf();
+        logbuf = std::cout.rdbuf();
+    }
+
+    std::ostream out(buf);
+    std::ostream log(logbuf);
+    if (!out) {
         std::ostringstream stream;
         stream
             << "Error: Can't open file: "
@@ -371,10 +386,10 @@ void Duplo::Run(const Options& options) {
         throw std::runtime_error(stream.str().c_str());
     }
 
-    std::cout << "Loading and hashing files ... " << std::flush;
+    log << "Loading and hashing files ... " << std::flush;
 
     if (options.GetOutputXml()) {
-        outfile
+        out
             << "<?xml version=\"1.0\"?>"
             << std::endl
             << "<duplo>"
@@ -382,8 +397,11 @@ void Duplo::Run(const Options& options) {
     }
 
     auto lines = LoadFileList(options.GetListFilename());
-    auto [sourceFiles, matrix, files, locsTotal] =
-        LoadSourceFiles(lines, options.GetMinChars(), options.GetIgnorePrepStuff());
+    auto [sourceFiles, matrix, files, locsTotal] = LoadSourceFiles(
+        lines,
+        options.GetMinChars(),
+        options.GetIgnorePrepStuff(),
+        log);
     auto numFilesToCheck = options.GetFilesToCheck() > 0 ? std::min(options.GetFilesToCheck(), sourceFiles.size()): sourceFiles.size();
 
     // hash maps
@@ -410,14 +428,13 @@ void Duplo::Run(const Options& options) {
             }
         }
 
-        std::cout << left.GetFilename();
         ProcessResult processResult =
             Process(
                 left,
                 left,
                 matrix,
                 options,
-                outfile);
+                out);
 
         // files to compare are those that have matching lines
         for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
@@ -430,25 +447,31 @@ void Duplo::Run(const Options& options) {
                         right,
                         matrix,
                         options,
-                        outfile);
+                        out);
             }
         }
 
-        if (processResult.Blocks() > 0) {
-            std::cout << " found: " << processResult.Blocks() << " block(s)" << std::endl;
-        } else {
-            std::cout << " nothing found." << std::endl;
+        if (options.GetOutputXml() == false) {
+            if (processResult.Blocks() > 0) {
+                log
+                    << left.GetFilename()
+                    << " found: " << processResult.Blocks() << " block(s)" << std::endl;
+            } else {
+                log
+                    << left.GetFilename()
+                    << " nothing found." << std::endl;
+            }
         }
 
         processResultTotal << processResult;
     }
 
     if (options.GetOutputXml()) {
-        outfile
+        out
             << "</duplo>"
             << std::endl;
     } else {
-        outfile
+        out
             << "Configuration:"
             << std::endl
             << "  Number of files: "

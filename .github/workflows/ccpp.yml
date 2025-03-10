@@ -43,9 +43,12 @@ jobs:
       with:
         node-version: 18
 
-    - name: build
+    - name: setup
       run: |
         npm install -g bats
+
+    - name: build
+      run: |
         export DUPLO_VERSION=`cat ./uploads/tag.txt`
         mkdir -p build
         pushd build
@@ -53,6 +56,10 @@ jobs:
         make
         popd
         zip --junk-paths duplo-linux build/duplo
+
+    - name: test
+      run: bats --recursive tests
+
     - name: upload linux artifact
       uses: actions/upload-artifact@v4
       with:
@@ -216,4 +223,3 @@ jobs:
         asset_path: ./uploads/windows-build/duplo-windows.zip
         asset_name: duplo-windows.zip
         asset_content_type: application/zip
-
