@@ -1,5 +1,7 @@
 # Duplo - Duplicate Source Code Block Finder <!-- omit in toc -->
 
+> *This tool is seriously fast - it will process your codebase in seconds!*
+
 ![C/C++ CI](https://github.com/dlidstrom/Duplo/workflows/C/C++%20CI/badge.svg)
 
 **Updates:**
@@ -9,6 +11,51 @@
 - v0.8 adds improved Java support
 
 🙌 Help needed! See [8.3](#83-additional-language-support) on how to support more languages.
+
+**For the impatient:**
+
+Find duplicated code blocks in a C++ codebase. Ignore pre-processor directives
+and require minimum 20 line duplicates.
+
+***Linux***
+
+```bash
+# download latest release
+curl -s "https://api.github.com/repos/dlidstrom/Duplo/releases/latest" \
+  | grep "browser_download_url" \
+  | grep "duplo-linux" \
+  | cut -d : -f 2,3 \
+  | tr -d '"' \
+  | wget -qi -
+unzip duplo-linux.zip
+
+find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | ./duplo -ml 20 -ip - -
+```
+
+***macOS***
+
+```bash
+# download latest release
+curl -s "https://api.github.com/repos/dlidstrom/Duplo/releases/latest" \
+  | grep "browser_download_url" \
+  | grep "duplo-macos" \
+  | cut -d : -f 2,3 \
+  | tr -d '"' \
+  | wget -qi -
+unzip duplo-macos.zip
+
+find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | ./duplo -ml 20 -ip - -
+```
+
+***Windows***
+
+```PowerShell
+> url = (Invoke-RestMethod https://api.github.com/repos/dlidstrom/Duplo/releases/latest).assets.browser_download_url `
+  | ? { $_ -match "windows" }
+> Invoke-WebRequest -Uri $url -OutFile duplo-windows.zip
+> Expand-Archive ./duplo-windows.zip -DestinationPath Duplo.exe
+> Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | ./Duplo.exe - -
+```
 
 **Table of Contents:**
 
@@ -138,7 +185,7 @@ written to `out.txt`.
 
 #### 5.1.2. Windows
 
-```bash
+```PowerShell
 # windows
 > Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | Duplo.exe - out.txt
 ```
