@@ -2,7 +2,7 @@
 
 @test "LineNumbers.c" {
     run ./build/duplo tests/Simple/LineNumbers.lst out.txt
-    [ "$status" -eq 0 ]
+    [ "$status" -eq 1 ]
     [ "${lines[0]}" = "Loading and hashing files ... 2 done." ]
     [ "${lines[1]}" = "tests/Simple/LineNumbers.c found: 1 block(s)" ]
 }
