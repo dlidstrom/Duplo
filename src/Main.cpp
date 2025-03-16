@@ -42,8 +42,7 @@ namespace {
                 ignoreSameFilename,
                 listFilename,
                 outputFilename);
-            Duplo::Run(options);
-            return EXIT_SUCCESS;
+            return Duplo::Run(options);
         } else {
             std::cout << "\nNAME\n";
             std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";

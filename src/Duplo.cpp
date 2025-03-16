@@ -356,7 +356,7 @@ namespace {
     }
 }
 
-void Duplo::Run(const Options& options) {
+int Duplo::Run(const Options& options) {
     std::streambuf* buf;
     std::streambuf* logbuf;
     std::ofstream of;
@@ -507,4 +507,8 @@ void Duplo::Run(const Options& options) {
             << std::endl
             << std::endl;
     }
+
+    return processResultTotal.Blocks() > 0
+        ? EXIT_FAILURE
+        : EXIT_SUCCESS;
 }
