@@ -14,7 +14,7 @@ const std::string VERSION = "";
 #endif
 
 namespace Duplo {
-    void Run(const Options& options);
+    int Run(const Options& options);
 }
 
 #endif

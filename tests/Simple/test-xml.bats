@@ -2,7 +2,7 @@
 
 @test "LineNumbers.c" {
     run ./build/duplo -xml tests/Simple/LineNumbers.lst out.xml
-    [ "$status" -eq 0 ]
+    [ "$status" -eq 1 ]
     [ "${lines[0]}" = "Loading and hashing files ... 2 done." ]
 }
 
