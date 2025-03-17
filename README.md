@@ -2,11 +2,12 @@
 
 > *This tool is seriously fast - it will process your codebase in seconds!*
 
-![C/C++ CI](https://github.com/dlidstrom/Duplo/workflows/C/C++%20CI/badge.svg)
+[![C/C++ CI](https://github.com/dlidstrom/Duplo/actions/workflows/ccpp.yml/badge.svg)](https://github.com/dlidstrom/Duplo/actions/workflows/ccpp.yml)
 
 **Updates:**
 
-- 🔥 v1.1 improve memory usage (grabbed from [@nachose fork](https://github.com/nachose/Duplo)), also re-enabled tests and organized code
+- 🔥 Introducing [duplo-action](https://github.com/dlidstrom/duplo-action) for using Duplo in GitHub Actions!
+- v1.1 improve memory usage (grabbed from [@nachose fork](https://github.com/nachose/Duplo)), also re-enabled tests and organized code
 - 🚀 v1.0 add build on Windows (thanks [@chausner](https://github.com/chausner)!)
 - v0.8 adds improved Java support
 
