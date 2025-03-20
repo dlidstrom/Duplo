@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Duplo Analyser
-        uses: dlidstrom/duplo-analyser@v2.0.2
+        uses: dlidstrom/duplo-analyser@v2.0.3
         with:
           include-pattern: .*\.src.*
   bump-tag-dry:
