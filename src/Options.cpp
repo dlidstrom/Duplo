@@ -7,6 +7,7 @@ Options::Options(
     unsigned blockPercentThreshold,
     unsigned filesToCheck,
     bool outputXml,
+    bool outputJSON,
     bool ignoreSameFilename,
     const std::string& listFilename,
     const std::string& outputFilename)
@@ -16,6 +17,7 @@ Options::Options(
     , m_blockPercentThreshold(blockPercentThreshold)
     , m_filesToCheck(filesToCheck)
     , m_outputXml(outputXml)
+    , m_outputJSON(outputJSON)
     , m_ignoreSameFilename(ignoreSameFilename)
     , m_listFilename(listFilename)
     , m_outputFilename(outputFilename)
@@ -40,6 +42,10 @@ unsigned Options::GetBlockPercentThreshold() const {
 
 bool Options::GetOutputXml() const {
     return m_outputXml;
+}
+
+bool Options::GetOutputJSON() const {
+    return m_outputJSON;
 }
 
 bool Options::GetIgnoreSameFilename() const {
