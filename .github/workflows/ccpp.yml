@@ -13,9 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Duplo Analyser
-        uses: dlidstrom/duplo-analyser@v2.0.3
+        uses: dlidstrom/duplo-analyser@v2.0.4
         with:
-          include-pattern: .*\.src.*
+          include-pattern: src
   bump-tag-dry:
     runs-on: ubuntu-latest
     needs: [duplicates]
