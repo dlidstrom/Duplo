@@ -109,7 +109,7 @@ namespace {
         return std::tuple(std::move(sourceFiles), matrix, files, locsTotal);
     }
 
-    unsigned ReportSeq(
+    void ReportSeq(
         int line1,
         int line2,
         int count,
@@ -117,7 +117,6 @@ namespace {
         const SourceFile& source1,
         const SourceFile& source2,
         std::ostream& out) {
-        unsigned duplicateLines = 0;
         if (xml) {
             out
                 << "    <set LineCount=\"" << count << "\">"
@@ -156,7 +155,6 @@ namespace {
                 StringUtil::StrSub(tmpstr, "&gt;", ">", -1);
 
                 out << "            <line Text=\"" << tmpstr << "\"/>" << std::endl;
-                duplicateLines++;
             }
 
             out << "        </lines>" << std::endl;
@@ -172,13 +170,10 @@ namespace {
                 << std::endl;
             for (int j = 0; j < count; j++) {
                 out << source1.GetLine(j + line1).GetLine() << std::endl;
-                duplicateLines++;
             }
 
             out << std::endl;
         }
-
-        return duplicateLines;
     }
 
     ProcessResult Process(
@@ -227,15 +222,15 @@ namespace {
                         int line1 = y + x - seqLen;
                         int line2 = x - seqLen;
                         if (line1 != line2 || source1 != source2) {
-                            duplicateLines +=
-                                ReportSeq(
-                                    line1,
-                                    line2,
-                                    seqLen,
-                                    options.GetOutputXml(),
-                                    source1,
-                                    source2,
-                                    outFile);
+                            duplicateLines += seqLen;
+                            ReportSeq(
+                                line1,
+                                line2,
+                                seqLen,
+                                options.GetOutputXml(),
+                                source1,
+                                source2,
+                                outFile);
                             blocks++;
                         }
                     }
@@ -248,15 +243,15 @@ namespace {
                 int line1 = m - seqLen;
                 int line2 = n - seqLen;
                 if (line1 != line2 || source1 != source2) {
-                    duplicateLines +=
-                        ReportSeq(
-                            line1,
-                            line2,
-                            seqLen,
-                            options.GetOutputXml(),
-                            source1,
-                            source2,
-                            outFile);
+                    duplicateLines += seqLen;
+                    ReportSeq(
+                        line1,
+                        line2,
+                        seqLen,
+                        options.GetOutputXml(),
+                        source1,
+                        source2,
+                        outFile);
                     blocks++;
                 }
             }
@@ -272,15 +267,15 @@ namespace {
                         seqLen++;
                     } else {
                         if (seqLen >= lMinBlockSize) {
-                            duplicateLines +=
-                                ReportSeq(
-                                    y - seqLen,
-                                    x + y - seqLen,
-                                    seqLen,
-                                    options.GetOutputXml(),
-                                    source1,
-                                    source2,
-                                    outFile);
+                            duplicateLines += seqLen;
+                            ReportSeq(
+                                y - seqLen,
+                                x + y - seqLen,
+                                seqLen,
+                                options.GetOutputXml(),
+                                source1,
+                                source2,
+                                outFile);
                             blocks++;
                         }
                         seqLen = 0;
@@ -288,15 +283,15 @@ namespace {
                 }
 
                 if (seqLen >= lMinBlockSize) {
-                    duplicateLines +=
-                        ReportSeq(
-                            m - seqLen,
-                            n - seqLen,
-                            seqLen,
-                            options.GetOutputXml(),
-                            source1,
-                            source2,
-                            outFile);
+                    duplicateLines += seqLen;
+                    ReportSeq(
+                        m - seqLen,
+                        n - seqLen,
+                        seqLen,
+                        options.GetOutputXml(),
+                        source1,
+                        source2,
+                        outFile);
                     blocks++;
                 }
             }
