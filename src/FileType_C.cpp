@@ -1,6 +1,6 @@
 #include "FileType_C.h"
 #include "CstyleCommentsFilter.h"
-#include "CstyleUtils.h"
+#include "Utils.h"
 #include "SourceLine.h"
 
 FileType_C::FileType_C(bool ignorePrepStuff, unsigned minChars)

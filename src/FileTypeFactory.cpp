@@ -6,7 +6,7 @@
 #include "FileType_VB.h"
 #include "FileType_Ada.h"
 #include "FileType_Java.h"
-#include "StringUtil.h"
+#include "Utils.h"
 
 #include <algorithm>
 #include <map>

@@ -2,7 +2,7 @@
 #include "FileTypeFactory.h"
 #include "IFileType.h"
 #include "SourceLine.h"
-#include "StringUtil.h"
+#include "Util.h"
 #include "TextFile.h"
 
 #include <algorithm>

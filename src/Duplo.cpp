@@ -4,10 +4,11 @@
 #include "Options.h"
 #include "SourceFile.h"
 #include "SourceLine.h"
-#include "StringUtil.h"
+#include "Utils.h"
 #include "TextFile.h"
 
 #include <nlohmann/json.hpp>
+#include "ProcessResult.h"
 
 #include <algorithm>
 #include <cmath>
@@ -58,25 +59,6 @@ ProcessResult operator<<(ProcessResult& left, const ProcessResult& right) {
 }
 
 namespace {
-    bool IsSameFilename(const SourceFile& left, const SourceFile& right) {
-        return StringUtil::GetFilenamePart(left.GetFilename()) == StringUtil::GetFilenamePart(right.GetFilename());
-    }
-
-    std::vector<std::string> LoadFileList(const std::string& listFilename) {
-        if (listFilename == "-") {
-            std::vector<std::string> lines;
-            std::string line;
-            while (std::getline(std::cin, line)) {
-                lines.push_back(line);
-            }
-
-            return lines;
-        } else {
-            TextFile textFile(listFilename);
-            auto lines = textFile.ReadLines(true);
-            return lines;
-        }
-    }
 
     std::tuple<std::vector<SourceFile>, std::vector<bool>, unsigned, unsigned> LoadSourceFiles(
         const std::vector<std::string>& lines,
@@ -435,7 +417,7 @@ int Duplo::Run(const Options& options) {
 
     auto json_out = options.GetOutputJSON() ? std::optional(json()) : std::nullopt;
 
-    auto lines = LoadFileList(options.GetListFilename());
+    auto lines = FileSystem::LoadFileList(options.GetListFilename());
     auto [sourceFiles, matrix, files, locsTotal] = LoadSourceFiles(
         lines,
         options.GetMinChars(),
@@ -479,7 +461,7 @@ int Duplo::Run(const Options& options) {
         // files to compare are those that have matching lines
         for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
             const auto& right = sourceFiles[j];
-            if ((!options.GetIgnoreSameFilename() || !IsSameFilename(left, right))
+            if ((!options.GetIgnoreSameFilename() || !StringUtil::IsSameFilename(left, right))
                 && matchingFiles.find(&right.GetFilename()) != matchingFiles.end()) {
                 processResult
                     << Process(
