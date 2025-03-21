@@ -106,6 +106,7 @@
     <ClCompile Include="src\CstyleCommentsFilter.cpp" />
     <ClCompile Include="src\CstyleUtils.cpp" />
     <ClCompile Include="src\Duplo.cpp" />
+    <ClCompile Include="src\FileSystem.cpp" />
     <ClCompile Include="src\FileTypeBase.cpp" />
     <ClCompile Include="src\FileTypeFactory.cpp" />
     <ClCompile Include="src\FileType_Ada.cpp" />
@@ -119,6 +120,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\NoopLineFilter.cpp" />
     <ClCompile Include="src\Options.cpp" />
+    <ClCompile Include="src\ProcessResult.cpp" />
     <ClCompile Include="src\SourceFile.cpp" />
     <ClCompile Include="src\SourceLine.cpp" />
     <ClCompile Include="src\StringUtil.cpp" />
@@ -127,7 +129,7 @@
   <ItemGroup>
     <ClInclude Include="src\include\ArgumentParser.h" />
     <ClInclude Include="src\include\CstyleCommentsFilter.h" />
-    <ClInclude Include="src\include\CstyleUtils.h" />
+    <ClInclude Include="src\include\Utils.h" />
     <ClInclude Include="src\include\Duplo.h" />
     <ClInclude Include="src\include\FileTypeBase.h" />
     <ClInclude Include="src\include\FileTypeFactory.h" />
@@ -144,9 +146,9 @@
     <ClInclude Include="src\include\ILineFilter.h" />
     <ClInclude Include="src\include\NoopLineFilter.h" />
     <ClInclude Include="src\include\Options.h" />
+    <ClInclude Include="src\include\ProcessResult.h" />
     <ClInclude Include="src\include\SourceFile.h" />
     <ClInclude Include="src\include\SourceLine.h" />
-    <ClInclude Include="src\include\StringUtil.h" />
     <ClInclude Include="src\include\TextFile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
