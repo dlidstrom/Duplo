@@ -10,6 +10,7 @@ class Options {
     unsigned m_blockPercentThreshold;
     unsigned m_filesToCheck;
     bool m_outputXml;
+    bool m_outputJSON;
     bool m_ignoreSameFilename;
     std::string m_listFilename;
     std::string m_outputFilename;
@@ -22,6 +23,7 @@ public:
         unsigned blockPercentThreshold,
         unsigned m_filesToCheck,
         bool outputXml,
+        bool outputJSON,
         bool ignoreSameFilename,
         const std::string& listFilename,
         const std::string& outputFilename
@@ -31,6 +33,7 @@ public:
     const std::string& GetListFilename() const;
     const std::string& GetOutputFilename() const;
     bool GetOutputXml() const;
+    bool GetOutputJSON() const;
     unsigned GetMinChars() const;
     bool GetIgnorePrepStuff() const;
     unsigned GetMinBlockSize() const;

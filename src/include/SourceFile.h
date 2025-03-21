@@ -17,6 +17,7 @@ public:
 
     size_t GetNumOfLines() const;
     const SourceLine& GetLine(int index) const;
+    std::vector<std::string> GetLines(int begin, int end) const;
     const std::string& GetFilename() const;
 
     bool operator==(const SourceFile& other) const;

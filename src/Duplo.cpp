@@ -7,11 +7,14 @@
 #include "StringUtil.h"
 #include "TextFile.h"
 
+#include <nlohmann/json.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <ctime>
 #include <fstream>
+#include <optional>
 #include <sstream>
 #include <tuple>
 #include <unordered_map>
@@ -20,6 +23,7 @@
 typedef std::tuple<unsigned, std::string> FileLength;
 typedef const std::string* StringPtr;
 typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
+using json = nlohmann::json;
 
 class ProcessResult {
     unsigned m_blocks;
@@ -159,6 +163,27 @@ namespace {
         return std::tuple(std::move(sourceFiles), matrix, files, locsTotal);
     }
 
+    void ReportSeqJSON(
+        int begin,
+        int end,
+        int src_begin1,
+        int src_end1,
+        int src_begin2,
+        int src_end2,
+        const SourceFile& source1,
+        const SourceFile& source2,
+        json& json_out) {
+        json_out.emplace_back(json{
+            { "LineCount", end - begin },
+            { "SourceFile1", source1.GetFilename() },
+            { "StartLineNumber1", src_begin1 },
+            { "EndLineNumber1", src_end1 },
+            { "SourceFile2", source2.GetFilename() },
+            { "StartLineNumber2", src_begin2 },
+            { "EndLineNumber2", src_end2 },
+            { "Lines", source1.GetLines(begin, end) } });
+    }
+
     unsigned ReportSeq(
         int line1,
         int line2,
@@ -166,7 +191,8 @@ namespace {
         bool xml,
         const SourceFile& source1,
         const SourceFile& source2,
-        std::ostream& out) {
+        std::ostream& out,
+        std::optional<json>& json_out) {
         unsigned duplicateLines = 0;
         if (xml) {
             out
@@ -211,6 +237,18 @@ namespace {
 
             out << "        </lines>" << std::endl;
             out << "    </set>" << std::endl;
+        } else if (json_out) {
+            ReportSeqJSON(
+                    line1,
+                    line1 + count,
+                    source1.GetLine(line1).GetLineNumber(),
+                    source1.GetLine(line1 + count).GetLineNumber(),
+                    source2.GetLine(line2).GetLineNumber(),
+                    source2.GetLine(line2 + count).GetLineNumber(),
+                    source1,
+                    source2,
+                    json_out.value());
+            duplicateLines += count;
         } else {
             out
                 << source1.GetFilename()
@@ -236,7 +274,8 @@ namespace {
         const SourceFile& source2,
         std::vector<bool>& matrix,
         const Options& options,
-        std::ostream& outFile) {
+        std::ostream& outFile,
+        std::optional<json>& json_out) {
         size_t m = source1.GetNumOfLines();
         size_t n = source2.GetNumOfLines();
 
@@ -285,7 +324,8 @@ namespace {
                                     options.GetOutputXml(),
                                     source1,
                                     source2,
-                                    outFile);
+                                    outFile,
+                                    json_out);
                             blocks++;
                         }
                     }
@@ -306,7 +346,8 @@ namespace {
                             options.GetOutputXml(),
                             source1,
                             source2,
-                            outFile);
+                            outFile,
+                            json_out);
                     blocks++;
                 }
             }
@@ -330,7 +371,8 @@ namespace {
                                     options.GetOutputXml(),
                                     source1,
                                     source2,
-                                    outFile);
+                                    outFile,
+                                    json_out);
                             blocks++;
                         }
                         seqLen = 0;
@@ -346,7 +388,8 @@ namespace {
                             options.GetOutputXml(),
                             source1,
                             source2,
-                            outFile);
+                            outFile,
+                            json_out);
                     blocks++;
                 }
             }
@@ -396,6 +439,8 @@ int Duplo::Run(const Options& options) {
             << std::endl;
     }
 
+    auto json_out = options.GetOutputJSON() ? std::optional<nlohmann::json>() : std::nullopt;
+
     auto lines = LoadFileList(options.GetListFilename());
     auto [sourceFiles, matrix, files, locsTotal] = LoadSourceFiles(
         lines,
@@ -434,7 +479,8 @@ int Duplo::Run(const Options& options) {
                 left,
                 matrix,
                 options,
-                out);
+                out,
+                json_out);
 
         // files to compare are those that have matching lines
         for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
@@ -447,7 +493,8 @@ int Duplo::Run(const Options& options) {
                         right,
                         matrix,
                         options,
-                        out);
+                        out,
+                        json_out);
             }
         }
 
@@ -470,6 +517,8 @@ int Duplo::Run(const Options& options) {
         out
             << "</duplo>"
             << std::endl;
+    } else if (json_out) {
+        out << json_out->dump(2);
     } else {
         out
             << "Configuration:"
