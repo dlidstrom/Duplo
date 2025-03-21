@@ -1,5 +1,5 @@
 #include "TextFile.h"
-#include "StringUtil.h"
+#include "Utils.h"
 
 #include <fstream>
 #include <iostream>

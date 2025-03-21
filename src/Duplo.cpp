@@ -4,8 +4,9 @@
 #include "Options.h"
 #include "SourceFile.h"
 #include "SourceLine.h"
-#include "StringUtil.h"
+#include "Utils.h"
 #include "TextFile.h"
+#include "ProcessResult.h"
 
 #include <algorithm>
 #include <cmath>
@@ -21,58 +22,7 @@ typedef std::tuple<unsigned, std::string> FileLength;
 typedef const std::string* StringPtr;
 typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
 
-class ProcessResult {
-    unsigned m_blocks;
-    unsigned m_duplicateLines;
-
-public:
-    ProcessResult()
-        : m_blocks(0),
-          m_duplicateLines(0) {
-    }
-
-    ProcessResult(unsigned blocks, unsigned duplicateLines)
-        : m_blocks(blocks),
-          m_duplicateLines(duplicateLines) {
-    }
-
-    unsigned Blocks() const {
-        return m_blocks;
-    }
-
-    unsigned DuplicateLines() const {
-        return m_duplicateLines;
-    }
-
-    friend ProcessResult operator<<(ProcessResult& left, const ProcessResult& right);
-};
-
-ProcessResult operator<<(ProcessResult& left, const ProcessResult& right) {
-    left.m_blocks += right.m_blocks;
-    left.m_duplicateLines += right.m_duplicateLines;
-    return left;
-}
-
 namespace {
-    bool IsSameFilename(const SourceFile& left, const SourceFile& right) {
-        return StringUtil::GetFilenamePart(left.GetFilename()) == StringUtil::GetFilenamePart(right.GetFilename());
-    }
-
-    std::vector<std::string> LoadFileList(const std::string& listFilename) {
-        if (listFilename == "-") {
-            std::vector<std::string> lines;
-            std::string line;
-            while (std::getline(std::cin, line)) {
-                lines.push_back(line);
-            }
-
-            return lines;
-        } else {
-            TextFile textFile(listFilename);
-            auto lines = textFile.ReadLines(true);
-            return lines;
-        }
-    }
 
     std::tuple<std::vector<SourceFile>, std::vector<bool>, unsigned, unsigned> LoadSourceFiles(
         const std::vector<std::string>& lines,
@@ -159,7 +109,7 @@ namespace {
         return std::tuple(std::move(sourceFiles), matrix, files, locsTotal);
     }
 
-    unsigned ReportSeq(
+    void ReportSeq(
         int line1,
         int line2,
         int count,
@@ -167,7 +117,6 @@ namespace {
         const SourceFile& source1,
         const SourceFile& source2,
         std::ostream& out) {
-        unsigned duplicateLines = 0;
         if (xml) {
             out
                 << "    <set LineCount=\"" << count << "\">"
@@ -206,7 +155,6 @@ namespace {
                 StringUtil::StrSub(tmpstr, "&gt;", ">", -1);
 
                 out << "            <line Text=\"" << tmpstr << "\"/>" << std::endl;
-                duplicateLines++;
             }
 
             out << "        </lines>" << std::endl;
@@ -222,13 +170,10 @@ namespace {
                 << std::endl;
             for (int j = 0; j < count; j++) {
                 out << source1.GetLine(j + line1).GetLine() << std::endl;
-                duplicateLines++;
             }
 
             out << std::endl;
         }
-
-        return duplicateLines;
     }
 
     ProcessResult Process(
@@ -265,6 +210,17 @@ namespace {
         unsigned blocks = 0;
         unsigned duplicateLines = 0;
 
+        auto reportSeq = [&options, &source1, &source2, &outFile](int line1, int line2, int count) {
+            ReportSeq(
+                line1,
+                line2,
+                count,
+                options.GetOutputXml(),
+                source1,
+                source2,
+                outFile);
+        };
+
         // Scan vertical part
         for (size_t y = 0; y < m; y++) {
             unsigned seqLen = 0;
@@ -277,15 +233,8 @@ namespace {
                         int line1 = y + x - seqLen;
                         int line2 = x - seqLen;
                         if (line1 != line2 || source1 != source2) {
-                            duplicateLines +=
-                                ReportSeq(
-                                    line1,
-                                    line2,
-                                    seqLen,
-                                    options.GetOutputXml(),
-                                    source1,
-                                    source2,
-                                    outFile);
+                            duplicateLines += seqLen;
+                            reportSeq(line1, line2, seqLen);
                             blocks++;
                         }
                     }
@@ -298,15 +247,8 @@ namespace {
                 int line1 = m - seqLen;
                 int line2 = n - seqLen;
                 if (line1 != line2 || source1 != source2) {
-                    duplicateLines +=
-                        ReportSeq(
-                            line1,
-                            line2,
-                            seqLen,
-                            options.GetOutputXml(),
-                            source1,
-                            source2,
-                            outFile);
+                    duplicateLines += seqLen;
+                    reportSeq(line1, line2, seqLen);
                     blocks++;
                 }
             }
@@ -322,15 +264,8 @@ namespace {
                         seqLen++;
                     } else {
                         if (seqLen >= lMinBlockSize) {
-                            duplicateLines +=
-                                ReportSeq(
-                                    y - seqLen,
-                                    x + y - seqLen,
-                                    seqLen,
-                                    options.GetOutputXml(),
-                                    source1,
-                                    source2,
-                                    outFile);
+                            duplicateLines += seqLen;
+                            reportSeq(y - seqLen, x + y - seqLen, seqLen);
                             blocks++;
                         }
                         seqLen = 0;
@@ -338,15 +273,8 @@ namespace {
                 }
 
                 if (seqLen >= lMinBlockSize) {
-                    duplicateLines +=
-                        ReportSeq(
-                            m - seqLen,
-                            n - seqLen,
-                            seqLen,
-                            options.GetOutputXml(),
-                            source1,
-                            source2,
-                            outFile);
+                    duplicateLines += seqLen;
+                    reportSeq(m - seqLen, n - seqLen, seqLen);
                     blocks++;
                 }
             }
@@ -396,7 +324,7 @@ int Duplo::Run(const Options& options) {
             << std::endl;
     }
 
-    auto lines = LoadFileList(options.GetListFilename());
+    auto lines = FileSystem::LoadFileList(options.GetListFilename());
     auto [sourceFiles, matrix, files, locsTotal] = LoadSourceFiles(
         lines,
         options.GetMinChars(),
@@ -439,7 +367,7 @@ int Duplo::Run(const Options& options) {
         // files to compare are those that have matching lines
         for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
             const auto& right = sourceFiles[j];
-            if ((!options.GetIgnoreSameFilename() || !IsSameFilename(left, right))
+            if ((!options.GetIgnoreSameFilename() || !StringUtil::IsSameFilename(left, right))
                 && matchingFiles.find(&right.GetFilename()) != matchingFiles.end()) {
                 processResult
                     << Process(
