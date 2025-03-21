@@ -280,6 +280,18 @@ namespace {
         unsigned blocks = 0;
         unsigned duplicateLines = 0;
 
+        auto reportSeq = [&options, &source1, &source2, &outFile](int line1, int line2, int count) {
+            ReportSeq(
+                line1,
+                line2,
+                count,
+                options.GetOutputXml(),
+                source1,
+                source2,
+                outFile,
+                json_out);
+        };
+
         // Scan vertical part
         for (size_t y = 0; y < m; y++) {
             unsigned seqLen = 0;
@@ -292,16 +304,8 @@ namespace {
                         int line1 = y + x - seqLen;
                         int line2 = x - seqLen;
                         if (line1 != line2 || source1 != source2) {
-                            ReportSeq(
-                                line1,
-                                line2,
-                                seqLen,
-                                options.GetOutputXml(),
-                                source1,
-                                source2,
-                                outFile,
-                                json_out);
-                            duplicateLines += seqLen;
+                          reportSeq(line1, line2, seqLen);
+                          duplicateLines += seqLen;
                             blocks++;
                         }
                     }
@@ -314,15 +318,7 @@ namespace {
                 int line1 = m - seqLen;
                 int line2 = n - seqLen;
                 if (line1 != line2 || source1 != source2) {
-                    ReportSeq(
-                        line1,
-                        line2,
-                        seqLen,
-                        options.GetOutputXml(),
-                        source1,
-                        source2,
-                        outFile,
-                        json_out);
+                    reportSeq(line1, line2, seqLen);
                     duplicateLines += seqLen;
                     blocks++;
                 }
@@ -339,15 +335,7 @@ namespace {
                         seqLen++;
                     } else {
                         if (seqLen >= lMinBlockSize) {
-                            ReportSeq(
-                                y - seqLen,
-                                x + y - seqLen,
-                                seqLen,
-                                options.GetOutputXml(),
-                                source1,
-                                source2,
-                                outFile,
-                                json_out);
+                            reportSeq(y - seqLen, x + y - seqLen, seqLen);
                             duplicateLines += seqLen;
                             blocks++;
                         }
@@ -356,15 +344,7 @@ namespace {
                 }
 
                 if (seqLen >= lMinBlockSize) {
-                    ReportSeq(
-                        m - seqLen,
-                        n - seqLen,
-                        seqLen,
-                        options.GetOutputXml(),
-                        source1,
-                        source2,
-                        outFile,
-                        json_out);
+                    reportSeq(m - seqLen, n - seqLen, seqLen);
                     duplicateLines += seqLen;
                     blocks++;
                 }
