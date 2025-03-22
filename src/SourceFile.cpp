@@ -7,6 +7,8 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iterator>
+#include <vector>
 
 SourceFile::SourceFile(const std::string& filename, unsigned minChars, bool ignorePrepStuff)
     : m_filename(filename),
@@ -29,6 +31,19 @@ size_t SourceFile::GetNumOfLines() const {
 
 const SourceLine& SourceFile::GetLine(int index) const {
     return m_sourceLines[index];
+}
+
+std::vector<std::string> SourceFile::GetLines(int begin, int end) const {
+    std::vector<std::string> lines;
+    lines.reserve(end - begin);
+    auto begin_it = std::next(m_sourceLines.begin(), begin);
+    auto end_it = std::next(m_sourceLines.begin(), end);
+    std::transform(begin_it, end_it, std::back_inserter(lines),
+                   [](SourceLine const& line) {
+                       return line.GetLine();
+                   }
+    );
+    return lines;
 }
 
 const std::string& SourceFile::GetFilename() const {
