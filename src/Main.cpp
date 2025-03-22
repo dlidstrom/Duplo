@@ -7,10 +7,6 @@
 #include <iterator>
 
 namespace {
-    int Clamp(int upper, int lower, int value) {
-        return std::max(lower, std::min(upper, value));
-    }
-
     int run(long argc, const char* argv[]) {
         ArgumentParser ap(argc, argv);
 
@@ -19,7 +15,7 @@ namespace {
 
         if (!ap.is("--help") && argc > 2) {
             auto minBlockSize = ap.getInt("-ml", MIN_BLOCK_SIZE);
-            auto blockPercentThresholdValue = Clamp(100, 0, ap.getInt("-pt", 100));
+            auto blockPercentThresholdValue = std::clamp(ap.getInt("-pt", 100), 0, 100);
             if (blockPercentThresholdValue < 0 || 100 < blockPercentThresholdValue) {
                 throw std::runtime_error("-pt out of range");
             }
