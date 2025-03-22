@@ -492,7 +492,7 @@ int Duplo::Run(const Options& options) {
             }
         }
 
-        if (options.GetOutputXml() == false) {
+        if (!options.GetOutputXml() && !options.GetOutputJSON()) {
             if (processResult.Blocks() > 0) {
                 log
                     << left.GetFilename()
