@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iterator>
 #include <vector>
 
 SourceFile::SourceFile(const std::string& filename, unsigned minChars, bool ignorePrepStuff)
