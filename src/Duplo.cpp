@@ -399,7 +399,7 @@ int Duplo::Run(const Options& options) {
     std::ofstream of;
     if (options.GetOutputFilename() == "-") {
         buf = std::cout.rdbuf();
-        if (options.GetOutputXml() == false) {
+        if (!options.GetOutputXml() && !options.GetOutputJSON()) {
             logbuf = std::cout.rdbuf();
         }
         else {
