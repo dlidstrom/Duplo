@@ -1,6 +1,5 @@
 #include "FileType_Unknown.h"
 #include "NoopLineFilter.h"
-#include "SourceLine.h"
 
 FileType_Unknown::FileType_Unknown(unsigned minChars)
     : FileTypeBase(false, minChars) {

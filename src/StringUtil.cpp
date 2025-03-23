@@ -1,7 +1,6 @@
 #include "Utils.h"
 
 #include <algorithm>
-#include <ctype.h>
 #include <locale>
 
 namespace {

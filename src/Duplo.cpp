@@ -1,23 +1,18 @@
 #include "Duplo.h"
-#include "ArgumentParser.h"
-#include "HashUtil.h"
 #include "Options.h"
 #include "SourceFile.h"
 #include "SourceLine.h"
 #include "Utils.h"
-#include "TextFile.h"
-
-#include <nlohmann/json.hpp>
 #include "ProcessResult.h"
 
+#include <nlohmann/json.hpp>
+
 #include <algorithm>
-#include <cmath>
 #include <cstring>
 #include <ctime>
 #include <fstream>
-#include <optional>
+#include <iostream>
 #include <sstream>
-#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 

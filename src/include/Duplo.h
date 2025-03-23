@@ -4,8 +4,6 @@
 #include "Fwd.h"
 
 #include <string>
-#include <iostream>
-#include <vector>
 
 #ifdef DUPLO_VERSION
 const std::string VERSION = DUPLO_VERSION;
