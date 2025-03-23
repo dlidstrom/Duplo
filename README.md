@@ -9,6 +9,7 @@
 - 🔥 v1.2 support for reporting in json format (thanks [@cgkantidis](https://github.com/cgkantidis)!)
   - [Performance improvements](#71-performance-measurements): it now takes ~9s to process Quake 2 source! (thanks [@cgkantidis](https://github.com/cgkantidis)!)
 - Introducing [duplo-action](https://github.com/dlidstrom/duplo-action) for using Duplo in GitHub Actions!
+  - 👉 This action is now used to analyse duplicates in this repository.
 - v1.1 improve memory usage (grabbed from [@nachose fork](https://github.com/nachose/Duplo)), also re-enabled tests and organized code
 - 🚀 v1.0 add build on Windows (thanks [@chausner](https://github.com/chausner)!)
 - v0.8 adds improved Java support
