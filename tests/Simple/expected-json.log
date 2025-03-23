@@ -1,0 +1,18 @@
+[
+  {
+    "EndLineNumber1": 13,
+    "EndLineNumber2": 7,
+    "LineCount": 5,
+    "Lines": [
+      "AAAAA",
+      "BBBBB",
+      "CCCCC",
+      "DDDDD",
+      "EEEEE"
+    ],
+    "SourceFile1": "tests/Simple/LineNumbers.c",
+    "SourceFile2": "tests/Simple/LineNumbers.c",
+    "StartLineNumber1": 7,
+    "StartLineNumber2": 1
+  }
+]
