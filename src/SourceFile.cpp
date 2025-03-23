@@ -25,6 +25,16 @@ SourceFile::SourceFile(SourceFile&& right) noexcept
     , m_sourceLines(std::move(right.m_sourceLines)) {
 }
 
+SourceFile &SourceFile::operator=(SourceFile const &other) {
+    if (this == &other) {
+        return *this;
+    }
+    m_filename = other.m_filename;
+    m_fileType = other.m_fileType;
+    m_sourceLines = other.m_sourceLines;
+    return *this;
+}
+
 size_t SourceFile::GetNumOfLines() const {
     return m_sourceLines.size();
 }

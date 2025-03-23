@@ -14,6 +14,7 @@ class SourceFile {
 public:
     SourceFile(const std::string& fileName, unsigned minChars, bool ignorePrepStuff);
     SourceFile(SourceFile&& right) noexcept;
+    SourceFile &operator=(SourceFile const &other);
 
     size_t GetNumOfLines() const;
     const SourceLine& GetLine(int index) const;
