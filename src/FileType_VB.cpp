@@ -1,5 +1,5 @@
 #include "FileType_VB.h"
-#include "CstyleUtils.h"
+#include "Utils.h"
 #include "NoopLineFilter.h"
 #include "SourceLine.h"
 
