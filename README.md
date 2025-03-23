@@ -227,7 +227,7 @@ for further information.
 | Quake2 | 266 | 102740 | 9sec |
 
 This was measured on modern hardware anno 2025. It means Duplo is able to
-process more than 10 thousand lines of code (or 26 files) per second.
+process more than 10 thousand lines of code (or ~30 files) per second.
 
 ## 8. Developing
 
