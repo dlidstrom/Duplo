@@ -6,7 +6,9 @@
 
 **Updates:**
 
-- 🔥 Introducing [duplo-action](https://github.com/dlidstrom/duplo-action) for using Duplo in GitHub Actions!
+- 🔥 v1.2 support for reporting in json format (thanks [@cgkantidis](https://github.com/cgkantidis)!)
+  - [Performance improvements](#71-performance-measurements): it now takes ~9s to process Quake 2 source! (thanks [@cgkantidis](https://github.com/cgkantidis)!)
+- Introducing [duplo-action](https://github.com/dlidstrom/duplo-action) for using Duplo in GitHub Actions!
 - v1.1 improve memory usage (grabbed from [@nachose fork](https://github.com/nachose/Duplo)), also re-enabled tests and organized code
 - 🚀 v1.0 add build on Windows (thanks [@chausner](https://github.com/chausner)!)
 - v0.8 adds improved Java support
@@ -64,15 +66,14 @@ find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | ./duplo -ml 20 -ip - -
 - [2. Maintainer](#2-maintainer)
 - [3. File Format Support](#3-file-format-support)
 - [4. Installation](#4-installation)
-  - [4.1. Docker](#41-docker)
-  - [4.2. Pre-built binaries](#42-pre-built-binaries)
+  - [4.1. Pre-built binaries](#41-pre-built-binaries)
 - [5. Usage](#5-usage)
   - [5.1. Passing files using `stdin`](#51-passing-files-using-stdin)
     - [5.1.1. Bash](#511-bash)
     - [5.1.2. Windows](#512-windows)
-    - [5.1.3. Docker](#513-docker)
   - [5.2. Passing files using file](#52-passing-files-using-file)
-  - [5.3. Xml output](#53-xml-output)
+  - [5.3. Json output](#53-json-output)
+  - [5.4. Xml output](#54-xml-output)
 - [6. Feedback and Bug Reporting](#6-feedback-and-bug-reporting)
 - [7. Algorithm Background](#7-algorithm-background)
   - [7.1. Performance Measurements](#71-performance-measurements)
@@ -137,19 +138,7 @@ src\engine\geometry\SkinnedMeshGeometry.cpp(45)
 
 ## 4. Installation
 
-### 4.1. Docker
-
-If you have Docker, the way to run Duplo is to use this command:
-
-```bash
-# Docker on unix
-> docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo
-```
-
-This pulls the latest image and runs duplo. Note that you'll have to pipe the
-filenames into this command. A complete commandline sample will be shown below.
-
-### 4.2. Pre-built binaries
+### 4.1. Pre-built binaries
 
 Duplo is also available as a pre-built binary for (Alpine) Linux, macOS and
 Windows. Grab the executable from the
@@ -194,30 +183,6 @@ written to `out.txt`.
 This works similarly to the Bash command, but uses PowerShell commands to
 achieve the same effect.
 
-#### 5.1.3. Docker
-
-```bash
-# Docker on unix
-> find . -type f \( -iname "*.cpp" -or -iname "*.h" \) | docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo - out.txt
-```
-
-This command also works in a similar fashion to the Bash command, but instead of
-piping into a local `duplo` executable, it will pipe into `duplo` running inside
-Docker. This is very convenient as you do not have to install `duplo`
-separately. You will have to install Docker though, if you haven't already. That
-is a good thing to do anyway, since it opens up a lot of possibilities apart
-from running `duplo`.
-
-Again, similarly to the Bash command, this uses `find` to find files in the
-current directory, then passes the file list to Docker which will pass it
-further into an instance of the latest version of `duplo`. The working directory
-in the `duplo` container should be `/src` (that's where the `duplo` executable
-is located) and the current path of your host machine will be mapped to `/src`
-when the container is running. The `-i` allows `stdin` of your host machine to
-be passed into Docker to allow `duplo` to read the filenames. Any parameters to
-`duplo` can be placed at the end of the command as you can see `- out.txt` has
-been.
-
 ### 5.2. Passing files using file
 
 `duplo` can analyze files specified in a separate file:
@@ -230,15 +195,16 @@ been.
 # windows
 > Get-ChildItem -Include "*.cpp", "*.h" -Recurse |  % { $_.FullName } | Out-File -encoding ascii files.lst
 > Duplo.exe files.lst out.txt
-
-# Docker on unix
-> find . -type f \( -iname "*.cpp" -o -iname "*.h" \) > files.lst
-> docker run --rm -i -w /src -v $(pwd):/src dlidstrom/duplo files.lst out.txt
 ```
 
 Again, the duplicated blocks are written to `out.txt`.
 
-### 5.3. Xml output
+### 5.3. Json output
+
+Using `-json <filename>` you can output the result as json. This may be useful
+if you want to process the result further.
+
+### 5.4. Xml output
 
 Duplo can also output xml and there is a stylesheet that will format the result
 for viewing in a browser. This can be used as a report tab in your continuous
@@ -258,7 +224,10 @@ for further information.
 
 | System | Files | Loc's | Time |
 |-|-|-|-|
-| Quake2 | 266 | 102740 | 18sec |
+| Quake2 | 266 | 102740 | 9sec |
+
+This was measured on modern hardware anno 2025. It means Duplo is able to
+process more than 10 thousand lines of code (or 26 files) per second.
 
 ## 8. Developing
 
