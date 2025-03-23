@@ -1,4 +1,4 @@
-#include "StringUtil.h"
+#include "Utils.h"
 
 #include <algorithm>
 #include <ctype.h>
@@ -154,4 +154,8 @@ std::string StringUtil::GetFilenamePart(const std::string& fullpath) {
     }
 
     return filename;
+}
+
+bool StringUtil::IsSameFilename(const SourceFile& left, const SourceFile& right) {
+  return StringUtil::GetFilenamePart(left.GetFilename()) == StringUtil::GetFilenamePart(right.GetFilename());
 }
