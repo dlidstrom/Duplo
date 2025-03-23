@@ -1,7 +1,7 @@
 #include "FileTypeBase.h"
 #include "ILineFilter.h"
 #include "SourceLine.h"
-#include "StringUtil.h"
+#include "Utils.h"
 
 #include <algorithm>
 #include <cctype>

@@ -1,4 +1,4 @@
-#include "CstyleUtils.h"
+#include "Utils.h"
 
 std::string CstyleUtils::RemoveSingleLineComments(const std::string& line) {
     // Remove single line comments
