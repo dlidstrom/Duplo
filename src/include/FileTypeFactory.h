@@ -1,7 +1,7 @@
 #ifndef _FILETYPEFACTORY_H_
 #define _FILETYPEFACTORY_H_
 
-#include "Fwd.h"
+#include "IFileType.h"
 
 #include <string>
 

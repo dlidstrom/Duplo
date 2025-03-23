@@ -2,6 +2,7 @@
 #define _FILETYPEBASE_H_
 
 #include "IFileType.h"
+#include "ILineFilter.h"
 
 class FileTypeBase : public IFileType {
     bool m_ignorePrepStuff;

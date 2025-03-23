@@ -1,7 +1,7 @@
 #ifndef _DUPLO_H_
 #define _DUPLO_H_
 
-#include "Fwd.h"
+#include "Options.h"
 
 #include <string>
 
