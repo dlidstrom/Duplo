@@ -26,38 +26,6 @@ typedef const std::string* StringPtr;
 typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
 using json = nlohmann::json;
 
-class ProcessResult {
-    unsigned m_blocks;
-    unsigned m_duplicateLines;
-
-public:
-    ProcessResult()
-        : m_blocks(0),
-          m_duplicateLines(0) {
-    }
-
-    ProcessResult(unsigned blocks, unsigned duplicateLines)
-        : m_blocks(blocks),
-          m_duplicateLines(duplicateLines) {
-    }
-
-    unsigned Blocks() const {
-        return m_blocks;
-    }
-
-    unsigned DuplicateLines() const {
-        return m_duplicateLines;
-    }
-
-    friend ProcessResult operator<<(ProcessResult& left, const ProcessResult& right);
-};
-
-ProcessResult operator<<(ProcessResult& left, const ProcessResult& right) {
-    left.m_blocks += right.m_blocks;
-    left.m_duplicateLines += right.m_duplicateLines;
-    return left;
-}
-
 namespace {
 
     std::tuple<std::vector<SourceFile>, std::vector<bool>, unsigned, unsigned> LoadSourceFiles(
@@ -280,7 +248,8 @@ namespace {
         unsigned blocks = 0;
         unsigned duplicateLines = 0;
 
-        auto reportSeq = [&options, &source1, &source2, &outFile](int line1, int line2, int count) {
+        // make curried function for invoking ReportSeq
+        auto reportSeq = [&options, &source1, &source2, &outFile, &json_out](int line1, int line2, int count) {
             ReportSeq(
                 line1,
                 line2,
@@ -304,8 +273,8 @@ namespace {
                         int line1 = y + x - seqLen;
                         int line2 = x - seqLen;
                         if (line1 != line2 || source1 != source2) {
-                          reportSeq(line1, line2, seqLen);
-                          duplicateLines += seqLen;
+                            reportSeq(line1, line2, seqLen);
+                            duplicateLines += seqLen;
                             blocks++;
                         }
                     }
