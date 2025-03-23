@@ -26,7 +26,19 @@ typedef const std::string* StringPtr;
 typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
 using json = nlohmann::json;
 
+static constexpr std::size_t TOP_N_LONGEST = 10;
+
 namespace {
+    void printLongestFiles(std::ostringstream &oss, std::vector<SourceFile> &sourceFiles, std::size_t top_n) {
+        std::sort(std::begin(sourceFiles),
+                  std::end(sourceFiles),
+                  [](SourceFile const& l, SourceFile const& r) {
+            return l.GetNumOfLines() > r.GetNumOfLines();
+        });
+        std::for_each_n(std::begin(sourceFiles), top_n, [&oss](SourceFile const& file) {
+            oss << file.GetNumOfLines() << ": " << file.GetFilename() << '\n';
+        });
+    }
 
     std::tuple<std::vector<SourceFile>, std::vector<bool>, unsigned, unsigned> LoadSourceFiles(
         const std::vector<std::string>& lines,
@@ -39,16 +51,6 @@ namespace {
         size_t maxLinesPerFile = 0;
         int files = 0;
         unsigned long locsTotal = 0;
-        std::vector<FileLength> longestFiles;
-        auto addSorted = [&longestFiles](int numLines, const std::string& filename) {
-            longestFiles.emplace_back(numLines, filename);
-            std::sort(
-                std::begin(longestFiles),
-                std::end(longestFiles),
-                [](auto l, auto r) { return std::get<0>(l) > std::get<0>(r); });
-            if (longestFiles.size() > 10)
-                longestFiles.resize(10);
-        };
 
         // Create vector with all source files
         for (size_t i = 0; i < lines.size(); i++) {
@@ -62,17 +64,6 @@ namespace {
                     if (maxLinesPerFile < numLines) {
                         maxLinesPerFile = numLines;
                     }
-
-                    // keep 10 worst case files
-                    if (longestFiles.size() < 10) {
-                        addSorted(numLines, lines[i]);
-                    } else {
-                        auto& [l, r] = longestFiles.back();
-                        (void)r;
-                        if (l < numLines) {
-                            addSorted(numLines, lines[i]);
-                        }
-                    }
                 }
             }
         }
@@ -84,10 +75,7 @@ namespace {
                 << std::sqrt(matrix.max_size())
                 << " lines at most." << std::endl
                 << "Longest files:" << std::endl;
-            for (auto& [l, f] : longestFiles) {
-                stream << l << ": " << f << std::endl;
-            }
-
+            printLongestFiles(stream, sourceFiles, TOP_N_LONGEST);
             throw std::runtime_error(stream.str().c_str());
         }
 
@@ -103,10 +91,7 @@ namespace {
             stream
                 << ex.what() << std::endl
                 << "Longest files:" << std::endl;
-            for (auto& [l, f] : longestFiles) {
-                stream << l << ": " << f << std::endl;
-            }
-
+            printLongestFiles(stream, sourceFiles, TOP_N_LONGEST);
             throw std::runtime_error(stream.str().c_str());
         }
 
