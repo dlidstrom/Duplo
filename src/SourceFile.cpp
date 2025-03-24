@@ -1,12 +1,10 @@
 #include "SourceFile.h"
 #include "FileTypeFactory.h"
-#include "IFileType.h"
 #include "SourceLine.h"
-#include "Utils.h"
 #include "TextFile.h"
+#include "IFileType.h"
 
 #include <algorithm>
-#include <cassert>
 #include <iterator>
 #include <vector>
 

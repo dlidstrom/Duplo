@@ -2,7 +2,6 @@
 #define _SOURCELINE_H_
 
 #include <string>
-#include <vector>
 
 class SourceLine {
     std::string m_line;
