@@ -1,8 +1,8 @@
 #include "SourceFile.h"
 #include "FileTypeFactory.h"
+#include "IFileType.h"
 #include "SourceLine.h"
 #include "TextFile.h"
-#include "IFileType.h"
 
 #include <algorithm>
 #include <iterator>
@@ -18,12 +18,10 @@ SourceFile::SourceFile(const std::string& filename, unsigned minChars, bool igno
 }
 
 SourceFile::SourceFile(SourceFile&& right) noexcept
-    : m_filename(std::move(right.m_filename))
-    , m_fileType(std::move(right.m_fileType))
-    , m_sourceLines(std::move(right.m_sourceLines)) {
+    : m_filename(std::move(right.m_filename)), m_fileType(std::move(right.m_fileType)), m_sourceLines(std::move(right.m_sourceLines)) {
 }
 
-SourceFile &SourceFile::operator=(SourceFile const &other) {
+SourceFile& SourceFile::operator=(SourceFile const& other) {
     if (this == &other) {
         return *this;
     }
@@ -47,10 +45,9 @@ std::vector<std::string> SourceFile::GetLines(int begin, int end) const {
     auto begin_it = std::next(m_sourceLines.begin(), begin);
     auto end_it = std::next(m_sourceLines.begin(), end);
     std::transform(begin_it, end_it, std::back_inserter(lines),
-                   [](SourceLine const& line) {
-                       return line.GetLine();
-                   }
-    );
+        [](SourceLine const& line) {
+            return line.GetLine();
+        });
     return lines;
 }
 

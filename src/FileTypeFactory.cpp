@@ -1,11 +1,11 @@
 #include "FileTypeFactory.h"
+#include "FileType_Ada.h"
 #include "FileType_C.h"
 #include "FileType_CS.h"
+#include "FileType_Java.h"
 #include "FileType_S.h"
 #include "FileType_Unknown.h"
 #include "FileType_VB.h"
-#include "FileType_Ada.h"
-#include "FileType_Java.h"
 #include "Utils.h"
 
 IFileTypePtr FileTypeFactory::CreateFileType(

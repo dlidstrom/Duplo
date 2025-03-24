@@ -156,5 +156,5 @@ std::string StringUtil::GetFilenamePart(const std::string& fullpath) {
 }
 
 bool StringUtil::IsSameFilename(const SourceFile& left, const SourceFile& right) {
-  return StringUtil::GetFilenamePart(left.GetFilename()) == StringUtil::GetFilenamePart(right.GetFilename());
+    return StringUtil::GetFilenamePart(left.GetFilename()) == StringUtil::GetFilenamePart(right.GetFilename());
 }

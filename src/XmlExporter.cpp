@@ -4,8 +4,7 @@
 #include <iostream>
 
 XmlExporter::XmlExporter(const Options& options)
-: FileExporter(options, false) {
-
+    : FileExporter(options, false) {
 }
 
 void XmlExporter::LogMessage(const std::string& message) {

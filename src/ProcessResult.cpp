@@ -19,7 +19,7 @@ unsigned ProcessResult::DuplicateLines() const {
 }
 
 ProcessResult operator<<(ProcessResult& left, const ProcessResult& right) {
-  left.m_blocks += right.m_blocks;
-  left.m_duplicateLines += right.m_duplicateLines;
-  return left;
+    left.m_blocks += right.m_blocks;
+    left.m_duplicateLines += right.m_duplicateLines;
+    return left;
 }
