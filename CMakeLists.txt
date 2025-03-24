@@ -17,7 +17,7 @@ FetchContent_MakeAvailable(nlohmann_json)
 add_executable(duplo ${SOURCES})
 
 set_target_properties(duplo PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )
 

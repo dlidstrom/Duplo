@@ -8,9 +8,6 @@
 #include "FileType_Java.h"
 #include "Utils.h"
 
-#include <algorithm>
-#include <map>
-
 IFileTypePtr FileTypeFactory::CreateFileType(
     const std::string& filename,
     bool ignorePrepStuff,
