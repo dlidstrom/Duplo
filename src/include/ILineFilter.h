@@ -2,6 +2,7 @@
 #define _ILINEFILTER_H_
 
 #include <string>
+#include <memory>
 
 struct ILineFilter {
     virtual ~ILineFilter() = default;

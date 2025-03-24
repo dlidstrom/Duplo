@@ -1,16 +1,16 @@
 #include "Duplo.h"
+#include "IExporter.h"
 #include "Options.h"
+#include "ProcessResult.h"
 #include "SourceFile.h"
 #include "SourceLine.h"
 #include "Utils.h"
-#include "ProcessResult.h"
-
-#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <cstring>
 #include <ctime>
-#include <fstream>
+#include <cmath>
+#include <format>
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
@@ -19,7 +19,6 @@
 typedef std::tuple<unsigned, std::string> FileLength;
 typedef const std::string* StringPtr;
 typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
-using json = nlohmann::json;
 
 static constexpr std::size_t TOP_N_LONGEST = 10;
 
@@ -39,7 +38,7 @@ namespace {
         const std::vector<std::string>& lines,
         unsigned minChars,
         bool ignorePrepStuff,
-        std::ostream& log) {
+        IExporterPtr exporter) {
 
         std::vector<SourceFile> sourceFiles;
         std::vector<bool> matrix;
@@ -74,9 +73,8 @@ namespace {
             throw std::runtime_error(stream.str().c_str());
         }
 
-        log
-            << lines.size()
-            << " done.\n\n";
+        exporter->Log(std::format("{} done.\n\n", lines.size()));
+
         // Generate matrix large enough for all files
         try {
             matrix.resize(maxLinesPerFile * maxLinesPerFile);
@@ -93,113 +91,12 @@ namespace {
         return std::tuple(std::move(sourceFiles), matrix, files, locsTotal);
     }
 
-    void ReportSeqJSON(
-        int begin,
-        int end,
-        int src_begin1,
-        int src_end1,
-        int src_begin2,
-        int src_end2,
-        const SourceFile& source1,
-        const SourceFile& source2,
-        json& json_out) {
-        json_out.emplace_back(json{
-            { "LineCount", end - begin },
-            { "SourceFile1", source1.GetFilename() },
-            { "StartLineNumber1", src_begin1 },
-            { "EndLineNumber1", src_end1 },
-            { "SourceFile2", source2.GetFilename() },
-            { "StartLineNumber2", src_begin2 },
-            { "EndLineNumber2", src_end2 },
-            { "Lines", source1.GetLines(begin, end) } });
-    }
-
-    void ReportSeq(
-        int line1,
-        int line2,
-        int count,
-        bool xml,
-        const SourceFile& source1,
-        const SourceFile& source2,
-        std::ostream& out,
-        std::optional<json>& json_out) {
-        if (xml) {
-            out
-                << "    <set LineCount=\"" << count << "\">"
-                << std::endl;
-            int startLineNumber1 = source1.GetLine(line1).GetLineNumber();
-            int endLineNumber1 = source1.GetLine(line1 + count).GetLineNumber();
-            out
-                << "        <block SourceFile=\"" << source1.GetFilename()
-                << "\" StartLineNumber=\"" << startLineNumber1
-                << "\" EndLineNumber=\"" << endLineNumber1 << "\"/>"
-                << std::endl;
-            int startLineNumber2 = source2.GetLine(line2).GetLineNumber();
-            int endLineNumber2 = source2.GetLine(line2 + count).GetLineNumber();
-            out
-                << "        <block SourceFile=\"" << source2.GetFilename()
-                << "\" StartLineNumber=\"" << startLineNumber2
-                << "\" EndLineNumber=\"" << endLineNumber2 << "\"/>"
-                << std::endl;
-            out
-                << "        <lines xml:space=\"preserve\">"
-                << std::endl;
-            for (int j = 0; j < count; j++) {
-                // replace various characters/ strings so that it doesn't upset the XML parser
-                std::string tmpstr = source1.GetLine(j + line1).GetLine();
-
-                // " --> '
-                StringUtil::StrSub(tmpstr, "\'", "\"", -1);
-
-                // & --> &amp;
-                StringUtil::StrSub(tmpstr, "&amp;", "&", -1);
-
-                // < --> &lt;
-                StringUtil::StrSub(tmpstr, "&lt;", "<", -1);
-
-                // > --> &gt;
-                StringUtil::StrSub(tmpstr, "&gt;", ">", -1);
-
-                out << "            <line Text=\"" << tmpstr << "\"/>" << std::endl;
-            }
-
-            out << "        </lines>" << std::endl;
-            out << "    </set>" << std::endl;
-        } else if (json_out) {
-            ReportSeqJSON(
-                    line1,
-                    line1 + count,
-                    source1.GetLine(line1).GetLineNumber(),
-                    source1.GetLine(line1 + count).GetLineNumber(),
-                    source2.GetLine(line2).GetLineNumber(),
-                    source2.GetLine(line2 + count).GetLineNumber(),
-                    source1,
-                    source2,
-                    json_out.value());
-        } else {
-            out
-                << source1.GetFilename()
-                << "(" << source1.GetLine(line1).GetLineNumber() << ")"
-                << std::endl;
-            out
-                << source2.GetFilename()
-                << "(" << source2.GetLine(line2).GetLineNumber() << ")"
-                << std::endl;
-            for (int j = 0; j < count; j++) {
-                out << source1.GetLine(j + line1).GetLine() << std::endl;
-            }
-
-            out << std::endl;
-        }
-    }
-
     ProcessResult Process(
         const SourceFile& source1,
         const SourceFile& source2,
         std::vector<bool>& matrix,
         const Options& options,
-        std::ostream& outFile,
-        std::optional<json>& json_out) {
+        IExporterPtr exporter) {
         size_t m = source1.GetNumOfLines();
         size_t n = source2.GetNumOfLines();
 
@@ -229,16 +126,13 @@ namespace {
         unsigned duplicateLines = 0;
 
         // make curried function for invoking ReportSeq
-        auto reportSeq = [&options, &source1, &source2, &outFile, &json_out](int line1, int line2, int count) {
-            ReportSeq(
+        auto reportSeq = [&source1, &source2, &exporter](int line1, int line2, int count) {
+            exporter->ReportSeq(
                 line1,
                 line2,
                 count,
-                options.GetOutputXml(),
                 source1,
-                source2,
-                outFile,
-                json_out);
+                source2);
         };
 
         // Scan vertical part
@@ -305,54 +199,19 @@ namespace {
 }
 
 int Duplo::Run(const Options& options) {
-    std::streambuf* buf;
-    std::streambuf* logbuf;
-    std::ofstream of;
-    if (options.GetOutputFilename() == "-") {
-        buf = std::cout.rdbuf();
-        if (!options.GetOutputXml() && !options.GetOutputJSON()) {
-            logbuf = std::cout.rdbuf();
-        }
-        else {
-          logbuf = 0;
-        }
-    }
-    else {
-        of.open(options.GetOutputFilename().c_str(), std::ios::out | std::ios::binary);
-        buf = of.rdbuf();
-        logbuf = std::cout.rdbuf();
-    }
 
-    std::ostream out(buf);
-    std::ostream log(logbuf);
-    if (!out) {
-        std::ostringstream stream;
-        stream
-            << "Error: Can't open file: "
-            << options.GetOutputFilename()
-            << std::endl;
-        throw std::runtime_error(stream.str().c_str());
-    }
+    IExporterPtr exporter = IExporter::CreateExporter(options);
+    exporter->Log("Loading and hashing files ... ");
 
-    log << "Loading and hashing files ... " << std::flush;
-
-    if (options.GetOutputXml()) {
-        out
-            << "<?xml version=\"1.0\"?>"
-            << std::endl
-            << "<duplo>"
-            << std::endl;
-    }
-
-    auto json_out = options.GetOutputJSON() ? std::optional(json()) : std::nullopt;
+    exporter->WriteHeader();
 
     auto lines = FileSystem::LoadFileList(options.GetListFilename());
     auto [sourceFiles, matrix, files, locsTotal] = LoadSourceFiles(
         lines,
         options.GetMinChars(),
         options.GetIgnorePrepStuff(),
-        log);
-    auto numFilesToCheck = options.GetFilesToCheck() > 0 ? std::min(options.GetFilesToCheck(), sourceFiles.size()): sourceFiles.size();
+        exporter);
+    auto numFilesToCheck = options.GetFilesToCheck() > 0 ? std::min(options.GetFilesToCheck(), sourceFiles.size()) : sourceFiles.size();
 
     // hash maps
     HashToFiles hashToFiles;
@@ -384,85 +243,34 @@ int Duplo::Run(const Options& options) {
                 left,
                 matrix,
                 options,
-                out,
-                json_out);
+                exporter);
 
         // files to compare are those that have matching lines
         for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
             const auto& right = sourceFiles[j];
-            if ((!options.GetIgnoreSameFilename() || !StringUtil::IsSameFilename(left, right))
-                && matchingFiles.find(&right.GetFilename()) != matchingFiles.end()) {
+            if ((!options.GetIgnoreSameFilename() || !StringUtil::IsSameFilename(left, right)) && matchingFiles.find(&right.GetFilename()) != matchingFiles.end()) {
                 processResult
                     << Process(
-                        left,
-                        right,
-                        matrix,
-                        options,
-                        out,
-                        json_out);
+                           left,
+                           right,
+                           matrix,
+                           options,
+                           exporter);
             }
         }
 
-        if (!options.GetOutputXml() && !options.GetOutputJSON()) {
-            if (processResult.Blocks() > 0) {
-                log
-                    << left.GetFilename()
-                    << " found: " << processResult.Blocks() << " block(s)" << std::endl;
-            } else {
-                log
-                    << left.GetFilename()
-                    << " nothing found." << std::endl;
-            }
+        if (processResult.Blocks() > 0) {
+            exporter->Log(std::format("{} found: {} block(s)\n", left.GetFilename(), processResult.Blocks()));
+        } else {
+            exporter->Log(std::format("{} nothing found.\n", left.GetFilename()));
         }
 
         processResultTotal << processResult;
     }
 
-    if (options.GetOutputXml()) {
-        out
-            << "</duplo>"
-            << std::endl;
-    } else if (json_out) {
-        out << json_out->dump(2);
-    } else {
-        out
-            << "Configuration:"
-            << std::endl
-            << "  Number of files: "
-            << files
-            << std::endl
-            << "  Minimal block size: "
-            << options.GetMinBlockSize()
-            << std::endl
-            << "  Minimal characters in line: "
-            << options.GetMinChars()
-            << std::endl
-            << "  Ignore preprocessor directives: "
-            << options.GetIgnorePrepStuff()
-            << std::endl
-            << "  Ignore same filenames: "
-            << options.GetIgnoreSameFilename()
-            << std::endl
-            << std::endl
-            << "Results:"
-            << std::endl
-            << "  Lines of code: "
-            << locsTotal
-            << std::endl
-            << "  Duplicate lines of code: "
-            << processResultTotal.DuplicateLines()
-            //<< " ("
-            //<< 100 * processResultTotal.DuplicateLines() / locsTotal
-            //<< "%)"
-            << std::endl
-            << "  Total "
-            << processResultTotal.Blocks()
-            << " duplicate block(s) found."
-            << std::endl
-            << std::endl;
-    }
+    exporter->WriteFooter(options, files, locsTotal, processResultTotal);
 
     return processResultTotal.Blocks() > 0
-        ? EXIT_FAILURE
-        : EXIT_SUCCESS;
+               ? EXIT_FAILURE
+               : EXIT_SUCCESS;
 }

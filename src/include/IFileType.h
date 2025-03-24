@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 struct IFileType {
     virtual ~IFileType() = default;
