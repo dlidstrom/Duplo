@@ -1,15 +1,9 @@
 #ifndef _CONSOLEEXPORTER_H_
 #define _CONSOLEEXPORTER_H_
 
-#include "IExporter.h"
+#include "FileExporter.h"
 
-#include <fstream>
-
-class ConsoleExporter : public IExporter {
-    std::ofstream m_of;
-    std::shared_ptr<std::ostream> m_out;
-    std::shared_ptr<std::ostream> m_log;
-
+class ConsoleExporter : public FileExporter {
 public:
     ConsoleExporter(const Options& options);
     void LogMessage(const std::string& message) override;

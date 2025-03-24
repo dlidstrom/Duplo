@@ -2,10 +2,9 @@
 #include "Utils.h"
 
 #include <iostream>
-#include <sstream>
 
 XmlExporter::XmlExporter(const Options& options)
-: FileExporter(options) {
+: FileExporter(options, false) {
 
 }
 
