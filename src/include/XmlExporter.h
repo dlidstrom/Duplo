@@ -1,18 +1,12 @@
 #ifndef _XMLEXPORTER_H_
 #define _XMLEXPORTER_H_
 
-#include "IExporter.h"
+#include "FileExporter.h"
 
-#include <fstream>
-
-class XmlExporter : public IExporter {
-    std::ofstream m_of;
-    std::shared_ptr<std::ostream> m_out;
-    std::shared_ptr<std::ostream> m_log;
-
+class XmlExporter : public FileExporter {
 public:
     XmlExporter(const Options& options);
-    void Log(const std::string& message) override;
+    void LogMessage(const std::string& message) override;
     void WriteHeader() override;
     void WriteFooter(
         const Options& options,

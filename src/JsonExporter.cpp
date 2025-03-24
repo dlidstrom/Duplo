@@ -1,36 +1,14 @@
 #include "JsonExporter.h"
+#include "FileExporter.h"
 
 #include <iostream>
-#include <sstream>
 
-JsonExporter::JsonExporter(const Options& options) {
-    std::streambuf* buf;
-    std::streambuf* logbuf;
-    if (options.GetOutputFilename() == "-") {
-        buf = std::cout.rdbuf();
-        logbuf = 0;
-    } else {
-        m_of.open(options.GetOutputFilename().c_str(), std::ios::out | std::ios::binary);
-        buf = m_of.rdbuf();
-        logbuf = std::cout.rdbuf();
-    }
-
-    m_out = std::make_shared<std::ostream>(buf);
-    m_log = std::make_shared<std::ostream>(logbuf);
-    std::ostream out(buf);
-    std::ostream log(logbuf);
-    if (!out) {
-        std::ostringstream stream;
-        stream
-            << "Error: Can't open file: "
-            << options.GetOutputFilename()
-            << std::endl;
-        throw std::runtime_error(stream.str().c_str());
-    }
+JsonExporter::JsonExporter(const Options& options)
+    : FileExporter(options) {
 }
 
-void JsonExporter::Log(const std::string& message) {
-    (*m_log) << message << std::flush;
+void JsonExporter::LogMessage(const std::string& message) {
+    Log() << message << std::flush;
 }
 
 void JsonExporter::WriteHeader() {
@@ -41,7 +19,7 @@ void JsonExporter::WriteFooter(
     int files,
     long locsTotal,
     const ProcessResult& processResult) {
-    (*m_out) << m_json.dump(2);
+    Out() << m_json.dump(2);
 }
 
 void JsonExporter::ReportSeq(

@@ -13,7 +13,7 @@ typedef std::shared_ptr<IExporter> IExporterPtr;
 struct IExporter {
     virtual ~IExporter() = default;
     static IExporterPtr CreateExporter(const Options& options);
-    virtual void Log(const std::string& message) = 0;
+    virtual void LogMessage(const std::string& message) = 0;
     virtual void WriteHeader() = 0;
     virtual void WriteFooter(
         const Options& options,

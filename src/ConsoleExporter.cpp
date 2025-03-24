@@ -33,7 +33,7 @@ ConsoleExporter::ConsoleExporter(const Options& options) {
     }
 }
 
-void ConsoleExporter::Log(const std::string& message) {
+void ConsoleExporter::LogMessage(const std::string& message) {
     (*m_log) << message << std::flush;
 }
 

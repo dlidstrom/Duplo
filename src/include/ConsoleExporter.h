@@ -12,7 +12,7 @@ class ConsoleExporter : public IExporter {
 
 public:
     ConsoleExporter(const Options& options);
-    void Log(const std::string& message) override;
+    void LogMessage(const std::string& message) override;
     void WriteHeader() override;
     void WriteFooter(
         const Options& options,

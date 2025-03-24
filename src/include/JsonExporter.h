@@ -1,21 +1,16 @@
 #ifndef _JSONEXPORTER_H_
 #define _JSONEXPORTER_H_
 
-#include "IExporter.h"
+#include "FileExporter.h"
 
 #include <nlohmann/json.hpp>
 
-#include <fstream>
-
-class JsonExporter : public IExporter {
-    std::ofstream m_of;
-    std::shared_ptr<std::ostream> m_out;
-    std::shared_ptr<std::ostream> m_log;
+class JsonExporter : public FileExporter {
     nlohmann::json m_json;
 
 public:
     JsonExporter(const Options& options);
-    void Log(const std::string& message) override;
+    void LogMessage(const std::string& message) override;
     void WriteHeader() override;
     void WriteFooter(
         const Options& options,

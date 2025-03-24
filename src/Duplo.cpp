@@ -73,7 +73,7 @@ namespace {
             throw std::runtime_error(stream.str().c_str());
         }
 
-        exporter->Log(std::format("{} done.\n\n", lines.size()));
+        exporter->LogMessage(std::format("{} done.\n\n", lines.size()));
 
         // Generate matrix large enough for all files
         try {
@@ -201,7 +201,7 @@ namespace {
 int Duplo::Run(const Options& options) {
 
     IExporterPtr exporter = IExporter::CreateExporter(options);
-    exporter->Log("Loading and hashing files ... ");
+    exporter->LogMessage("Loading and hashing files ... ");
 
     exporter->WriteHeader();
 
@@ -260,9 +260,9 @@ int Duplo::Run(const Options& options) {
         }
 
         if (processResult.Blocks() > 0) {
-            exporter->Log(std::format("{} found: {} block(s)\n", left.GetFilename(), processResult.Blocks()));
+            exporter->LogMessage(std::format("{} found: {} block(s)\n", left.GetFilename(), processResult.Blocks()));
         } else {
-            exporter->Log(std::format("{} nothing found.\n", left.GetFilename()));
+            exporter->LogMessage(std::format("{} nothing found.\n", left.GetFilename()));
         }
 
         processResultTotal << processResult;
