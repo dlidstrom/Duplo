@@ -1,40 +1,14 @@
 #include "ConsoleExporter.h"
+#include "FileExporter.h"
 
 #include <iostream>
-#include <sstream>
 
-ConsoleExporter::ConsoleExporter(const Options& options) {
-    std::streambuf* buf;
-    std::streambuf* logbuf;
-    if (options.GetOutputFilename() == "-") {
-        buf = std::cout.rdbuf();
-        if (options.GetOutputXml() || options.GetOutputJSON()) {
-            logbuf = 0;
-        } else {
-            logbuf = std::cout.rdbuf();
-        }
-    } else {
-        m_of.open(options.GetOutputFilename().c_str(), std::ios::out | std::ios::binary);
-        buf = m_of.rdbuf();
-        logbuf = std::cout.rdbuf();
-    }
-
-    m_out = std::make_shared<std::ostream>(buf);
-    m_log = std::make_shared<std::ostream>(logbuf);
-    std::ostream out(buf);
-    std::ostream log(logbuf);
-    if (!out) {
-        std::ostringstream stream;
-        stream
-            << "Error: Can't open file: "
-            << options.GetOutputFilename()
-            << std::endl;
-        throw std::runtime_error(stream.str().c_str());
-    }
+ConsoleExporter::ConsoleExporter(const Options& options)
+    : FileExporter(options, true) {
 }
 
 void ConsoleExporter::LogMessage(const std::string& message) {
-    (*m_log) << message << std::flush;
+    Log() << message << std::flush;
 }
 
 void ConsoleExporter::WriteHeader() {}
@@ -43,7 +17,7 @@ void ConsoleExporter::WriteFooter(
     int files,
     long locsTotal,
     const ProcessResult& processResult) {
-    (*m_out)
+    Out()
         << "Configuration:"
         << std::endl
         << "  Number of files: "
@@ -83,17 +57,17 @@ void ConsoleExporter::ReportSeq(
     int count,
     const SourceFile& source1,
     const SourceFile& source2) {
-    (*m_out)
+    Out()
         << source1.GetFilename()
         << "(" << source1.GetLine(line1).GetLineNumber() << ")"
         << std::endl;
-    (*m_out)
+    Out()
         << source2.GetFilename()
         << "(" << source2.GetLine(line2).GetLineNumber() << ")"
         << std::endl;
     for (int j = 0; j < count; j++) {
-      (*m_out) << source1.GetLine(j + line1).GetLine() << std::endl;
+        Out() << source1.GetLine(j + line1).GetLine() << std::endl;
     }
 
-    (*m_out) << std::endl;
+    Out() << std::endl;
 }

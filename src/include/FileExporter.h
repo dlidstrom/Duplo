@@ -15,7 +15,7 @@ protected:
     std::ostream& Out() const;
 
 public:
-    FileExporter(const Options&);
+    FileExporter(const Options&, bool);
 };
 
 #endif

@@ -4,7 +4,7 @@
 #include <iostream>
 
 JsonExporter::JsonExporter(const Options& options)
-    : FileExporter(options) {
+    : FileExporter(options, false) {
 }
 
 void JsonExporter::LogMessage(const std::string& message) {
