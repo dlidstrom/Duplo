@@ -1,7 +1,8 @@
 #ifndef _SOURCEFILE_H_
 #define _SOURCEFILE_H_
 
-#include "Fwd.h"
+#include "IFileType.h"
+#include "SourceLine.h"
 
 #include <string>
 #include <vector>

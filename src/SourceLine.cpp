@@ -1,6 +1,5 @@
 #include "SourceLine.h"
 #include "HashUtil.h"
-#include "SourceFile.h"
 
 #include <algorithm>
 #include <iterator>

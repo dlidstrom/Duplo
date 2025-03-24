@@ -1,7 +1,6 @@
 #include "FileType_Java.h"
 #include "CstyleCommentsFilter.h"
 #include "Utils.h"
-#include "SourceLine.h"
 
 #include <cstring>
 

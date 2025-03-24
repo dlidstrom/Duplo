@@ -1,5 +1,4 @@
 #include "FileTypeBase.h"
-#include "ILineFilter.h"
 #include "SourceLine.h"
 #include "Utils.h"
 
