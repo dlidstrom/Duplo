@@ -8,39 +8,13 @@ namespace {
 }
 
 std::string StringUtil::Trim(const std::string& input) {
-    // If string is empty, there is nothing to look for.
-    if (input.length() == 0) {
+    auto l_idx = input.find_first_not_of(" \t");
+    if (l_idx == std::string::npos) {
         return "";
     }
 
-    // Set up temporary
-    std::string final = input;
-
-    // Remove spaces at beginning
-    decltype(input.length()) i = 0;
-    while (i < input.length() && input[i] <= ' ') {
-        i++;
-    }
-
-    // String full of spaces, return nothing.
-    if (i >= input.length()) {
-        return "";
-    }
-
-    if (i > 0) {
-        final = input.substr(i, input.length() - i);
-    }
-
-    // Remove spaces at end
-    i = final.length() - 1;
-    while (i >= 0 && final[i] <= ' ') {
-        i--;
-    }
-
-    final = final.substr(0, i + 1);
-
-    // Return the new string
-    return final;
+    auto r_idx = input.find_last_not_of(" \t");
+    return input.substr(l_idx, r_idx - l_idx + 1);
 }
 
 int StringUtil::Split(const std::string& input, const std::string& delimiter, std::vector<std::string>& results, bool doTrim) {

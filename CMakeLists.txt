@@ -27,5 +27,5 @@ find_package(nlohmann_json 3.11.3 REQUIRED)
 target_link_libraries(duplo PRIVATE nlohmann_json::nlohmann_json)
 
 if(NOT MSVC)
-    target_compile_options(duplo PRIVATE -Wall -Werror)
+    target_compile_options(duplo PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
