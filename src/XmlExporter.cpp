@@ -20,10 +20,10 @@ void XmlExporter::WriteHeader() {
 }
 
 void XmlExporter::WriteFooter(
-    const Options& options,
-    int files,
-    long locsTotal,
-    const ProcessResult& processResult) {
+    const Options& /*options*/,
+    int /*files*/,
+    long /*locsTotal*/,
+    const ProcessResult& /*processResult*/) {
     Out()
         << "</duplo>"
         << std::endl;

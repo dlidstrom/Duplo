@@ -15,10 +15,10 @@ void JsonExporter::WriteHeader() {
 }
 
 void JsonExporter::WriteFooter(
-    const Options& options,
-    int files,
-    long locsTotal,
-    const ProcessResult& processResult) {
+    const Options& /*options*/,
+    int /*files*/,
+    long /*locsTotal*/,
+    const ProcessResult& /*processResult*/) {
     Out() << m_json.dump(2);
 }
 
