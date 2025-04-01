@@ -22,6 +22,7 @@ namespace {
 
             unsigned char blockPercentThreshold = static_cast<unsigned char>(blockPercentThresholdValue);
             auto numberOfFiles = ap.getInt("-n", 0);
+            auto numThreads = ap.getInt("-j", 1);
             auto minChars = ap.getInt("-mc", MIN_CHARS);
             bool ignorePrepStuff = ap.is("-ip");
             bool outputXml = ap.is("-xml");
@@ -35,6 +36,7 @@ namespace {
                 minBlockSize,
                 blockPercentThreshold,
                 numberOfFiles,
+                numThreads,
                 outputXml,
                 outputJSON,
                 ignoreSameFilename,

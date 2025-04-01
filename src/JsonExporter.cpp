@@ -1,3 +1,4 @@
+#include "Block.h"
 #include "JsonExporter.h"
 #include "FileExporter.h"
 
@@ -18,7 +19,8 @@ void JsonExporter::WriteFooter(
     const Options& /*options*/,
     int /*files*/,
     long /*locsTotal*/,
-    const ProcessResult& /*processResult*/) {
+    std::vector<Block> const &/*tot_dup_blocks*/,
+    unsigned /*tot_dup_lines*/) {
     Out() << m_json.dump(2, ' ', true, nlohmann::json::error_handler_t::ignore);
 }
 

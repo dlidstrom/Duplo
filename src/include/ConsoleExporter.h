@@ -1,6 +1,7 @@
 #ifndef _CONSOLEEXPORTER_H_
 #define _CONSOLEEXPORTER_H_
 
+#include "Block.h"
 #include "FileExporter.h"
 
 class ConsoleExporter : public FileExporter {
@@ -12,7 +13,8 @@ public:
         const Options& options,
         int files,
         long locsTotal,
-        const ProcessResult& processResult) override;
+        std::vector<Block> const &tot_dup_blocks,
+        unsigned tot_dup_lines) override;
     void ReportSeq(
         int line1,
         int line2,

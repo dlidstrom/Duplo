@@ -1,3 +1,4 @@
+#include "Block.h"
 #include "XmlExporter.h"
 #include "Utils.h"
 
@@ -23,7 +24,8 @@ void XmlExporter::WriteFooter(
     const Options& /*options*/,
     int /*files*/,
     long /*locsTotal*/,
-    const ProcessResult& /*processResult*/) {
+    std::vector<Block> const &/*tot_dup_blocks*/,
+    unsigned /*tot_dup_lines*/) {
     Out()
         << "</duplo>"
         << std::endl;

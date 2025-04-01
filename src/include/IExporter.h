@@ -1,8 +1,8 @@
 #ifndef _IEXPORTER_H_
 #define _IEXPORTER_H_
 
+#include "Block.h"
 #include "Options.h"
-#include "ProcessResult.h"
 #include "SourceFile.h"
 
 #include <memory>
@@ -19,7 +19,8 @@ struct IExporter {
         const Options& options,
         int files,
         long locsTotal,
-        const ProcessResult& processResult) = 0;
+        std::vector<Block> const &tot_dup_blocks,
+        unsigned tot_dup_lines) = 0;
     virtual void ReportSeq(
         int line1,
         int line2,

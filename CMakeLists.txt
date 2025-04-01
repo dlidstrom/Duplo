@@ -22,7 +22,14 @@ FetchContent_Declare(
   GIT_SHALLOW 1
   OVERRIDE_FIND_PACKAGE
 )
-FetchContent_MakeAvailable(nlohmann_json)
+FetchContent_Declare(
+  thread_pool
+  GIT_REPOSITORY https://github.com/bshoshany/thread-pool.git
+  GIT_TAG v5.0.0
+  GIT_SHALLOW 1
+  OVERRIDE_FIND_PACKAGE
+)
+FetchContent_MakeAvailable(nlohmann_json thread_pool)
 
 add_executable(duplo ${SOURCES})
 
@@ -34,7 +41,10 @@ set_target_properties(duplo PROPERTIES
 target_compile_definitions(duplo PRIVATE DUPLO_VERSION=${DUPLO_VERSION})
 target_include_directories(duplo PRIVATE src/include/)
 find_package(nlohmann_json 3.11.3 REQUIRED)
-target_link_libraries(duplo PRIVATE nlohmann_json::nlohmann_json)
+add_library(thread_pool INTERFACE)
+target_include_directories(thread_pool INTERFACE ${thread_pool_SOURCE_DIR}/include)
+find_package(Threads REQUIRED)
+target_link_libraries(duplo PRIVATE nlohmann_json::nlohmann_json thread_pool Threads::Threads)
 
 if(NOT MSVC)
     target_compile_options(duplo PRIVATE -Wall -Wextra -pedantic -Werror)

@@ -9,6 +9,7 @@ class Options {
     unsigned m_minBlockSize;
     unsigned m_blockPercentThreshold;
     unsigned m_filesToCheck;
+    unsigned m_numThreads;
     bool m_outputXml;
     bool m_outputJSON;
     bool m_ignoreSameFilename;
@@ -22,6 +23,7 @@ public:
         unsigned minBlockSize,
         unsigned blockPercentThreshold,
         unsigned m_filesToCheck,
+        unsigned numThreads,
         bool outputXml,
         bool outputJSON,
         bool ignoreSameFilename,
@@ -39,6 +41,9 @@ public:
     unsigned GetMinBlockSize() const;
     unsigned GetBlockPercentThreshold() const;
     size_t GetFilesToCheck() const;
+    [[nodiscard]] unsigned GetNumThreads() const {
+        return m_numThreads;
+    }
 };
 
 #endif

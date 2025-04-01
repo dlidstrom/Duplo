@@ -1,7 +1,7 @@
 #include "Duplo.h"
 #include "IExporter.h"
 #include "Options.h"
-#include "ProcessResult.h"
+#include "Block.h"
 #include "SourceFile.h"
 #include "SourceLine.h"
 #include "Utils.h"
@@ -15,12 +15,23 @@
 #include <sstream>
 #include <unordered_map>
 #include <unordered_set>
+#include <thread>
+#include <ranges>
+
+#include <BS_thread_pool.hpp>
 
 typedef std::tuple<unsigned, std::string> FileLength;
 typedef const std::string* StringPtr;
 typedef std::unordered_map<unsigned long, std::vector<StringPtr>> HashToFiles;
+using thread_pool = BS::thread_pool<>;
 
 static constexpr std::size_t TOP_N_LONGEST = 10;
+
+struct ThreadContext {
+    std::vector<bool> matrix;
+    std::vector<Block> dup_blocks;
+    std::size_t num_dup_lines;
+};
 
 namespace {
     void printLongestFiles(std::ostringstream &oss, std::vector<SourceFile> &sourceFiles, std::size_t top_n) {
@@ -34,14 +45,14 @@ namespace {
         });
     }
 
-    std::tuple<std::vector<SourceFile>, std::vector<bool>, unsigned, unsigned> LoadSourceFiles(
+    std::tuple<std::vector<SourceFile>, unsigned, unsigned, std::size_t> LoadSourceFiles(
         const std::vector<std::string>& lines,
         unsigned minChars,
         bool ignorePrepStuff,
+        unsigned numThreads,
         IExporterPtr exporter) {
 
         std::vector<SourceFile> sourceFiles;
-        std::vector<bool> matrix;
         size_t maxLinesPerFile = 0;
         int files = 0;
         unsigned long locsTotal = 0;
@@ -62,41 +73,32 @@ namespace {
             }
         }
 
-        if (maxLinesPerFile * maxLinesPerFile > matrix.max_size()) {
+        auto const max_size = std::vector<bool>().max_size();
+        if (numThreads * maxLinesPerFile * maxLinesPerFile > max_size) {
             std::ostringstream stream;
             stream
-                << "Some files have too many lines. You can have files with approximately "
-                << std::sqrt(matrix.max_size())
-                << " lines at most." << std::endl
-                << "Longest files:" << std::endl;
+                << "Some files have too many lines, or you're using too many threads.\n"
+                << "Using " << numThreads << " thread(s), you can have files with approximately "
+                << std::sqrt((double)max_size / numThreads) << " lines at most.\n"
+                << "Longest files:\n";
             printLongestFiles(stream, sourceFiles, TOP_N_LONGEST);
             throw std::runtime_error(stream.str().c_str());
         }
 
         exporter->LogMessage(std::format("{} done.\n\n", lines.size()));
 
-        // Generate matrix large enough for all files
-        try {
-            matrix.resize(maxLinesPerFile * maxLinesPerFile);
-        }
-        catch (const std::bad_alloc& ex) {
-            std::ostringstream stream;
-            stream
-                << ex.what() << std::endl
-                << "Longest files:" << std::endl;
-            printLongestFiles(stream, sourceFiles, TOP_N_LONGEST);
-            throw std::runtime_error(stream.str().c_str());
-        }
-
-        return std::tuple(std::move(sourceFiles), matrix, files, locsTotal);
+        return std::tuple(std::move(sourceFiles), files, locsTotal, maxLinesPerFile);
     }
 
-    ProcessResult Process(
+    void Process(
         const SourceFile& source1,
         const SourceFile& source2,
-        std::vector<bool>& matrix,
         const Options& options,
-        IExporterPtr exporter) {
+        ThreadContext &context) {
+
+        // unwrap the context
+        auto &[matrix, dup_blocks, num_dup_lines] = context;
+
         size_t m = source1.GetNumOfLines();
         size_t n = source2.GetNumOfLines();
 
@@ -122,19 +124,6 @@ namespace {
                 (size_t)options.GetMinBlockSize(),
                 (std::max(n, m) * 100) / options.GetBlockPercentThreshold()));
 
-        unsigned blocks = 0;
-        unsigned duplicateLines = 0;
-
-        // make curried function for invoking ReportSeq
-        auto reportSeq = [&source1, &source2, &exporter](int line1, int line2, int count) {
-            exporter->ReportSeq(
-                line1,
-                line2,
-                count,
-                source1,
-                source2);
-        };
-
         // Scan vertical part
         for (size_t y = 0; y < m; y++) {
             unsigned seqLen = 0;
@@ -147,9 +136,8 @@ namespace {
                         int line1 = y + x - seqLen;
                         int line2 = x - seqLen;
                         if (line1 != line2 || source1 != source2) {
-                            reportSeq(line1, line2, seqLen);
-                            duplicateLines += seqLen;
-                            blocks++;
+                            dup_blocks.emplace_back(&source1, &source2, line1, line2, seqLen);
+                            num_dup_lines += seqLen;
                         }
                     }
 
@@ -161,9 +149,8 @@ namespace {
                 int line1 = m - seqLen;
                 int line2 = n - seqLen;
                 if (line1 != line2 || source1 != source2) {
-                    reportSeq(line1, line2, seqLen);
-                    duplicateLines += seqLen;
-                    blocks++;
+                    dup_blocks.emplace_back(&source1, &source2, line1, line2, seqLen);
+                    num_dup_lines += seqLen;
                 }
             }
         }
@@ -178,40 +165,90 @@ namespace {
                         seqLen++;
                     } else {
                         if (seqLen >= lMinBlockSize) {
-                            reportSeq(y - seqLen, x + y - seqLen, seqLen);
-                            duplicateLines += seqLen;
-                            blocks++;
+                            dup_blocks.emplace_back(&source1, &source2, y - seqLen, x + y - seqLen, seqLen);
+                            num_dup_lines += seqLen;
                         }
                         seqLen = 0;
                     }
                 }
 
                 if (seqLen >= lMinBlockSize) {
-                    reportSeq(m - seqLen, n - seqLen, seqLen);
-                    duplicateLines += seqLen;
-                    blocks++;
+                    dup_blocks.emplace_back(&source1, &source2, m - seqLen, n - seqLen, seqLen);
+                    num_dup_lines += seqLen;
                 }
             }
         }
+    }
 
-        return ProcessResult(blocks, duplicateLines);
+    void ProcessRange(
+        std::vector<SourceFile>::iterator l_it,
+        std::vector<SourceFile>::iterator end_it,
+        HashToFiles const& hashToFiles,
+        Options const& options,
+        IExporterPtr exporter,
+        std::mutex &exporter_mtx,
+        std::unordered_map<std::thread::id, ThreadContext>& contexts) {
+
+        // get matching files
+        std::unordered_set<StringPtr> matchingFiles;
+        for (std::size_t k = 0; k < l_it->GetNumOfLines(); k++) {
+            auto hash = l_it->GetLine(k).GetHash();
+            const auto& filenames = hashToFiles.find(hash)->second;
+            matchingFiles.insert(filenames.begin(), filenames.end());
+        }
+
+        auto& context = contexts.find(std::this_thread::get_id())->second;
+
+        auto const old_num_blocks = context.dup_blocks.size();
+
+        // compare the file with itself
+        Process(*l_it, *l_it, options, context);
+
+        // files to compare with are those that have matching lines
+        for (auto r_it = std::next(l_it); r_it != end_it; ++r_it) {
+            if (options.GetIgnoreSameFilename() && StringUtil::IsSameFilename(*l_it, *r_it)) {
+                continue;
+            }
+            if (matchingFiles.find(&r_it->GetFilename()) == matchingFiles.end()) {
+                continue;
+            }
+            // compare the file with another file
+            Process(*l_it, *r_it, options, context);
+        }
+
+        auto const num_blocks_added = context.dup_blocks.size() - old_num_blocks;
+
+        {
+            std::scoped_lock sl(exporter_mtx);
+            if (num_blocks_added > 0) {
+                exporter->LogMessage(std::format("{} found: {} block(s)\n", l_it->GetFilename(), num_blocks_added));
+            } else {
+                exporter->LogMessage(std::format("{} nothing found.\n", l_it->GetFilename()));
+            }
+        }
     }
 }
 
 int Duplo::Run(const Options& options) {
 
     IExporterPtr exporter = IExporter::CreateExporter(options);
+    std::mutex exporter_mtx;
     exporter->LogMessage("Loading and hashing files ... ");
 
     exporter->WriteHeader();
 
     auto lines = FileSystem::LoadFileList(options.GetListFilename());
-    auto [sourceFiles, matrix, files, locsTotal] = LoadSourceFiles(
+    auto [sourceFiles, files, locsTotal, max_lines] = LoadSourceFiles(
         lines,
         options.GetMinChars(),
         options.GetIgnorePrepStuff(),
+        options.GetNumThreads(),
         exporter);
-    auto numFilesToCheck = options.GetFilesToCheck() > 0 ? std::min(options.GetFilesToCheck(), sourceFiles.size()) : sourceFiles.size();
+
+    auto end_it = sourceFiles.end();
+    if (options.GetFilesToCheck() > 0 && options.GetFilesToCheck() < sourceFiles.size()) {
+        end_it = std::next(sourceFiles.begin(), options.GetFilesToCheck());
+    }
 
     // hash maps
     HashToFiles hashToFiles;
@@ -221,56 +258,49 @@ int Duplo::Run(const Options& options) {
         }
     }
 
-    // Compare each file with each other
-    ProcessResult processResultTotal;
-    for (unsigned i = 0; i < numFilesToCheck; i++) {
-        const auto& left = sourceFiles[i];
-
-        // get matching files
-        std::unordered_set<StringPtr> matchingFiles;
-        for (std::size_t k = 0; k < left.GetNumOfLines(); k++) {
-            auto hash = left.GetLine(k).GetHash();
-            const auto& filenames = hashToFiles[hash];
-            matchingFiles.reserve(filenames.size());
-            for (auto& x : filenames) {
-                matchingFiles.insert(x);
-            }
+    thread_pool pool(options.GetNumThreads());
+    std::unordered_map<std::thread::id, ThreadContext> contexts;
+    // Generate matrix large enough for all files
+    try {
+        for (auto const &thread_id : pool.get_thread_ids()) {
+            contexts[thread_id] = {std::vector<bool>(max_lines * max_lines), {}, {}};
         }
-
-        ProcessResult processResult =
-            Process(
-                left,
-                left,
-                matrix,
-                options,
-                exporter);
-
-        // files to compare are those that have matching lines
-        for (unsigned j = i + 1; j < sourceFiles.size(); j++) {
-            const auto& right = sourceFiles[j];
-            if ((!options.GetIgnoreSameFilename() || !StringUtil::IsSameFilename(left, right)) && matchingFiles.find(&right.GetFilename()) != matchingFiles.end()) {
-                processResult
-                    << Process(
-                           left,
-                           right,
-                           matrix,
-                           options,
-                           exporter);
-            }
-        }
-
-        if (processResult.Blocks() > 0) {
-            exporter->LogMessage(std::format("{} found: {} block(s)\n", left.GetFilename(), processResult.Blocks()));
-        } else {
-            exporter->LogMessage(std::format("{} nothing found.\n", left.GetFilename()));
-        }
-
-        processResultTotal << processResult;
+    }
+    catch (const std::bad_alloc& ex) {
+        std::ostringstream stream;
+        stream << ex.what() << '\n'
+               << "Try reducing the number of threads or exclude some the following longest files:\n"
+               << "Longest files:\n";
+        printLongestFiles(stream, sourceFiles, TOP_N_LONGEST);
+        throw std::runtime_error(stream.str().c_str());
     }
 
-    exporter->WriteFooter(options, files, locsTotal, processResultTotal);
+    // add a task in the threadpool to compare each file with all files after it
+    for (auto l_it = sourceFiles.begin(), l_end = end_it; l_it != l_end; ++l_it) {
+        pool.detach_task([l_it, end_it, &hashToFiles, &options, &exporter, &exporter_mtx, &contexts]{
+            ProcessRange(l_it, end_it, hashToFiles, options, exporter, exporter_mtx, contexts);
+        });
+    }
+    pool.wait();
 
-    return processResultTotal.Blocks() > 0
-               ? EXIT_FAILURE
-               : EXIT_SUCCESS;
+    std::size_t tot_num_dup_blocks = 0;
+    std::size_t tot_num_dup_lines = 0;
+    for (auto const &[tid, context] : contexts) {
+        tot_num_dup_blocks += context.dup_blocks.size();
+        tot_num_dup_lines += context.num_dup_lines;
+    }
+
+    std::vector<Block> tot_dup_blocks;
+    tot_dup_blocks.reserve(tot_num_dup_blocks);
+    for (auto const &[tid, context] : contexts) {
+        tot_dup_blocks.insert(tot_dup_blocks.end(), context.dup_blocks.begin(), context.dup_blocks.end());
+    }
+
+    std::ranges::for_each(tot_dup_blocks, [&exporter](Block const& block) {
+        exporter->ReportSeq(block.m_line1, block.m_line2, block.m_count, *block.m_source1, *block.m_source2);
+    });
+
+    exporter->WriteFooter(options, files, locsTotal, tot_dup_blocks, tot_num_dup_lines);
+
+    return tot_dup_blocks.empty() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
