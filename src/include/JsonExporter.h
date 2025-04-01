@@ -16,7 +16,8 @@ public:
         const Options& options,
         int files,
         long locsTotal,
-        const ProcessResult& processResult) override;
+        unsigned tot_dup_blocks,
+        unsigned tot_dup_lines) override;
     void ReportSeq(
         int line1,
         int line2,
