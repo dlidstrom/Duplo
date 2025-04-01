@@ -19,7 +19,7 @@ void JsonExporter::WriteFooter(
     int /*files*/,
     long /*locsTotal*/,
     const ProcessResult& /*processResult*/) {
-    Out() << m_json.dump(2);
+    Out() << m_json.dump(2, ' ', true, nlohmann::json::error_handler_t::ignore);
 }
 
 void JsonExporter::ReportSeq(
