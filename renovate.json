@@ -7,6 +7,7 @@
   "packageRules": [
     {
       "description": "Automerge updates",
+      "match": ["major", "minor", "patch"],
       "automerge": true
     }
   ]
