@@ -205,7 +205,7 @@ jobs:
         path: uploads
     - name: upload macos
       id: upload-macos
-      uses: actions/upload-release-asset@v1.0.1
+      uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -215,7 +215,7 @@ jobs:
         asset_content_type: application/zip
     - name: upload linux
       id: upload-linux
-      uses: actions/upload-release-asset@v1.0.1
+      uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -225,7 +225,7 @@ jobs:
         asset_content_type: application/zip
     - name: upload windows
       id: upload-windows
-      uses: actions/upload-release-asset@v1.0.1
+      uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
