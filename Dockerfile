@@ -1,4 +1,4 @@
-FROM alpine:3.11 AS build
+FROM alpine:3.21 AS build
 ARG DUPLO_VERSION=v1.0.1
 
 RUN apk --no-cache add \
@@ -14,7 +14,7 @@ RUN mkdir build && \
     cmake .. -DDUPLO_VERSION=\"$DUPLO_VERSION\" && \
     make
 
-FROM alpine:3.11
+FROM alpine:3.21
 
 RUN apk --no-cache add libstdc++
 
