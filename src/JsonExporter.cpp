@@ -20,6 +20,7 @@ void JsonExporter::WriteFooter(
     long /*locsTotal*/,
     const ProcessResult& /*processResult*/) {
     Out() << m_json.dump(2, ' ', true, nlohmann::json::error_handler_t::ignore);
+    Out() << '\n';
 }
 
 void JsonExporter::ReportSeq(
