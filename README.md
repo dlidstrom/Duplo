@@ -6,7 +6,11 @@
 
 **Updates:**
 
-- 🔥 v1.2 support for reporting in json format (thanks [@cgkantidis](https://github.com/cgkantidis)!)
+- 🔥 **v2.0 has been released!**\
+  🚀 Duplo just got a major speed boost! With new
+  multithreading support, it now takes full advantage of modern CPUs to scan and
+  detect duplicates faster than ever ⚡️ (thanks [@cgkantidis](https://github.com/cgkantidis)!)
+- v1.2 support for reporting in json format (thanks [@cgkantidis](https://github.com/cgkantidis)!)
   - [Performance improvements](#71-performance-measurements): it now takes ~9s to process Quake 2 source! (thanks [@cgkantidis](https://github.com/cgkantidis)!)
   - refactored xml/json reports for improved maintainability
 - Introducing [duplo-action](https://github.com/dlidstrom/duplo-action) for using Duplo in GitHub Actions!
@@ -230,6 +234,9 @@ for further information.
 
 This was measured on modern hardware anno 2025. It means Duplo is able to
 process more than 10 thousand lines of code (or ~30 files) per second.
+
+> Note that this is single-threaded performance. Duplo now supports using
+> multiple threads (`-j` option) with an almost linear performance improvement.
 
 ## 8. Developing
 

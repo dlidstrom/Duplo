@@ -48,7 +48,7 @@ namespace {
             std::cout << "       Duplo " << VERSION << " - duplicate source code block finder\n\n";
 
             std::cout << "\nSYNOPSIS\n";
-            std::cout << "       duplo [OPTIONS] [INTPUT_FILELIST] [OUTPUT_FILE]\n";
+            std::cout << "       duplo [OPTIONS] [INPUT_FILELIST] [OUTPUT_FILE]\n";
 
             std::cout << "\nDESCRIPTION\n";
             std::cout << "       Duplo is a tool to find duplicated code blocks in large\n";
@@ -61,6 +61,7 @@ namespace {
             std::cout << "       -mc              minimal characters in line (default is " << MIN_CHARS << ")\n";
             std::cout << "                        lines with less characters are ignored\n";
             std::cout << "       -n               only report for first N files\n";
+            std::cout << "       -j               number of threads to use (default is 1)\n";
             std::cout << "       -ip              ignore preprocessor directives\n";
             std::cout << "       -d               ignore file pairs with same name\n";
             std::cout << "       -xml             output file in XML\n";
@@ -76,6 +77,7 @@ namespace {
                 "       Daniel Lidstrom (dlidstrom@gmail.com)",
                 "       Christian M. Ammann (cammann@giants.ch)",
                 "       Trevor D'Arcy-Evans (tdarcyevans@hotmail.com)",
+                "       Christos Gkantidis (cgkantid@proton.me)"
             };
             std::copy(std::begin(authors), std::end(authors), std::ostream_iterator<const char*>(std::cout, "\n"));
             std::cout << "\n";

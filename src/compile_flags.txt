@@ -4,3 +4,5 @@
 include/
 -I
 ../build/_deps/nlohmann_json-src/single_include/
+-I
+../build/_deps/thread_pool-src/include/
