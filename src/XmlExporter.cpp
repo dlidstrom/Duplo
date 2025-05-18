@@ -39,14 +39,14 @@ void XmlExporter::ReportSeq(
         << "    <set LineCount=\"" << count << "\">"
         << std::endl;
     int startLineNumber1 = source1.GetLine(line1).GetLineNumber();
-    int endLineNumber1 = source1.GetLine(line1 + count).GetLineNumber();
+    int endLineNumber1 = source1.GetLine(line1 + count - 1).GetLineNumber();
     Out()
         << "        <block SourceFile=\"" << source1.GetFilename()
         << "\" StartLineNumber=\"" << startLineNumber1
         << "\" EndLineNumber=\"" << endLineNumber1 << "\"/>"
         << std::endl;
     int startLineNumber2 = source2.GetLine(line2).GetLineNumber();
-    int endLineNumber2 = source2.GetLine(line2 + count).GetLineNumber();
+    int endLineNumber2 = source2.GetLine(line2 + count - 1).GetLineNumber();
     Out()
         << "        <block SourceFile=\"" << source2.GetFilename()
         << "\" StartLineNumber=\"" << startLineNumber2

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <duplo>
     <set LineCount="5">
-        <block SourceFile="tests/Simple/LineNumbers.c" StartLineNumber="7" EndLineNumber="13"/>
-        <block SourceFile="tests/Simple/LineNumbers.c" StartLineNumber="1" EndLineNumber="7"/>
+        <block SourceFile="tests/Simple/LineNumbers.c" StartLineNumber="7" EndLineNumber="12"/>
+        <block SourceFile="tests/Simple/LineNumbers.c" StartLineNumber="1" EndLineNumber="5"/>
         <lines xml:space="preserve">
             <line Text="AAAAA"/>
             <line Text="BBBBB"/>
