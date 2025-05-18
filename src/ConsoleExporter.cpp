@@ -1,3 +1,4 @@
+#include "Block.h"
 #include "ConsoleExporter.h"
 #include "FileExporter.h"
 
@@ -16,7 +17,8 @@ void ConsoleExporter::WriteFooter(
     const Options& options,
     int files,
     long locsTotal,
-    const ProcessResult& processResult) {
+    unsigned tot_dup_blocks,
+    unsigned tot_dup_lines) {
     Out()
         << "Configuration:"
         << std::endl
@@ -42,10 +44,10 @@ void ConsoleExporter::WriteFooter(
         << locsTotal
         << std::endl
         << "  Duplicate lines of code: "
-        << processResult.DuplicateLines()
+        << tot_dup_lines
         << std::endl
         << "  Total "
-        << processResult.Blocks()
+        << tot_dup_blocks
         << " duplicate block(s) found."
         << std::endl
         << std::endl;

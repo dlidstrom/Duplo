@@ -6,6 +6,7 @@ Options::Options(
     unsigned minBlockSize,
     unsigned blockPercentThreshold,
     unsigned filesToCheck,
+    unsigned numThreads,
     bool outputXml,
     bool outputJSON,
     bool ignoreSameFilename,
@@ -16,6 +17,7 @@ Options::Options(
     , m_minBlockSize(minBlockSize)
     , m_blockPercentThreshold(blockPercentThreshold)
     , m_filesToCheck(filesToCheck)
+    , m_numThreads(numThreads)
     , m_outputXml(outputXml)
     , m_outputJSON(outputJSON)
     , m_ignoreSameFilename(ignoreSameFilename)
