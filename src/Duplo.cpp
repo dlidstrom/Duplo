@@ -134,8 +134,8 @@ namespace {
                     seqLen++;
                 } else {
                     if (seqLen >= lMinBlockSize) {
-                        int line1 = y + x - seqLen;
-                        int line2 = x - seqLen;
+                        unsigned line1 = y + x - seqLen;
+                        unsigned line2 = x - seqLen;
                         if (line1 != line2 || source1 != source2) {
                             dup_blocks.emplace_back(&source1, &source2, line1, line2, seqLen);
                             num_dup_lines += seqLen;
@@ -148,8 +148,8 @@ namespace {
             }
 
             if (seqLen >= lMinBlockSize) {
-                int line1 = m - seqLen;
-                int line2 = n - seqLen;
+                unsigned line1 = m - seqLen;
+                unsigned line2 = n - seqLen;
                 if (line1 != line2 || source1 != source2) {
                     dup_blocks.emplace_back(&source1, &source2, line1, line2, seqLen);
                     num_dup_lines += seqLen;

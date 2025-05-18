@@ -11,7 +11,16 @@ public:
     unsigned m_line2;
     unsigned m_count;
 
-    auto operator<=>(Block const &) const = default;
+    Block(SourceFile const* source1,
+          SourceFile const* source2,
+          unsigned line1,
+          unsigned line2,
+          unsigned count)
+          : m_source1{ source1 },
+            m_source2{ source2 },
+            m_line1{ line1 },
+            m_line2{ line2 },
+            m_count{ count } {}
 };
 
 #endif
