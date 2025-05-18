@@ -31,9 +31,9 @@ void JsonExporter::ReportSeq(
     int begin = line1;
     int end = line1 + count;
     int src_begin1 = source1.GetLine(line1).GetLineNumber();
-    int src_end1 = source1.GetLine(line1 + count).GetLineNumber();
+    int src_end1 = source1.GetLine(line1 + count - 1).GetLineNumber(); // inclusive
     int src_begin2 = source2.GetLine(line2).GetLineNumber();
-    int src_end2 = source2.GetLine(line2 + count).GetLineNumber();
+    int src_end2 = source2.GetLine(line2 + count - 1).GetLineNumber(); // inclusive
     m_json.emplace_back(nlohmann::json{
         { "LineCount", end - begin },
         { "SourceFile1", source1.GetFilename() },
