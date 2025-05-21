@@ -63,7 +63,7 @@ find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | ./duplo -ml 20 -ip - -
   | ? { $_ -match "windows" }
 > Invoke-WebRequest -Uri $url -OutFile duplo-windows.zip
 > Expand-Archive ./duplo-windows.zip -DestinationPath Duplo.exe
-> Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | ./Duplo.exe - -
+> Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | ./Duplo.exe -ml 20 -ip - -
 ```
 
 **Table of Contents:**
