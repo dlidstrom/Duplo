@@ -59,7 +59,7 @@ find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | ./duplo -ml 20 -ip - -
 ***Windows***
 
 ```PowerShell
-> url = (Invoke-RestMethod https://api.github.com/repos/dlidstrom/Duplo/releases/latest).assets.browser_download_url `
+> $url = (Invoke-RestMethod https://api.github.com/repos/dlidstrom/Duplo/releases/latest).assets.browser_download_url `
   | ? { $_ -match "windows" }
 > Invoke-WebRequest -Uri $url -OutFile duplo-windows.zip
 > Expand-Archive ./duplo-windows.zip -DestinationPath Duplo.exe
