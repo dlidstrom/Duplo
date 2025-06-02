@@ -17,6 +17,7 @@ jobs:
         with:
           directory: src
           include-pattern: \.cpp$
+          version: v2.0.1
   bump-tag-dry:
     runs-on: ubuntu-latest
     needs: [duplicates]
