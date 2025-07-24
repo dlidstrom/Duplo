@@ -10,7 +10,7 @@ struct FileType_Sas : public FileTypeBase {
 
     std::string GetCleanLine(const std::string& line) const override;
 
-    bool IsPreprocessorDirective(const std::string&) const override;
+    bool IsPreprocessorDirective(const std::string& line) const override;
 };
 
 #endif
