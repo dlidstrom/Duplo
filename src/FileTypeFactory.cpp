@@ -4,6 +4,7 @@
 #include "FileType_CS.h"
 #include "FileType_Java.h"
 #include "FileType_S.h"
+#include "FileType_Sas.h"
 #include "FileType_Unknown.h"
 #include "FileType_VB.h"
 #include "Utils.h"
@@ -20,6 +21,8 @@ IFileTypePtr FileTypeFactory::CreateFileType(
         fileType.reset(new FileType_CS(ignorePrepStuff, minChars));
     else if (ext == "s")
         fileType.reset(new FileType_S(ignorePrepStuff, minChars));
+    else if (ext == "sas")
+        fileType.reset(new FileType_Sas(ignorePrepStuff, minChars));
     else if (ext == "vb")
         fileType.reset(new FileType_VB(ignorePrepStuff, minChars));
     else if (ext == "ads" || ext == "adb")

@@ -5,7 +5,10 @@ RUN apk --no-cache add \
     alpine-sdk cmake
 
 RUN mkdir -p /usr/src/ && \
-    git clone https://github.com/dlidstrom/Duplo /usr/src/Duplo
+    git clone https://github.com/dlidstrom/Duplo /usr/src/Duplo && \
+    rm -rf /usr/src/Duplo/src
+
+COPY src /usr/src/Duplo/src
 
 WORKDIR /usr/src/Duplo
 
