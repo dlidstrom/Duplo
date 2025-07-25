@@ -185,6 +185,10 @@ namespace {
         }
     }
 
+    int percentage(int count, int total) {
+        return (int)(100.0 * ((double)count / (double)total));
+    }
+    
     void ProcessRange(
         std::vector<SourceFile>::iterator l_it,
         std::vector<SourceFile>::iterator end_it,
@@ -225,10 +229,14 @@ namespace {
                 exporter->LogMessage(std::format("__BEGIN FILE: {} ({} blocks)\n", l_it->GetFilename(), context.dup_blocks.size()));
                 int blockNum = 1;
                 std::ranges::for_each(context.dup_blocks, [&](Block const& block) {
-                    exporter->LogMessage(std::format("__BEGIN BLOCK: {} ({} of {})\n", l_it->GetFilename(), blockNum, context.dup_blocks.size()));
-                    exporter->LogMessage(std::format("__MATCH a={} b={} lines={}\n", block.m_source1->GetFilename(), block.m_source2->GetFilename(), block.m_count));
+                    exporter->LogMessage(std::format("__BEGIN BLOCK: '{}' ({} of {})\n", l_it->GetFilename(), blockNum, context.dup_blocks.size()));
+                    exporter->LogMessage(std::format("__MATCH a='{}' b='{}' lines={} percent={}/{}\n",
+                                                     block.m_source1->GetFilename(), block.m_source2->GetFilename(), block.m_count,
+                                                     percentage(block.m_count, block.m_source1->GetNumOfLines()),
+                                                     percentage(block.m_count, block.m_source2->GetNumOfLines())
+                                                 ));
                     exporter->ReportSeq(block.m_line1, block.m_line2, block.m_count, *block.m_source1, *block.m_source2);
-                    exporter->LogMessage(std::format("__END BLOCK: {} ({} of {})\n\n", l_it->GetFilename(), blockNum, context.dup_blocks.size()));
+                    exporter->LogMessage(std::format("__END BLOCK: '{}' ({} of {})\n\n", l_it->GetFilename(), blockNum, context.dup_blocks.size()));
                     blockNum += 1;
                 });
                 exporter->LogMessage(std::format("__END FILE: {}\n\n", l_it->GetFilename()));
@@ -282,6 +290,10 @@ int Duplo::Run(const Options& options) {
                << "Longest files:\n";
         printLongestFiles(stream, sourceFiles, TOP_N_LONGEST);
         throw std::runtime_error(stream.str().c_str());
+    }
+
+    for (auto l_it = sourceFiles.begin(), l_end = end_it; l_it != l_end; ++l_it) {
+        exporter->LogMessage(std::format("__SIZE: file='{}' lines={}\n", l_it->GetFilename(), l_it->GetNumOfLines()));
     }
 
     // add a task in the threadpool to compare each file with all files after it
