@@ -1,6 +1,7 @@
 #include "SasStyleCommentsFilter.h"
 
 #include <algorithm>
+#include <iostream>
 
 SasStyleCommentsLineFilter::SasStyleCommentsLineFilter()
     : m_inMessageComment(false),
@@ -17,20 +18,24 @@ std::string SasStyleCommentsLineFilter::ProcessSourceLine(const std::string& lin
             if (line[j] == ';') {
                 m_inMessageComment = false;
                 atStart = true;
+//                std::cout << "MESSAGE COMMENT END at " << j << ": " << line << std::endl;
             } else {
                 atStart = false;
             }
             continue;
         }
-        if (atStart && line[j] == '*') {
+        if (m_openBlockComments <= 0 && atStart && line[j] == '*') {
             m_inMessageComment = true;
             atStart = false;
+//            std::cout << "MESSAGE COMMENT START at " << j << ": " << line << std::endl;
             continue;
         }
         atStart = atStart && (line[j] == ' ' || line[j] == '\t');
 
-        if (line[j] == '/' && line[std::min(line.size() - 1, j + 1)] == '*') {
+        auto after = j == line.size() - 1 ? j : j + 1;
+        if (line[j] == '/' && line[after] == '*') {
             m_openBlockComments++;
+//            std::cout << "BLOCK COMMENT START at " << j << ": " << line << std::endl;
         }
 
         if (m_openBlockComments <= 0) {
@@ -40,8 +45,13 @@ std::string SasStyleCommentsLineFilter::ProcessSourceLine(const std::string& lin
         auto before = j == 0 ? 0 : j - 1;
         if (line[before] == '*' && line[j] == '/') {
             m_openBlockComments--;
+//            std::cout << "BLOCK COMMENT END at " << j << ": " << line << std::endl;
         }
     }
 
+//    if (line != tmp) {
+//        std::cout << "BEFORE: " << line << std::endl;
+//        std::cout << "AFTER : " << tmp << std::endl;
+//    }
     return tmp;
 }
