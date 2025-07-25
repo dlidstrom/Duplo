@@ -222,16 +222,16 @@ namespace {
         {
             std::scoped_lock sl(exporter_mtx);
             if (!context.dup_blocks.empty()) {
-                exporter->LogMessage("--BEGIN-------------------------------------------------\n");
-                exporter->LogMessage(std::format("-- {} found: {} block(s)\n", l_it->GetFilename(), context.dup_blocks.size()));
+                exporter->LogMessage(std::format("__BEGIN FILE: {} ({} blocks)\n", l_it->GetFilename(), context.dup_blocks.size()));
                 int blockNum = 1;
                 std::ranges::for_each(context.dup_blocks, [&](Block const& block) {
-                    exporter->LogMessage(std::format("-- {} block {} of : {}\n", l_it->GetFilename(), blockNum, context.dup_blocks.size()));
+                    exporter->LogMessage(std::format("__BEGIN BLOCK: {} ({} of {})\n", l_it->GetFilename(), blockNum, context.dup_blocks.size()));
+                    exporter->LogMessage(std::format("__MATCH a={} b={} lines={}\n", block.m_source1->GetFilename(), block.m_source2->GetFilename(), block.m_count));
                     exporter->ReportSeq(block.m_line1, block.m_line2, block.m_count, *block.m_source1, *block.m_source2);
+                    exporter->LogMessage(std::format("__END BLOCK: {} ({} of {})\n\n", l_it->GetFilename(), blockNum, context.dup_blocks.size()));
                     blockNum += 1;
                 });
-                exporter->LogMessage(std::format("-- {} found: {} block(s)\n", l_it->GetFilename(), context.dup_blocks.size()));
-                exporter->LogMessage("--END---------------------------------------------------\n");
+                exporter->LogMessage(std::format("__END FILE: {}\n\n", l_it->GetFilename()));
                 context.dup_blocks.clear();
             }
         }
