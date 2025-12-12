@@ -35,7 +35,7 @@ jobs:
       run: |
         echo ${{ steps.tag.outputs.new_tag }} > tag.txt
     - name: upload new tag artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: tag-txt
         path: tag.txt
@@ -45,7 +45,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: download artifacts
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: tag-txt
         path: uploads
@@ -72,7 +72,7 @@ jobs:
       run: bats --recursive tests
 
     - name: upload linux artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: linux-build
         path: duplo-linux.zip
@@ -82,7 +82,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: download artifacts
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: tag-txt
         path: uploads
@@ -97,7 +97,7 @@ jobs:
         popd
         zip --junk-paths duplo-macos build/duplo
     - name: upload macos artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: macos-build
         path: duplo-macos.zip
@@ -107,7 +107,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: download artifacts
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         name: tag-txt
         path: uploads
@@ -121,7 +121,7 @@ jobs:
         popd
         Compress-Archive -Path build\Release\duplo.exe -DestinationPath duplo-windows.zip
     - name: upload windows artifact
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: windows-build
         path: duplo-windows.zip
@@ -201,7 +201,7 @@ jobs:
         draft: false
         prerelease: false
     - name: download artifacts
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v7
       with:
         path: uploads
     - name: upload macos
