@@ -6,7 +6,9 @@
 
 **Updates:**
 
-- 🔥 **v2.0 has been released!**\
+- 🔥 **v2.1 has been released!**
+  - add support for Erlang (thanks [@mrrubinos](https://github.com/mrrubinos)!)
+- **v2.0**\
   🚀 Duplo just got a major speed boost! With new
   multithreading support, it now takes full advantage of modern CPUs to scan and
   detect duplicates faster than ever ⚡️ (thanks [@cgkantidis](https://github.com/cgkantidis)!)
