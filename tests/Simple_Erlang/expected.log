@@ -1,0 +1,36 @@
+Loading and hashing files ... 2 done.
+
+tests/Simple_Erlang/simple_logger.erl(34)
+tests/Simple_Erlang/simple_logger.erl(22)
+        true ->
+            io:format(standard_error, "~s~n", [Message]);  
+        false ->
+    end.
+
+tests/Simple_Erlang/simple_logger.erl(45)
+tests/Simple_Erlang/simple_logger.erl(34)
+        true ->
+            io:format(standard_error, "~s~n", [Message]);  
+        false ->
+    end.
+
+tests/Simple_Erlang/simple_logger.erl(45)
+tests/Simple_Erlang/simple_logger.erl(22)
+        true ->
+            io:format(standard_error, "~s~n", [Message]);  
+        false ->
+    end.
+
+tests/Simple_Erlang/simple_logger.erl found: 3 block(s)
+Configuration:
+  Number of files: 1
+  Minimal block size: 2
+  Minimal characters in line: 3
+  Ignore preprocessor directives: 0
+  Ignore same filenames: 0
+
+Results:
+  Lines of code: 42
+  Duplicate lines of code: 12
+  Total 3 duplicate block(s) found.
+
