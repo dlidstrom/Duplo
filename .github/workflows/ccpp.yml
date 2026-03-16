@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Run Duplo Analyser
-        uses: dlidstrom/duplo-analyser@v2.0.8
+        uses: dlidstrom/duplo-analyser@v2.0.10
         with:
           directory: src
           include-pattern: \.cpp$
