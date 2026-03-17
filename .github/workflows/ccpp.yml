@@ -13,11 +13,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Run Duplo Analyser
-        uses: dlidstrom/duplo-analyser@v2.0.8
+        uses: dlidstrom/duplo-analyser@v2
         with:
           directory: src
           include-pattern: \.cpp$
-          version: v2.0.1
+          version: v2.1.3
   bump-tag-dry:
     runs-on: ubuntu-latest
     needs: [duplicates]
