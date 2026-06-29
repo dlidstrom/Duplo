@@ -88,6 +88,7 @@ jobs:
         path: uploads
     - name: build
       run: |
+        brew trust aws/tap
         brew install bats-core
         export DUPLO_VERSION=`cat ./uploads/tag.txt`
         mkdir -p build
