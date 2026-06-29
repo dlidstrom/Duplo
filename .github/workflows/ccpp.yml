@@ -116,7 +116,7 @@ jobs:
         $duploVersion = Get-Content .\uploads\tag.txt
         mkdir build | Out-Null
         pushd build
-        cmake .. "-DDUPLO_VERSION=`"$duploVersion`"" -G "Visual Studio 20 2026" -A x64
+        cmake .. "-DDUPLO_VERSION=`"$duploVersion`"" -G "Visual Studio 18 2026" -A x64
         cmake --build . --config Release
         popd
         Compress-Archive -Path build\Release\duplo.exe -DestinationPath duplo-windows.zip
