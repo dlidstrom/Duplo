@@ -36,13 +36,10 @@ and require minimum 20 line duplicates.
 ***Linux***
 
 ```bash
-# download latest release
-curl -s "https://api.github.com/repos/dlidstrom/Duplo/releases/latest" \
-  | grep "browser_download_url" \
-  | grep "duplo-linux" \
-  | cut -d : -f 2,3 \
-  | tr -d '"' \
-  | wget -qi -
+# download latest release (needs jq)
+url=$(curl -s "https://api.github.com/repos/dlidstrom/Duplo/releases/latest" |
+  jq -r '.assets[] | select(.name == "duplo-linux.zip") | .browser_download_url')
+curl -L -O "$url"
 unzip duplo-linux.zip
 
 find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | ./duplo -ml 20 -ip - -
@@ -51,13 +48,10 @@ find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | ./duplo -ml 20 -ip - -
 ***macOS***
 
 ```bash
-# download latest release
-curl -s "https://api.github.com/repos/dlidstrom/Duplo/releases/latest" \
-  | grep "browser_download_url" \
-  | grep "duplo-macos" \
-  | cut -d : -f 2,3 \
-  | tr -d '"' \
-  | wget -qi -
+# download latest release (needs jq)
+url=$(curl -s "https://api.github.com/repos/dlidstrom/Duplo/releases/latest" |
+  jq -r '.assets[] | select(.name == "duplo-macos.zip") | .browser_download_url')
+curl -L -O "$url"
 unzip duplo-macos.zip
 
 find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | ./duplo -ml 20 -ip - -
@@ -66,11 +60,11 @@ find . -type f \( -iname "*.cpp" -o -iname "*.h" \) | ./duplo -ml 20 -ip - -
 ***Windows***
 
 ```PowerShell
-> $url = (Invoke-RestMethod https://api.github.com/repos/dlidstrom/Duplo/releases/latest).assets.browser_download_url `
-  | ? { $_ -match "windows" }
-> Invoke-WebRequest -Uri $url -OutFile duplo-windows.zip
-> Expand-Archive ./duplo-windows.zip -DestinationPath Duplo.exe
-> Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | ./Duplo.exe -ml 20 -ip - -
+$url = (Invoke-RestMethod https://api.github.com/repos/dlidstrom/Duplo/releases/latest).assets `
+  | Where-Object name -eq "duplo-windows.zip"
+Invoke-WebRequest -Uri $url.browser_download_url -OutFile duplo-windows.zip
+Expand-Archive -Force .\duplo-windows.zip -DestinationPath .
+Get-ChildItem -Include "*.cpp", "*.h" -Recurse | % { $_.FullName } | .\Duplo.exe -ml 20 -ip - -
 ```
 
 **Table of Contents:**
