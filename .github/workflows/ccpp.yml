@@ -63,7 +63,7 @@ jobs:
         export DUPLO_VERSION=`cat ./uploads/tag.txt`
         mkdir -p build
         pushd build
-        cmake .. -DDUPLO_VERSION=\"$DUPLO_VERSION\" -DCMAKE_BUILD_TYPE=Release
+        cmake .. -DDUPLO_VERSION=\"$DUPLO_VERSION\" -DCMAKE_BUILD_TYPE=Release -DDUPLO_STATIC=ON
         make
         popd
         zip --junk-paths duplo-linux build/duplo

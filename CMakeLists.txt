@@ -9,7 +9,6 @@ if(CMAKE_CONFIGURATION_TYPES)
         FORCE)
 endif()
 
-
 file(GLOB SOURCES src/*.cpp)
 
 SET(DUPLO_VERSION "\"v1.0.1\"" CACHE STRING "Duplo version")
@@ -60,4 +59,9 @@ if(NOT MSVC)
     # gperftools CPU Profiler https://github.com/gperftools/gperftools
     target_compile_options(duplo PRIVATE $<$<CONFIG:PROFILE>:-g -O1>)
     target_link_options(duplo PRIVATE $<$<CONFIG:PROFILE>:-lprofiler>)
+endif()
+
+option(DUPLO_STATIC "Link a fully static executable (Linux)" OFF)
+if(DUPLO_STATIC AND UNIX AND NOT APPLE)
+    target_link_options(duplo PRIVATE -static)
 endif()
